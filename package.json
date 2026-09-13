@@ -2,8 +2,16 @@
   "name": "for-kt-family",
   "version": "1.0.0",
   "private": true,
-  "description": "Offline-ready square-root study room for junior high school students",
-  "scripts": {"test": "node tests/dom.cjs && node tests/smoke.cjs", "test:dom": "node tests/dom.cjs"},
-  "devDependencies": {"jsdom": "30.0.1", "playwright": "1.62.1"},
-  "engines": {"node": ">=22.12.0"}
+  "description": "Family learning hub with printable and interactive mathematics lessons",
+  "scripts": {
+    "test": "node tests/dom.cjs && node tests/family.cjs && node tests/smoke.cjs && node tests/quadratic-smoke.cjs",
+    "test:dom": "node tests/dom.cjs && node tests/family.cjs"
+  },
+  "devDependencies": {
+    "jsdom": "30.0.1",
+    "playwright": "1.62.1"
+  },
+  "engines": {
+    "node": ">=22.12.0"
+  }
 }

@@ -1,12 +1,12 @@
 const fs=require('node:fs'),path=require('node:path'),assert=require('node:assert/strict');
 const {JSDOM,VirtualConsole}=require('jsdom');
 const root=path.resolve(__dirname,'..');
-const html=fs.readFileSync(path.join(root,'index.html'),'utf8');
+const html=fs.readFileSync(path.join(root,'study/math/square-roots/index.html'),'utf8');
 const data=fs.readFileSync(path.join(root,'assets/questions.js'),'utf8');
 const app=fs.readFileSync(path.join(root,'assets/app.js'),'utf8');
 let errors=[];
 const vc=new VirtualConsole();vc.on('jsdomError',e=>errors.push(e.message));
-function make(stored,blocked=false){const dom=new JSDOM(html,{url:'https://example.test/for_KT_family/',runScripts:'outside-only',pretendToBeVisual:true,virtualConsole:vc});const w=dom.window;w.scrollTo=()=>{};w.HTMLElement.prototype.scrollIntoView=()=>{};if(stored)w.localStorage.setItem('family-square-roots-v1',stored);if(blocked)Object.defineProperty(w,'localStorage',{get(){throw Error('denied');}});w.eval(data);w.eval(app);return dom;}
+function make(stored,blocked=false){const dom=new JSDOM(html,{url:'https://example.test/for_KT_family/study/math/square-roots/',runScripts:'outside-only',pretendToBeVisual:true,virtualConsole:vc});const w=dom.window;w.scrollTo=()=>{};w.HTMLElement.prototype.scrollIntoView=()=>{};if(stored)w.localStorage.setItem('family-square-roots-v1',stored);if(blocked)Object.defineProperty(w,'localStorage',{get(){throw Error('denied');}});w.eval(data);w.eval(app);return dom;}
 let d=make(),w=d.window,doc=w.document;
 const $=s=>doc.querySelector(s),click=s=>$(s).click();
 function route(hash){w.location.hash=hash;w.dispatchEvent(new w.HashChangeEvent('hashchange'));}
@@ -31,5 +31,5 @@ const saved=w.localStorage.getItem('family-square-roots-v1');d.window.close();d=
 route('results');w.confirm=()=>false;click('#reset-record');assert.equal(stored().questions['1'].firstCorrect,false);w.confirm=()=>true;click('#reset-record');assert.equal(Object.keys(stored().questions).length,0);
 d.window.close();d=make(null,true);w=d.window;doc=w.document;assert.equal($('#storage-notice').hidden,false);route('practice/start');click('#q1 [data-choice="3"]');click('#q1 .check-answer');assert.match($('#q1 .quiz-feedback').textContent,/正解/);
 // Root-relative resource paths would break GitHub Pages project sites; require local paths.
-for(const el of doc.querySelectorAll('script[src],link[href],a[href$=".pdf"]')){const p=el.getAttribute('src')||el.getAttribute('href');assert.ok(!p.startsWith('/')&&!p.startsWith('http'),p);assert.ok(fs.existsSync(path.join(root,p)),p);}
+for(const el of doc.querySelectorAll('script[src],link[href],a[href$=".pdf"]')){const p=el.getAttribute('src')||el.getAttribute('href');assert.ok(!p.startsWith('/')&&!p.startsWith('http'),p);assert.ok(fs.existsSync(path.join(root,'study/math/square-roots',p)),p);}
 assert.deepEqual(errors,[]);d.window.close();console.log('PASS: all 46 questions, initial vs latest score, changed choice, duplicate submission, hints, self grading, persistence, reset, lesson marks, diagram values, invalid input, blocked storage, relative assets.');

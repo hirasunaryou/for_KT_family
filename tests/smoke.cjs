@@ -15,7 +15,8 @@ const server = http.createServer((req,res)=>{
 });
 (async()=>{
  await new Promise(r=>server.listen(0,'127.0.0.1',r));
- const base=`http://127.0.0.1:${server.address().port}/`;
+ const siteBase=`http://127.0.0.1:${server.address().port}/`;
+ const base=siteBase+'study/math/square-roots/index.html';
  const browser=await chromium.launch({headless:true,...(process.env.TEST_CHROME?{executablePath:process.env.TEST_CHROME}:{}),args:['--no-sandbox']});
  try{
  const context=await browser.newContext({viewport:{width:1440,height:1080}});
@@ -101,14 +102,14 @@ const server = http.createServer((req,res)=>{
  const dims=await page.evaluate(()=>({width:innerWidth,scroll:document.documentElement.scrollWidth}));assert.ok(dims.scroll<=dims.width+1,`${route} mobile overflow: ${JSON.stringify(dims)}`);
  await page.screenshot({path:path.join(output,route.replaceAll('/','-')+'-mobile.png'),fullPage:true,animations:'disabled'});
  }
- for(const pdf of ['guide','workbook','answers']){const res=await context.request.get(base+`print/square-roots-${pdf}.pdf`);assert.equal(res.status(),200);assert.equal((await res.body()).subarray(0,4).toString(),'%PDF');}
+ for(const pdf of ['guide','workbook','answers']){const res=await context.request.get(siteBase+`print/square-roots-${pdf}.pdf`);assert.equal(res.status(),200);assert.equal((await res.body()).subarray(0,4).toString(),'%PDF');}
  assert.deepEqual(errors,[]);
- assert.ok(requests.every(url=>url.startsWith(base)||url.startsWith('blob:')),'Unexpected external requests');
+ assert.ok(requests.every(url=>url.startsWith(siteBase)||url.startsWith('blob:')),'Unexpected external requests');
  // Storage restrictions should degrade to an in-memory session.
  const noStore=await browser.newContext();await noStore.addInitScript(()=>{Object.defineProperty(window,'localStorage',{get(){throw new Error('blocked');}});});
  const ns=await noStore.newPage();await ns.goto(base);await expect(ns.locator('#storage-notice')).toBeVisible();await ns.goto(base+'#practice/start');await ns.locator('#q1 [data-choice="3"]').click();await ns.locator('#q1 .check-answer').click();await expect(ns.locator('#q1 .quiz-feedback')).toContainText(/正解/);await noStore.close();
  // An extracted ZIP works with file:// too: no fetch/module dependency.
- const offline=await browser.newContext();const op=await offline.newPage();await op.goto('file://'+path.join(root,'index.html'));await expect(op.locator('.hero h1')).toBeVisible();await op.locator('.hero .primary').click();await expect(op.locator('.question-card')).toHaveCount(8);await offline.close();
+ const offline=await browser.newContext();const op=await offline.newPage();await op.goto('file://'+path.join(root,'study/math/square-roots/index.html'));await expect(op.locator('.hero h1')).toBeVisible();await op.locator('.hero .primary').click();await expect(op.locator('.question-card')).toHaveCount(8);await offline.close();
  console.log('PASS: checkpoint scoring, retry history, hints, self grading, reload, all 46 questions, diagrams, invalid input, export/import/reset, mobile overflow, PDFs, storage denied, offline entry, no external requests.');
  }finally{await browser.close();}
 })().catch(e=>{console.error(e);process.exitCode=1;}).finally(()=>server.close());
