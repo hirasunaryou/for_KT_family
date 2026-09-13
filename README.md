@@ -4,6 +4,7 @@
 
 **[家族の入口](https://hirasunaryou.github.io/for_KT_family/)**
 
+- [Python続編：サイコロ金庫破り](https://hirasunaryou.github.io/for_KT_family/study/programming/python-dice-vault/)
 - [Python：JupyterLabでサイコロ探偵を作る](https://hirasunaryou.github.io/for_KT_family/study/programming/python-dice-jupyter/)
 - [Python：ブラウザで実行するサイコロ探偵](https://hirasunaryou.github.io/for_KT_family/study/programming/python-dice/)
 - [二次関数：中3 y = ax²](https://hirasunaryou.github.io/for_KT_family/study/math/quadratic-functions/)
@@ -117,3 +118,16 @@ python3 -m http.server 8000
 ```
 
 `http://localhost:8000/` を開きます。操作検証は [tests/README.md](tests/README.md) を参照してください。
+
+
+## Python続編：サイコロ金庫破り
+
+- 説明サイトとブラウザの完成見本: `study/programming/python-dice-vault/`
+- 文章・見本ルール・表示: `assets/python-dice-vault/`
+- 配布部品とNotebook: `materials/python-dice-vault/`
+- 作業フォルダ: `python_games/dice_vault/`。自作コードは `vault_lab.ipynb`、画面部品は `vault_ui.py`。前編とは別ファイル。
+- 全6回: 状態設計、持ち帰りと終了、シールド、CPU、自動実験、JSONセーブ。仕様を先に示し、読み物・道具・ヒント・完成例は段階的に開く。
+- ルールは学習者が渡すPython関数で動く。画面部品は乱数とボタンと表示だけを担当。HTMLへのPython変換は提供しない。友達へはNotebookと画面部品を渡し、JupyterLabで実行する。
+- 完成見本は別のJavaScript実装。Notebookの変更は自動反映されない。参考Pythonと既定ルールの整合性を検証する。
+- セーブは状態だけ。乱数の内部状態は保存しないので再開後の出目までは再現しない。全体の完成例は別名で配布し、学習者のNotebookを上書きしない。
+- 学習チェック: `family-python-dice-vault-v1`。前編の記録を保持し、別キーに保存する。
