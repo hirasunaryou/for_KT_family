@@ -4,8 +4,8 @@
   "private": true,
   "description": "Family learning hub with printable and interactive mathematics lessons",
   "scripts": {
-    "test": "node tests/dom.cjs && node tests/family.cjs && node tests/smoke.cjs && node tests/quadratic-smoke.cjs",
-    "test:dom": "node tests/dom.cjs && node tests/family.cjs"
+    "test": "node tests/dom.cjs && node tests/family.cjs && node tests/python-dice.cjs && node tests/smoke.cjs && node tests/quadratic-smoke.cjs",
+    "test:dom": "node tests/dom.cjs && node tests/family.cjs && node tests/python-dice.cjs"
   },
   "devDependencies": {
     "jsdom": "30.0.1",

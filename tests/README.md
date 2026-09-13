@@ -23,3 +23,16 @@ GitHub Actionsでもpushとpull request時に実行します。Actionsの `brows
 `quadratic-smoke.cjs` はブラウザで3つの動く図、44問の切替、作図問題の解答、自己評価、再挑戦リンク、旧トップの平方根リンクの転送、PDF、保存不可とオフラインを確認します。390pxの画面とデスクトップのスクリーンショットを残します。
 
 平方根の既存テストも新しいURLで継続します。新旧どちらの教材も通ることを確認してから変更を完了します。
+
+## Python教材
+
+`python-dice.cjs` はJupyterLab説明サイトの準備＋7ミッション、直接リンク、チェックの保存と分離、保存不可時、相対リンク、Notebookのひな形、ブラウザ実行版の資産の場所を確認します。`npm test` と `npm run test:dom` に含まれます。
+
+完成部品と説明中のPythonは、IPythonとipywidgetsを用意した環境で次のように確認できます。
+
+```bash
+python3 -m pip install ipython ipywidgets
+python3 tests/python-dice-tools.py
+```
+
+全ミッションのセルを順番に実行し、実物のipywidgetsボタンのコールバック、上限、保留、答え合わせ後の停止、再挑戦、不正な出目、HTMLへの安全なタイトル埋め込みを確認します。実際のJupyterLabフロントエンドでの表示確認とは別です。生成したゲームは `test-results/dice-export.html` に残ります。

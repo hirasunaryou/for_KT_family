@@ -4,6 +4,8 @@
 
 **[家族の入口](https://hirasunaryou.github.io/for_KT_family/)**
 
+- [Python：JupyterLabでサイコロ探偵を作る](https://hirasunaryou.github.io/for_KT_family/study/programming/python-dice-jupyter/)
+- [Python：ブラウザで実行するサイコロ探偵](https://hirasunaryou.github.io/for_KT_family/study/programming/python-dice/)
 - [二次関数：中3 y = ax²](https://hirasunaryou.github.io/for_KT_family/study/math/quadratic-functions/)
 - [平方根：中3](https://hirasunaryou.github.io/for_KT_family/study/math/square-roots/)
 - [日々の疑問](https://hirasunaryou.github.io/for_KT_family/questions/)：記事を追加するための入口。現在は記事なし。
@@ -17,6 +19,12 @@
 | `study/math/index.html` | 数学の単元一覧 |
 | `study/math/square-roots/index.html` | 平方根の教材 |
 | `study/math/quadratic-functions/index.html` | 二次関数の教材 |
+| `study/programming/index.html` | プログラミングの入口・2つの学び方 |
+| `study/programming/python-dice-jupyter/index.html` | JupyterLabで自分で作る説明サイト |
+| `study/programming/python-dice/index.html` | ページ内でPythonを実行する版 |
+| `assets/python-dice-jupyter/` | JupyterLab説明版の文章・表示・チェック |
+| `assets/python-dice/` | ブラウザ実行版のコード・スタイル・Worker |
+| `materials/python-dice/` | 完成部品dice_tools.py・空のNotebook・管理メモ |
 | `questions/index.html` | 日々の疑問の一覧 |
 | `questions/<topic>/index.html` | 今後追加する読み物の定位置 |
 | `assets/family/` | 家族サイト共通のスタイル |
@@ -36,7 +44,7 @@
 3. その親の一覧に、タイトル・対象・短い説明・リンクのカードを追加します。必要なら家族トップにも載せます。未完成のリンクは置きません。
 4. CSS・JavaScriptが単元固有なら `assets/<topic>/`、印刷PDFは `print/<topic>-guide.pdf` などへ置きます。
 5. 記録を保存する場合は `family-<topic>-v1` のように教材固有のキーを使い、他の教材を上書きしないようにします。
-6. 外部CDNに依存せず、リポジトリ内の相対リンクを使います。`/assets/...` のような先頭スラッシュはGitHub PagesのプロジェクトURLで壊れるため避けます。
+6. 通常の教材UIは外部CDNに依存せず、リポジトリ内の相対リンクを使います。Pythonブラウザ実行版だけは、要求された実行機能のためバージョン固定のPyodideをjsDelivrから読み込みます。この例外と通信要件を画面に明記します。`/assets/...` のような先頭スラッシュはGitHub PagesのプロジェクトURLで壊れるため避けます。
 7. `npm test` で既存教材の操作も確認します。新しい操作は対応するテストを追加します。
 
 小規模な教材なので、現在はビルド不要のHTML/CSS/JavaScriptで構成しています。一覧は手動更新です。教材が大幅に増えた時点で一覧生成を導入できます。
@@ -76,9 +84,31 @@
 
 GitHub Pagesは main ブランチのルートから配信する設定です。今回の整理で公開範囲・設定は変更していません。URLを知っている人は閲覧できます。公開する教材には氏名・家庭の非公開情報を含めません。
 
-ログイン、APIキー、ビルドは不要。Code → Download ZIPから取得し、展開して `index.html` を新しいブラウザで開けば、オフラインでも教材を利用できます。MathML対応の新しいChrome / Edge / Safari / Firefoxを使ってください。
+閲覧にはログイン、APIキー、ビルドは不要。Code → Download ZIPから取得し、展開して `index.html` を新しいブラウザで開けば、数学教材とJupyterLab説明サイトはオフラインでも読めます。Pythonブラウザ実行版は公開URL、または単体版の `study/programming/python-dice/dice-lab.html` を使い、Pyodideの読み込みにネット接続が必要です。JupyterLab版はPCのPythonで実行し、ボタン版の初回準備ではipywidgetsのインストールが必要な場合があります。JupyterLabで作る完成ゲームHTMLはオフラインで遊べます。MathML対応の新しいChrome / Edge / Safari / Firefoxを使ってください。
 
-学習記録は各ブラウザのlocalStorage内だけに保存し、GitHubやサーバーへ送信しません。広告・アクセス解析・外部フォント・外部JavaScriptは使いません。配信時の通常のアクセスはGitHub側に発生します。記録は端末・ブラウザ・オリジンごとで自動同期されず、閲覧データの削除で消えます。保存不可時は画面に案内して、その画面内では利用を継続できます。
+学習記録は各ブラウザのlocalStorage内だけに保存し、GitHubやサーバーへ送信しません。広告・アクセス解析・外部フォントは使いません。数学教材とJupyterLab説明サイトには外部JavaScriptはありません。Pythonブラウザ実行版のみPyodide 0.27.7を `https://cdn.jsdelivr.net/pyodide/v0.27.7/full/` から読み込むため、その配信元にも通常のアクセスが発生します。配信時の通常のアクセスはGitHub側に発生します。記録は端末・ブラウザ・オリジンごとで自動同期されず、閲覧データの削除で消えます。保存不可時は画面に案内して、その画面内では利用を継続できます。
+
+## Python：2つの版とファイルの置き場所
+
+最初に勧めるのは **JupyterLab説明版**。サイトは説明・コピー・ヒントに専念し、本人が自分のJupyterLabでコードを入力して実行します。ブラウザ実行版は、その場で試したいときの別ルートです。
+
+JupyterLabの左側で `python_games/dice_detective/` を作り、以下を同じ場所に置きます。これは**学習者のPCの作業フォルダ**であり、公開リポジトリに個人の実験メモを保存する指示ではありません。
+
+| ファイル名 | 用意・保存 | 開き方 |
+| --- | --- | --- |
+| `dice_lab.ipynb` | Notebookを新規作成して名前をつける。保存マークで保存 | JupyterLabの左の一覧でダブルクリック |
+| `dice_tools.py` | 説明ページからダウンロードし、同じ作業フォルダへUpload Files | Notebookのimportで使う。直接実行不要 |
+| `my_dice_game.html` | 最後のsave_gameセルで生成。右クリック→Downloadで取り出す | 通常のブラウザ。友達にはこの1ファイル |
+
+準備ページには、New Folder、Rename、Upload Files、Codeセル、Shift+Enter、保存、次の日の再開を順に記載しています。ダウンロード先、重複名の `(1)`、`.py.txt`、Kernelの実行順、ウィジェット表示、HTMLプレビューで動かない場合も案内します。
+
+完成部品の `create_game` はPythonのroll関数を呼び出し、ipywidgetsで操作画面を出します。`save_game` はタイトル・3種類のくじ配置・調査上限を、外部依存のないHTMLゲームに保存します。任意のPython関数をJavaScriptに自動変換するものではなく、教材の「リストから均等に選ぶ」ルールが対象です。
+
+ブラウザ実行版には独立Worker、15秒実行停止、200行出力上限があります。JupyterLabで本人が実行するコードにはその制限はないため、停止方法と大量出力の注意を説明しています。
+
+進み具合の保存キーは `family-python-dice-jupyter-v1`（説明サイトのチェック）と `family-python-dice-v1`（ブラウザ実行版）。Notebook本体はJupyterLab側で保存し、サイトのチェックとは別です。以前のSites版のブラウザ記録は異なるオリジンなので自動移行しません。
+
+ブラウザ単体HTMLは `python3 scripts/build-python-dice-portable.py` で再生成。JupyterLab説明サイトは手書きの静的HTML/JS/CSSで、ビルドは不要です。配置の詳細は [materials/python-dice/README.md](materials/python-dice/README.md) に記載しています。
 
 ## 開発
 
