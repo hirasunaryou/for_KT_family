@@ -31,7 +31,7 @@ function draw(svg,{a=null,compare=false,points=[],interval=null,secant=null,geom
  if(compare)s+=curve(1,'guide');if(a!==null&&!blank)s+=curve(a,'curve');
  if(interval){const [p,q]=interval;const vals=[a*p*p,a*q*q];if(p<=0&&q>=0)vals.push(0);const low=Math.min(...vals),high=Math.max(...vals);s+=`<rect x="${l}" y="${Y(high)}" width="${w}" height="${Math.max(1,Y(low)-Y(high))}" fill="#3566a0" opacity=".08"/>`+curve(a,'highlight',p,q);s+=`<line x1="${l+w-5}" x2="${l+w-5}" y1="${Y(low)}" y2="${Y(high)}" stroke="#3566a0" stroke-width="5"/>`;}
  if(secant){const [p,q]=secant,yp=a*p*p,yq=a*q*q,m=(yq-yp)/(q-p),b=yp-m*p;s+=line(xmin,m*xmin+b,xmax,m*xmax+b,'secant')+line(p,yp,q,yp,'guide')+line(q,yp,q,yq,'guide');}
- if(geometry){s+=`<polygon points="${X(0)},${Y(0)} ${X(-1)},${Y(1)} ${X(2)},${Y(4)}" fill="#dce9b0" fill-opacity=".55" stroke="#285c50" stroke-width="2"/>`+line(-2,0,3,5,'guide')+line(-1,1,0,1,'guide')+line(2,4,0,4,'guide');}
+ if(geometry){s+=`<polygon points="${X(0)},${Y(0)} ${X(-1)},${Y(1)} ${X(2)},${Y(4)}" fill="#dce9b0" fill-opacity=".55" stroke="#285c50" stroke-width="2"/>`+line(-2,0,3,5,'guide')+line(-1,1,0,1,'height-guide')+line(2,4,0,4,'height-guide');}
  s+='</g>';
  for(const [x,y,label] of points){s+=`<circle cx="${X(x)}" cy="${Y(y)}" r="4.5" fill="#b6502f"/>`;if(label)s+=text(X(x)+9,Y(y)-9,label);}
  svg.innerHTML=s;
