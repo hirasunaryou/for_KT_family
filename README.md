@@ -4,6 +4,7 @@
 
 **[家族の入口](https://hirasunaryou.github.io/for_KT_family/)**
 
+- [Python新テーマ：迷路メーカー＆脱出ロボット](https://hirasunaryou.github.io/for_KT_family/study/programming/python-maze-robot/)
 - [Python続編：サイコロ金庫破り](https://hirasunaryou.github.io/for_KT_family/study/programming/python-dice-vault/)
 - [Python：JupyterLabでサイコロ探偵を作る](https://hirasunaryou.github.io/for_KT_family/study/programming/python-dice-jupyter/)
 - [Python：ブラウザで実行するサイコロ探偵](https://hirasunaryou.github.io/for_KT_family/study/programming/python-dice/)
@@ -131,3 +132,16 @@ python3 -m http.server 8000
 - 完成見本は別のJavaScript実装。Notebookの変更は自動反映されない。参考Pythonと既定ルールの整合性を検証する。
 - セーブは状態だけ。乱数の内部状態は保存しないので再開後の出目までは再現しない。全体の完成例は別名で配布し、学習者のNotebookを上書きしない。
 - 学習チェック: `family-python-dice-vault-v1`。前編の記録を保持し、別キーに保存する。
+
+
+## Python新テーマ：迷路メーカー＆脱出ロボット
+
+- 入口: `study/programming/python-maze-robot/`。資産: `assets/python-maze-robot/`。配布ファイル: `materials/python-maze-robot/`。
+- 6回の制作: Matplotlibで地図描画、座標と壁判定、集合で足跡記録、dequeで幅優先探索、候補生成と到達性検査、追跡ロボットからの脱出。
+- サイト見本は探索の再生・停止・段階スライダー、壁編集、自動生成、地図JSON保存、脱出ゲームを提供する。P/S=自分・開始、G=ゴール、R=敵。xは右、yは下、縦横同縮尺。
+- 学習者は `python_games/maze_robot/maze_lab.ipynb` に自作関数を書く。`maze_tools.py` は描画・再生・ボタン・地図ファイルの読み書きだけを担当し、学習者の移動・探索・手番関数を使用する。Matplotlib・ipywidgetsが必要。
+- サイトとNotebookのコードは自動同期しない。共通形式 `my_maze.json` は `{version: 1, grid: [...]}`。壁配置のみで、途中のゲーム状態は含まない。サイトから保存したファイルはJupyterLab側へUpload Filesして使う。
+- 自動生成はランダムな壁を配置して、開始→出口・敵→開始の到達性を検査する。全通路の連結や追跡ゲームの勝利を保証するものではない。200案で停止。
+- BFSが最短になる前提は上下左右の等コスト移動。探索順と実際の歩行経路は分けて表示する。到達不能・始点終点一致・同率の最短経路も教材に含む。
+- 完成例は `maze_answers.ipynb` と `maze_reference.py`。自作Notebookとは別名で配布。地図の保存は自動実行しない。
+- チェック保存キーは `family-python-maze-robot-v1`。既存教材と分離。
