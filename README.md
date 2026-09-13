@@ -145,3 +145,16 @@ python3 -m http.server 8000
 - BFSが最短になる前提は上下左右の等コスト移動。探索順と実際の歩行経路は分けて表示する。到達不能・始点終点一致・同率の最短経路も教材に含む。
 - 完成例は `maze_answers.ipynb` と `maze_reference.py`。自作Notebookとは別名で配布。地図の保存は自動実行しない。
 - チェック保存キーは `family-python-maze-robot-v1`。既存教材と分離。
+
+
+## Python新テーマ：ドット絵モンスター工房
+
+- 入口: `study/programming/python-pixel-monster/`。資産: `assets/python-pixel-monster/`。配布物: `materials/python-pixel-monster/`。
+- 全6回: ピクセルとRGBA、色の置換とコピー、反転・切り抜き・拡大、合成、自動生成、まばたきGIF。各回は仕様・道具カード・骨組み・段階ヒント・非表示の完成例・実験・改造を含む。
+- 作業場所は `python_games/pixel_monster/`。自作Notebookは `monster_lab.ipynb`、表示と保存の部品は `monster_tools.py`。JupyterLabで `%pip install pillow` を実行。描画・色の置換・合成・生成・フレーム制作は学習者が書く。
+- サイトはJavaScriptの16×16ドット絵見本。色と透明度の編集、座標の確認、フレームの編集・再生、取り消し、PNGと設計図JSONの保存・読込ができる。編集内容は自動保存しない。
+- `monster_project.json` は16行×16文字の設計図・RGBAパレット・各絵の表示時間。JupyterLabへUpload Filesし、`load_project` でPillow画像へ変換する。Pythonでの加工結果はPNGへ保存し、設計図には自動同期しない。
+- 友達へは `monster_large.png` や `monster_blink.gif` を渡す。PNGは半透明を保持。GIF部品は同じサイズのフレーム、透明度0または255、透明色を除き255色までに対応。共通パレットとdisposal=2でフレーム間の透明背景を保持する。
+- 完成例 `monster_answers.ipynb` は画像を表示するだけで、既存画像を自動で上書きしない。`monster_reference.py` は描画・色変更・生成の関数を収録。
+- チェック保存キーは `family-python-pixel-monster-v1`。Notebookと絵の保存はチェックとは別。
+- 検証: `node tests/python-pixel.cjs` と `python3 tests/python-pixel.py`（Pillow・IPythonが必要）。npm testで既存教材と合わせて実行する。
