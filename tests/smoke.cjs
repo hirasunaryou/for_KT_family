@@ -19,6 +19,7 @@ const server = http.createServer((req,res)=>{
  try{
  const context=await browser.newContext({viewport:{width:1440,height:1080}});
  const page=await context.newPage();const errors=[];const requests=[];
+ async function go(hash){await page.goto(base+'#'+hash);const parts=hash.split('/');await page.locator('#view-'+parts[0]).waitFor({state:'visible'});if(parts[0]==='practice')await page.waitForFunction(id=>document.querySelector('.stage-tabs a.active')?.getAttribute('href')==='#practice/'+id,parts[1]);}
  page.on('pageerror',e=>errors.push(e.message));page.on('request',r=>requests.push(r.url()));
  await page.goto(base);await page.locator('.hero h1').waitFor();
  assert.equal(await page.locator('#home-done').innerText(),'0');
@@ -38,20 +39,20 @@ const server = http.createServer((req,res)=>{
  // A new selection clears the displayed feedback but preserves the previous scored attempt.
  await page.locator('#q2 [data-choice="0"]').click();await page.reload();
  assert.match(await page.locator('#q2 .quiz-feedback').innerText(),/選択を変更/);
- await page.locator('[data-nav="results"]').click();
+ await page.locator('[data-nav="results"]').click();await page.locator('#view-results').waitFor({state:'visible'});
  assert.equal(await page.locator('.score-number').first().innerText(),'1 / 8');
  assert.match(await page.locator('tbody tr').first().innerText(),/復習ポイント/);
  // A hint before a first correct answer is recorded separately.
- await page.goto(base+'#practice/finish');
+ await go('practice/finish');
  await page.locator('#q31 .hint summary').click();
  await page.locator('#q31 [data-choice="1"]').click();await page.locator('#q31 .check-answer').click();
  assert.equal(await page.locator('#q31 .question-status').innerText(),'ヒントでできた');
- await page.locator('[data-nav="results"]').click();
+ await page.locator('[data-nav="results"]').click();await page.locator('#view-results').waitFor({state:'visible'});
  assert.match(await page.locator('.score-card').last().innerText(),/回答前にヒント・解答を見た問題 1問/);
  await page.locator('tbody tr').first().getByRole('link').click();
  await page.locator('#q39').waitFor();
  // Self grading survives navigation and reload; it doesn't change checkpoint scores.
- await page.goto(base+'#practice/basic');
+ await go('practice/basic');
  await page.locator('#q12 .solution-button').click();
  assert.equal(await page.locator('#q12 .solution').isVisible(),true);
  await page.locator('#q12 [data-grade="own"]').click();await page.reload();
@@ -59,8 +60,8 @@ const server = http.createServer((req,res)=>{
  await page.screenshot({path:path.join(output,'practice-desktop.png'),fullPage:true});
  // All 46 questions render, with exactly one correct option for checkpoint questions.
  const stages={start:8,basic:8,algebra:6,apply:4,challenge:4,finish:8,retry:8};
- for(const [stage,count] of Object.entries(stages)){await page.goto(base+'#practice/'+stage);assert.equal(await page.locator('.question-card').count(),count);}
- await page.goto(base+'#learn');
+ for(const [stage,count] of Object.entries(stages)){await go('practice/'+stage);assert.equal(await page.locator('.question-card').count(),count);}
+ await go('learn');
  await page.locator('[data-area="5"]').click();
  assert.match(await page.locator('#area-result').innerText(),/5/);
  assert.match(await page.locator('#area-explanation').innerText(),/2より大きく、3より小さい/);
@@ -81,7 +82,7 @@ const server = http.createServer((req,res)=>{
  assert.equal(await page.locator('[data-lesson="meaning"]').getAttribute('aria-pressed'),'true');
  await page.screenshot({path:path.join(output,'learn-desktop.png'),fullPage:true});
  // Export/import round trip and rejecting malformed files.
- await page.goto(base+'#results');
+ await go('results');
  const downloadPromise=page.waitForEvent('download');await page.locator('#export-record').click();const download=await downloadPromise;const exported=path.join(output,'progress.json');await download.saveAs(exported);
  const saved=JSON.parse(fs.readFileSync(exported));assert.equal(saved.questions['1'].firstCorrect,false);assert.equal(saved.questions['1'].currentCorrect,true);assert.equal(saved.questions['31'].firstAssisted,true);
  page.once('dialog',d=>d.dismiss());await page.locator('#reset-record').click();assert.equal(await page.locator('.score-number').first().innerText(),'1 / 8');
@@ -95,7 +96,7 @@ const server = http.createServer((req,res)=>{
  // Narrow screens: no page-level horizontal overflow, even with longer equations.
  await page.setViewportSize({width:390,height:844});
  for(const route of ['home','learn','practice/start','practice/algebra','practice/challenge','results']){
- await page.goto(base+'#'+route);
+ await go(route);
  const dims=await page.evaluate(()=>({width:innerWidth,scroll:document.documentElement.scrollWidth}));assert.ok(dims.scroll<=dims.width+1,`${route} mobile overflow: ${JSON.stringify(dims)}`);
  await page.screenshot({path:path.join(output,route.replaceAll('/','-')+'-mobile.png'),fullPage:true});
  }
