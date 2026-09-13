@@ -1,0 +1,398 @@
+[
+  {
+    "id": 1,
+    "prompt": "x = -2 のときのyを求めよう。",
+    "expression": "y=2x^2",
+    "answer": "y=8",
+    "working": "2\\times(-2)^2=2\\times4=8",
+    "explanation": "負のxは、かっこごと2乗します。",
+    "hint": "-2の2乗は4。"
+  },
+  {
+    "id": 2,
+    "prompt": "点 (-3, 18) を通る。aを求めよう。",
+    "expression": "y=ax^2",
+    "answer": "a=2",
+    "working": "18=a\\times(-3)^2\\ \\Rightarrow\\ 18=9a",
+    "explanation": "xとyの値を、同じ式に代入します。",
+    "hint": "a = y ÷ x² を使おう。"
+  },
+  {
+    "id": 3,
+    "prompt": "グラフは上向き、下向きのどちらに開く？",
+    "expression": "y=-x^2",
+    "answer": "\\mathrm{downward}",
+    "working": "",
+    "explanation": "答えは下向き。a = -1なので、yは0以下です。",
+    "hint": "aの符号を見よう。"
+  },
+  {
+    "id": 4,
+    "prompt": "xが1から3まで増えるときの変化の割合は？",
+    "expression": "y=x^2",
+    "answer": "4",
+    "working": "\\frac{3^2-1^2}{3-1}=\\frac{9-1}{2}=4",
+    "explanation": "増加量どうしを割ります。",
+    "hint": "先に、両端でのyを求めよう。"
+  },
+  {
+    "id": 5,
+    "prompt": "次のとき、yの変域を求めよう。",
+    "expression": "y=x^2,\\quad-1\\leq x\\leq2",
+    "answer": "0\\leq y\\leq4",
+    "working": "x=-1: y=1,\\quad x=0: y=0,\\quad x=2: y=4",
+    "explanation": "xの範囲に0が入るので、最小値は0です。",
+    "hint": "両端だけでなく、原点も調べよう。"
+  },
+  {
+    "id": 6,
+    "prompt": "0でないxの値を2倍にすると、yは何倍？",
+    "expression": "y=3x^2",
+    "answer": "4",
+    "working": "3(2x)^2=4\\times3x^2",
+    "explanation": "答えは4倍。2乗するため、倍率も2乗です。",
+    "hint": "2倍の2乗を考えよう。"
+  },
+  {
+    "id": 7,
+    "prompt": "x = -3 のときのyを求めよう。",
+    "expression": "y=-2x^2",
+    "answer": "y=-18",
+    "working": "-2\\times(-3)^2=-2\\times9=-18",
+    "explanation": "2乗するのはx。前の-2の符号はそのままです。",
+    "hint": "-2 × 9 を計算しよう。"
+  },
+  {
+    "id": 8,
+    "prompt": "点 (-4, 8) を通る。関数の式を求めよう。",
+    "expression": "y=ax^2",
+    "answer": "y=\\frac12x^2",
+    "working": "8=16a\\ \\Rightarrow\\ a=\\frac12",
+    "explanation": "aだけでなく、y = ... の形まで書きます。",
+    "hint": "xを2乗してから8を割ろう。"
+  },
+  {
+    "id": 9,
+    "prompt": "y = 18 のときのxをすべて求めよう。",
+    "expression": "y=2x^2",
+    "answer": "x=\\pm3",
+    "working": "18=2x^2\\ \\Rightarrow\\ x^2=9",
+    "explanation": "3だけでなく-3も、2乗すると9です。",
+    "hint": "平方根の復習。正と負の両方。"
+  },
+  {
+    "id": 10,
+    "prompt": "0でないxを半分にすると、yは何倍？",
+    "expression": "y=4x^2",
+    "answer": "\\frac14",
+    "working": "4\\left(\\frac{x}{2}\\right)^2=\\frac14\\times4x^2",
+    "explanation": "答えは1/4倍。a = 4を変える問題ではありません。",
+    "hint": "1/2を2乗しよう。"
+  },
+  {
+    "id": 11,
+    "prompt": "グラフ上にある点をすべて選ぼう。\nA(2, 8)、B(-2, -8)、C(3, 18)",
+    "expression": "y=2x^2",
+    "answer": "A,\\ C",
+    "working": "2\\times2^2=8,\\quad2\\times(-2)^2=8,\\quad2\\times3^2=18",
+    "explanation": "Bのx = -2では、yは-8ではなく8です。",
+    "hint": "それぞれのxを式に入れて確かめよう。"
+  },
+  {
+    "id": 12,
+    "prompt": "「y = 6となる点がある」は正しい？\n理由も書こう。",
+    "expression": "y=-3x^2",
+    "answer": "\\mathrm{false}",
+    "working": "x^2\\geq0\\ \\Rightarrow\\ -3x^2\\leq0",
+    "explanation": "答えは正しくない。yは0以下なので、6にはなりません。",
+    "hint": "x²は負になるかな？"
+  },
+  {
+    "id": 13,
+    "prompt": "表を埋め、グラフを描こう。",
+    "expression": "y=\\frac12x^2",
+    "answer": "8,\\ 2,\\ 0,\\ 2,\\ 8",
+    "working": "\\frac12\\times(-4)^2=8,\\quad\\frac12\\times(-2)^2=2",
+    "explanation": "左から8、2、0、2、8。左右対称になめらかに結びます。",
+    "hint": "点は5つ。原点も通るよ。"
+  },
+  {
+    "id": 14,
+    "prompt": "図の放物線は点P(2, -2)を通る。\n関数の式を求めよう。",
+    "expression": "y=ax^2",
+    "answer": "y=-\\frac12x^2",
+    "working": "-2=a\\times2^2\\ \\Rightarrow\\ a=-\\frac12",
+    "explanation": "下向きのグラフなので、aが負なのも確かめられます。",
+    "hint": "Pの座標を代入しよう。"
+  },
+  {
+    "id": 15,
+    "prompt": "開きが広いのはどちら？ 理由も書こう。",
+    "expression": "y=3x^2,\\quad y=\\frac12x^2",
+    "answer": "y=\\frac12x^2",
+    "working": "",
+    "explanation": "|a|が小さいほうが開きは広い。1/2は3より小さいからです。",
+    "hint": "同じ高さyで、左右に広がるほうを考えよう。"
+  },
+  {
+    "id": 16,
+    "prompt": "xが増えると、yは増える？ 減る？\n① xが-3から0へ  ② xが0から3へ",
+    "expression": "y=-2x^2",
+    "answer": "-18\\to0,\\quad0\\to-18",
+    "working": "",
+    "explanation": "①増える、②減る。原点を境に、増減が入れ替わります。",
+    "hint": "yの値を、移動する順番に並べよう。"
+  },
+  {
+    "id": 17,
+    "prompt": "xが1から3まで増えるときの変化の割合。",
+    "expression": "y=3x^2",
+    "answer": "12",
+    "working": "\\frac{27-3}{3-1}=\\frac{24}{2}=12",
+    "explanation": "yの増加量24を、xの増加量2で割ります。",
+    "hint": "両端でのyは3と27。"
+  },
+  {
+    "id": 18,
+    "prompt": "xが2から4まで増えるときの変化の割合。",
+    "expression": "y=-\\frac12x^2",
+    "answer": "-3",
+    "working": "\\frac{-8-(-2)}{4-2}=\\frac{-6}{2}=-3",
+    "explanation": "yが減っているため、変化の割合は負です。",
+    "hint": "引く順番をそろえよう。"
+  },
+  {
+    "id": 19,
+    "prompt": "xが-3から-1まで増えるときの変化の割合。",
+    "expression": "y=2x^2",
+    "answer": "-8",
+    "working": "\\frac{2-18}{-1-(-3)}=\\frac{-16}{2}=-8",
+    "explanation": "aが正でも、変化の割合は負になることがあります。",
+    "hint": "xの増加量は2。"
+  },
+  {
+    "id": 20,
+    "prompt": "xが-2から2まで増えるときの変化の割合。",
+    "expression": "y=x^2",
+    "answer": "0",
+    "working": "\\frac{4-4}{2-(-2)}=0",
+    "explanation": "両端のyが同じため0。途中のyが一定という意味ではありません。",
+    "hint": "両端では、どちらもy = 4。"
+  },
+  {
+    "id": 21,
+    "prompt": "yの変域を求めよう。",
+    "expression": "y=2x^2,\\quad1\\leq x\\leq3",
+    "answer": "2\\leq y\\leq18",
+    "working": "x=1: y=2,\\quad x=3: y=18",
+    "explanation": "0を含まない正の区間。左端で最小、右端で最大。",
+    "hint": "範囲内にx = 0はあるかな？"
+  },
+  {
+    "id": 22,
+    "prompt": "yの変域を求めよう。",
+    "expression": "y=x^2,\\quad-4\\leq x\\leq-2",
+    "answer": "4\\leq y\\leq16",
+    "working": "x=-4: y=16,\\quad x=-2: y=4",
+    "explanation": "yは16から4へ減ります。変域は小さい数から書きます。",
+    "hint": "-4と-2、それぞれを2乗しよう。"
+  },
+  {
+    "id": 23,
+    "prompt": "yの変域を求めよう。",
+    "expression": "y=\\frac12x^2,\\quad-2\\leq x\\leq4",
+    "answer": "0\\leq y\\leq8",
+    "working": "x=-2: y=2,\\quad x=0: y=0,\\quad x=4: y=8",
+    "explanation": "0を含むので最小は0。原点から遠いx = 4で最大。",
+    "hint": "途中に原点があることを忘れずに。"
+  },
+  {
+    "id": 24,
+    "prompt": "yの変域を求めよう。",
+    "expression": "y=-x^2,\\quad-3\\leq x\\leq2",
+    "answer": "-9\\leq y\\leq0",
+    "working": "x=-3: y=-9,\\quad x=0: y=0,\\quad x=2: y=-4",
+    "explanation": "下向きで0を含むので最大は0。最小は-9です。",
+    "hint": "aが負。原点はいちばん上。"
+  },
+  {
+    "id": 25,
+    "prompt": "放物線上のA(-2, 4)、B(1, 1)を通る\n直線の式を求めよう。",
+    "expression": "y=x^2",
+    "answer": "y=-x+2",
+    "working": "m=\\frac{1-4}{1-(-2)}=-1,\\quad1=-1\\times1+b\\Rightarrow b=2",
+    "explanation": "直線をy = mx + bとおき、傾きmと切片bを求めます。",
+    "hint": "まず、2点間の変化の割合を求めよう。"
+  },
+  {
+    "id": 26,
+    "prompt": "問25のA、Bと原点Oを結ぶ三角形OABの面積を求めよう。\n座標の1目盛りを長さ1とする。",
+    "expression": "",
+    "answer": "3",
+    "working": "\\frac12\\times2\\times2+\\frac12\\times2\\times1=3",
+    "explanation": "直線のy切片は2。y軸で分けると底辺2、高さ2と1の2三角形。",
+    "hint": "直線ABとy軸の交点をCとし、OCを共通の底辺にしよう。"
+  },
+  {
+    "id": 27,
+    "prompt": "出発からx秒後までの移動距離をy mとする。\n①3秒後までの距離  ②1秒後から3秒後までの平均の速さ",
+    "expression": "y=3x^2\\quad(0\\leq x\\leq4)",
+    "answer": "27\\ \\mathrm{m},\\quad12\\ \\mathrm{m/s}",
+    "working": "x=3: y=27,\\quad\\frac{27-3}{3-1}=12",
+    "explanation": "①は距離。②は、その2秒間に進んだ24 mを2秒で割ります。",
+    "hint": "「出発から」と「1秒後から」を区別しよう。"
+  },
+  {
+    "id": 28,
+    "prompt": "正方形の1辺を2倍にする。\n面積と周の長さは、それぞれ何倍になる？ 理由も書こう。",
+    "expression": "",
+    "answer": "4,\\quad2",
+    "working": "(2x)^2=4x^2,\\quad4(2x)=2(4x)",
+    "explanation": "面積は4倍、周は2倍。面積はx²に、周はxに比例します。",
+    "hint": "面積はx²、周の長さは4x。"
+  },
+  {
+    "id": 29,
+    "prompt": "x = -2 のときのyを求めよう。",
+    "expression": "y=3x^2",
+    "answer": "y=12",
+    "working": "3\\times(-2)^2=3\\times4=12",
+    "explanation": "2乗してから3をかけます。",
+    "hint": "-2は、かっこごと2乗。"
+  },
+  {
+    "id": 30,
+    "prompt": "点 (-2, 12) を通る。aを求めよう。",
+    "expression": "y=ax^2",
+    "answer": "a=3",
+    "working": "12=4a\\ \\Rightarrow\\ a=3",
+    "explanation": "xとyを代入できれば、aが求められます。",
+    "hint": "12を(-2)²で割ろう。"
+  },
+  {
+    "id": 31,
+    "prompt": "グラフは上向き、下向きのどちらに開く？",
+    "expression": "y=-\\frac12x^2",
+    "answer": "\\mathrm{downward}",
+    "working": "",
+    "explanation": "答えは下向き。aが負だからです。",
+    "hint": "分数でも、符号の見方は同じ。"
+  },
+  {
+    "id": 32,
+    "prompt": "xが1から3まで増えるときの変化の割合は？",
+    "expression": "y=2x^2",
+    "answer": "8",
+    "working": "\\frac{18-2}{3-1}=8",
+    "explanation": "yの増加量16を、xの増加量2で割ります。",
+    "hint": "係数a = 2が、そのまま答えにはならないよ。"
+  },
+  {
+    "id": 33,
+    "prompt": "次のとき、yの変域を求めよう。",
+    "expression": "y=2x^2,\\quad-1\\leq x\\leq2",
+    "answer": "0\\leq y\\leq8",
+    "working": "x=-1: y=2,\\quad x=0: y=0,\\quad x=2: y=8",
+    "explanation": "原点を含むので最小は0。最大は8です。",
+    "hint": "両端と原点の3点を確認。"
+  },
+  {
+    "id": 34,
+    "prompt": "0でないxの値を3倍にすると、yは何倍？",
+    "expression": "y=2x^2",
+    "answer": "9",
+    "working": "2(3x)^2=9\\times2x^2",
+    "explanation": "答えは9倍。xの倍率を2乗します。",
+    "hint": "3の2乗は？"
+  },
+  {
+    "id": 35,
+    "prompt": "xが1から4まで増えるときの変化の割合が10。\n関数の式を求めよう。",
+    "expression": "y=ax^2",
+    "answer": "y=2x^2",
+    "working": "\\frac{16a-a}{4-1}=5a=10\\ \\Rightarrow\\ a=2",
+    "explanation": "係数が未定でも、変化の割合をaの式で表せます。",
+    "hint": "yの増加量は16a - a。"
+  },
+  {
+    "id": 36,
+    "prompt": "a > 0。xの変域が-2 ≤ x ≤ 3のとき、yの最大値は18。\naと、yの変域を求めよう。",
+    "expression": "y=ax^2",
+    "answer": "a=2,\\quad0\\leq y\\leq18",
+    "working": "9a=18\\ \\Rightarrow\\ a=2",
+    "explanation": "上向きで原点を含む。最大はx = 3、最小はx = 0での値。",
+    "hint": "原点から遠い端を探そう。"
+  },
+  {
+    "id": 37,
+    "prompt": "放物線と直線の交点の座標をすべて求めよう。\n二次方程式を習っている場合に挑戦。",
+    "expression": "y=x^2,\\quad y=2x+3",
+    "answer": "(-1,1),\\quad(3,9)",
+    "working": "x^2=2x+3\\ \\Rightarrow\\ (x-3)(x+1)=0",
+    "explanation": "x = -1または3。元の式に戻して、y = 1または9を求めます。",
+    "hint": "交点では、2つの式のyが等しい。"
+  },
+  {
+    "id": 38,
+    "prompt": "a > 0。放物線上にx座標が-2の点A、3の点Bがある。\n原点Oとの三角形OABの面積が15のとき、aを求めよう。",
+    "expression": "y=ax^2",
+    "answer": "a=1",
+    "working": "A(-2,4a),\\ B(3,9a),\\quad AB:\\ y=ax+6a",
+    "explanation": "直線ABの傾きはa、切片は6a。y軸で三角形を分けます。",
+    "hint": "共通の底辺は6a。高さは2と3。面積をaで表そう。"
+  },
+  {
+    "id": 39,
+    "prompt": "x = -2 のときのyを求めよう。",
+    "expression": "y=5x^2",
+    "answer": "y=20",
+    "working": "5\\times(-2)^2=20",
+    "explanation": "負のxでも、2乗した値は正です。",
+    "hint": "2乗してから5をかける。"
+  },
+  {
+    "id": 40,
+    "prompt": "点 (-4, 8) を通る。aを求めよう。",
+    "expression": "y=ax^2",
+    "answer": "a=\\frac12",
+    "working": "8=16a\\ \\Rightarrow\\ a=\\frac12",
+    "explanation": "a = 8 ÷ 16 です。",
+    "hint": "(-4)²は16。"
+  },
+  {
+    "id": 41,
+    "prompt": "グラフは上向き、下向きのどちらに開く？",
+    "expression": "y=-3x^2",
+    "answer": "\\mathrm{downward}",
+    "working": "",
+    "explanation": "答えは下向き。yは0以下です。",
+    "hint": "aが負なら、下向き。"
+  },
+  {
+    "id": 42,
+    "prompt": "xが2から4まで増えるときの変化の割合は？",
+    "expression": "y=x^2",
+    "answer": "6",
+    "working": "\\frac{16-4}{4-2}=6",
+    "explanation": "yの増加量12を、xの増加量2で割ります。",
+    "hint": "最後の値から最初の値を引こう。"
+  },
+  {
+    "id": 43,
+    "prompt": "次のとき、yの変域を求めよう。",
+    "expression": "y=3x^2,\\quad-2\\leq x\\leq1",
+    "answer": "0\\leq y\\leq12",
+    "working": "x=-2: y=12,\\quad x=0: y=0,\\quad x=1: y=3",
+    "explanation": "原点で最小の0、x = -2で最大の12になります。",
+    "hint": "遠い端は、今回は左側。"
+  },
+  {
+    "id": 44,
+    "prompt": "0でないxの値を4倍にすると、yは何倍？",
+    "expression": "y=2x^2",
+    "answer": "16",
+    "working": "2(4x)^2=16\\times2x^2",
+    "explanation": "答えは16倍。係数aは変えていません。",
+    "hint": "4の2乗を考えよう。"
+  }
+]
