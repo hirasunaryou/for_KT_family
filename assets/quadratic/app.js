@@ -13,20 +13,21 @@ const grades={own:'自力でできた',help:'ヒントでできた',review:'も�
 let state={},stage='start';
 try{const saved=JSON.parse(localStorage.getItem(KEY)||'{}');if(saved.version===1&&saved.grades&&typeof saved.grades==='object'){for(const q of Q)if(Object.hasOwn(grades,saved.grades[q.id]))state[q.id]=saved.grades[q.id];}localStorage.setItem(KEY,JSON.stringify({version:1,grades:state}));}catch{$('#storage-notice').hidden=false;}
 function save(){try{localStorage.setItem(KEY,JSON.stringify({version:1,grades:state}));}catch{$('#storage-notice').hidden=false;}}
-// SVG coordinates: fixed viewport for the three explorers; equal scales for geometry/worksheet graphs.
-function draw(svg,{a=null,compare=false,points=[],interval=null,secant=null,geometry=false,blank=false,xmin=-3.5,xmax=3.5,ymin=-20,ymax=20,equal=false}={}){
+// Every graph uses the same physical length per x/y unit. Explorers expand x bounds to fill the frame.
+function draw(svg,{a=null,compare=false,points=[],interval=null,secant=null,geometry=false,blank=false,xmin=-3.5,xmax=3.5,ymin=-20,ymax=20,equal=true,fillWidth=false}={}){
  let w=460,h=366,l=50,t=32;
+ if(fillWidth){const middle=(xmin+xmax)/2,half=(ymax-ymin)*w/h/2;xmin=middle-half;xmax=middle+half;}
  if(equal){const u=Math.min(w/(xmax-xmin),h/(ymax-ymin));l+=(w-u*(xmax-xmin))/2;w=u*(xmax-xmin);h=u*(ymax-ymin);}
  const X=x=>l+(x-xmin)/(xmax-xmin)*w,Y=y=>t+(ymax-y)/(ymax-ymin)*h;
  const clip='clip-'+svg.id;
  let s=`<defs><clipPath id="${clip}"><rect x="${l}" y="${t}" width="${w}" height="${h}"/></clipPath></defs>`;
  const line=(x1,y1,x2,y2,cls)=>`<line x1="${X(x1)}" y1="${Y(y1)}" x2="${X(x2)}" y2="${Y(y2)}" class="${cls}"/>`;
  const text=(x,y,label,extra='')=>`<text x="${x}" y="${y}" ${extra}>${esc(label)}</text>`;
- const ystep=equal?((ymax-ymin)>24?5:(ymax-ymin)>14?2:1):(ymax>50?25:5);
- for(let x=Math.ceil(xmin);x<=xmax;x++){s+=line(x,ymin,x,ymax,'gridline');if(x)s+=text(X(x),Y(0)+20,fmt(x),'text-anchor="middle"');}
- for(let y=Math.ceil(ymin/ystep)*ystep;y<=ymax;y+=ystep){s+=line(xmin,y,xmax,y,'gridline');if(y)s+=text(X(0)-10,Y(y)+4,fmt(y),'text-anchor="end"');}
+ const tickStep=[1,2,5,10,20,25,50,100].find(n=>n>=(ymax-ymin)/10)||100;
+ for(let x=Math.ceil(xmin/tickStep)*tickStep;x<=xmax;x+=tickStep){s+=line(x,ymin,x,ymax,'gridline');if(x)s+=text(X(x),Y(0)+20,fmt(x),'text-anchor="middle"');}
+ for(let y=Math.ceil(ymin/tickStep)*tickStep;y<=ymax;y+=tickStep){s+=line(xmin,y,xmax,y,'gridline');if(y)s+=text(X(0)-10,Y(y)+4,fmt(y),'text-anchor="end"');}
  s+=line(xmin,0,xmax,0,'axis')+line(0,ymin,0,ymax,'axis');s+=text(X(xmax)+13,Y(0)+5,'x')+text(X(0)+10,Y(ymax)-12,'y')+text(X(0)-14,Y(0)+20,'O');
- const curve=(a,cls,lo=xmin,hi=xmax)=>{let d='';for(let i=0;i<=240;i++){const x=lo+(hi-lo)*i/240;d+=`${i?'L':'M'}${X(x).toFixed(2)},${Y(a*x*x).toFixed(2)} `;}return `<path d="${d}" class="${cls}"/>`;};
+ const curve=(a,cls,lo=xmin,hi=xmax)=>{if(a!==0){const bound=Math.sqrt(Math.max(0,a>0?ymax/a:ymin/a));lo=Math.max(lo,-bound);hi=Math.min(hi,bound);if(lo>hi)return '';}let d='';for(let i=0;i<=240;i++){const x=lo+(hi-lo)*i/240;d+=`${i?'L':'M'}${X(x).toFixed(2)},${Y(a*x*x).toFixed(2)} `;}return `<path d="${d}" class="${cls}"/>`;};
  s+=`<g clip-path="url(#${clip})">`;
  if(compare)s+=curve(1,'guide');if(a!==null&&!blank)s+=curve(a,'curve');
  if(interval){const [p,q]=interval;const vals=[a*p*p,a*q*q];if(p<=0&&q>=0)vals.push(0);const low=Math.min(...vals),high=Math.max(...vals);s+=`<rect x="${l}" y="${Y(high)}" width="${w}" height="${Math.max(1,Y(low)-Y(high))}" fill="#3566a0" opacity=".08"/>`+curve(a,'highlight',p,q);s+=`<line x1="${l+w-5}" x2="${l+w-5}" y1="${Y(low)}" y2="${Y(high)}" stroke="#3566a0" stroke-width="5"/>`;}
@@ -53,7 +54,7 @@ function shape(changed){
  const a=value('shape-a'),x=value('shape-x'),y=a*x*x,extent=value('shape-view');
  $('#shape-a-number').value=a;$('#shape-a-number').removeAttribute('aria-invalid');$('#shape-input-message').textContent='';
  $('#shape-a-value').textContent=fmt(a);$('#shape-x-value').textContent=fmt(x);
- draw($('#shape-plot'),{a,compare:true,ymin:-extent,ymax:extent,points:[[x,y,'P'],[-x,y,x!==0?'P′':'']]});
+ draw($('#shape-plot'),{a,compare:true,fillWidth:true,ymin:-extent,ymax:extent,points:[[x,y,'P'],[-x,y,x!==0?'P′':'']]});
  $('#shape-plot').setAttribute('aria-label',`${formula(a)}。点P(${fmt(x)}, ${fmt(y)})。y軸に対して対称。${Math.abs(y)>extent?'点Pは表示範囲の外です。':''}`);
  $('#shape-result').innerHTML=`<strong>${a===0?'y = 0':formula(a)}</strong><br>x = ${fmt(x)} → y = ${fmt(y)}<br>${a===0?'a = 0ではx軸と重なる直線。二次関数ではありません。':(a>0?'上':'下')+'向きに開きます。'}<br>x = ${fmt(-x)} でも、yは同じ ${fmt(y)}。${Math.abs(y)>extent?'<br><b>点Pは表示範囲の外です。「広く見る」で確認できます。</b>':''}`;
  $('#shape-table').innerHTML=`<table class="data-table"><caption>${a===0?'y = 0':formula(a)} の表。左右を比べてみよう。</caption><tbody><tr><th scope="row">x</th>${[-3,-2,-1,0,1,2,3].map(x=>`<td>${fmt(x)}</td>`).join('')}</tr><tr><th scope="row">y</th>${[-3,-2,-1,0,1,2,3].map(x=>`<td>${fmt(a*x*x)}</td>`).join('')}</tr></tbody></table>`;
@@ -82,8 +83,8 @@ function area(){
  $('#area-scale-note').textContent=($('#area-lock').checked?'目盛りを固定中。':'図全体が見えるよう、拡大率を自動調整しています。大きさを比べるときは「目盛りを固定」を使おう。')+(outside?' 一部の点が表示範囲の外です。「図全体が入る範囲に戻す」で確認できます。':'');
  $$('[data-area-step]').forEach(b=>b.setAttribute('aria-pressed',String(Number(b.dataset.areaStep)===areaStep)));
 }
-function range(changed){const a=value('range-a');let p=value('range-left'),q=value('range-right');if(p>q){if(changed==='range-left')$('#range-right').value=p;else $('#range-left').value=q;p=value('range-left');q=value('range-right');}$('#range-left-value').textContent=fmt(p);$('#range-right-value').textContent=fmt(q);const zero=p<=0&&q>=0,vals=[a*p*p,a*q*q,...(zero?[0]:[])],lo=Math.min(...vals),hi=Math.max(...vals);draw($('#range-plot'),{a,interval:[p,q],points:[[p,a*p*p,'A'],[q,a*q*q,p!==q?'B':'']]});const why=p===q?'xが1つに決まるので、yも1つの値です。':zero?`0を含むので、原点のy = 0も調べます。`:'0を含まないので、両端のyを比べます。';$('#range-result').innerHTML=`${formula(a)}<br>${fmt(p)} ≤ x ≤ ${fmt(q)}<br><strong>${fmt(lo)} ≤ y ≤ ${fmt(hi)}</strong><br>両端のy：${fmt(a*p*p)} と ${fmt(a*q*q)}<br>${why}`;$('#range-plot').setAttribute('aria-label',`${formula(a)}、${fmt(p)}から${fmt(q)}の区間。yの変域は${fmt(lo)}以上${fmt(hi)}以下。`);}
-function rate(changed){const a=value('rate-a');let p=value('rate-left'),q=value('rate-right');if(q-p<.5){if(changed==='rate-left')$('#rate-right').value=p+.5;else $('#rate-left').value=q-.5;p=value('rate-left');q=value('rate-right');}$('#rate-left-value').textContent=fmt(p);$('#rate-right-value').textContent=fmt(q);const yp=a*p*p,yq=a*q*q,dy=yq-yp,dx=q-p,m=dy/dx;draw($('#rate-plot'),{a,secant:[p,q],points:[[p,yp,'A'],[q,yq,'B']]});$('#rate-result').innerHTML=`${formula(a)}<br>A(${fmt(p)}, ${fmt(yp)}) → B(${fmt(q)}, ${fmt(yq)})<br>xの増加量：${fmt(dx)}<br>yの増加量：${fmt(dy)}<br><strong>${fmt(dy)} ÷ ${fmt(dx)} = ${fmt(m)}</strong><br>${m===0?'両端のyは同じ。でも、途中のyは変化しています。':m<0?'平均すると、xが1増えるあたりyが'+fmt(-m)+'減ります。':'平均すると、xが1増えるあたりyが'+fmt(m)+'増えます。'}`;$('#rate-plot').setAttribute('aria-label',`${formula(a)}、xが${fmt(p)}から${fmt(q)}。変化の割合は${fmt(m)}。`);}
+function range(changed){const a=value('range-a');let p=value('range-left'),q=value('range-right');if(p>q){if(changed==='range-left')$('#range-right').value=p;else $('#range-left').value=q;p=value('range-left');q=value('range-right');}$('#range-left-value').textContent=fmt(p);$('#range-right-value').textContent=fmt(q);const zero=p<=0&&q>=0,vals=[a*p*p,a*q*q,...(zero?[0]:[])],lo=Math.min(...vals),hi=Math.max(...vals);draw($('#range-plot'),{a,fillWidth:true,interval:[p,q],points:[[p,a*p*p,'A'],[q,a*q*q,p!==q?'B':'']]});const why=p===q?'xが1つに決まるので、yも1つの値です。':zero?`0を含むので、原点のy = 0も調べます。`:'0を含まないので、両端のyを比べます。';$('#range-result').innerHTML=`${formula(a)}<br>${fmt(p)} ≤ x ≤ ${fmt(q)}<br><strong>${fmt(lo)} ≤ y ≤ ${fmt(hi)}</strong><br>両端のy：${fmt(a*p*p)} と ${fmt(a*q*q)}<br>${why}`;$('#range-plot').setAttribute('aria-label',`${formula(a)}、${fmt(p)}から${fmt(q)}の区間。yの変域は${fmt(lo)}以上${fmt(hi)}以下。`);}
+function rate(changed){const a=value('rate-a');let p=value('rate-left'),q=value('rate-right');if(q-p<.5){if(changed==='rate-left')$('#rate-right').value=p+.5;else $('#rate-left').value=q-.5;p=value('rate-left');q=value('rate-right');}$('#rate-left-value').textContent=fmt(p);$('#rate-right-value').textContent=fmt(q);const yp=a*p*p,yq=a*q*q,dy=yq-yp,dx=q-p,m=dy/dx;draw($('#rate-plot'),{a,fillWidth:true,secant:[p,q],points:[[p,yp,'A'],[q,yq,'B']]});$('#rate-result').innerHTML=`${formula(a)}<br>A(${fmt(p)}, ${fmt(yp)}) → B(${fmt(q)}, ${fmt(yq)})<br>xの増加量：${fmt(dx)}<br>yの増加量：${fmt(dy)}<br><strong>${fmt(dy)} ÷ ${fmt(dx)} = ${fmt(m)}</strong><br>${m===0?'両端のyは同じ。でも、途中のyは変化しています。':m<0?'平均すると、xが1増えるあたりyが'+fmt(-m)+'減ります。':'平均すると、xが1増えるあたりyが'+fmt(m)+'増えます。'}`;$('#rate-plot').setAttribute('aria-label',`${formula(a)}、xが${fmt(p)}から${fmt(q)}。変化の割合は${fmt(m)}。`);}
 for(const prefix of ['shape','range','rate'])$$(`[id^="${prefix}-"]`).filter(el=>el.matches('input,select')).forEach(el=>el.addEventListener('input',()=>({shape,range,rate}[prefix])(el.id)));
 $('#shape-flip').addEventListener('click',()=>{$('#shape-a').value=-value('shape-a');shape();});
 $$('[data-shape]').forEach(el=>el.addEventListener('click',()=>{$('#shape-a').value=el.dataset.shape;shape();}));

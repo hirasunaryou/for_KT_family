@@ -8,6 +8,9 @@ let d=make(),w=d.window,doc=w.document;
 const $=s=>doc.querySelector(s),txt=s=>$(s).textContent;
 const input=(s,v)=>{$(s).value=v;$(s).dispatchEvent(new w.Event('input',{bubbles:true}));};
 function route(stage){w.location.hash='practice/'+stage;w.dispatchEvent(new w.HashChangeEvent('hashchange'));}
+function equalUnits(id,x,y){const svg=$(id),axes=svg.querySelectorAll('.axis'),point=svg.querySelector('circle');const ux=(Number(point.getAttribute('cx'))-Number(axes[1].getAttribute('x1')))/x,uy=(Number(axes[0].getAttribute('y1'))-Number(point.getAttribute('cy')))/y;assert.ok(Math.abs(ux-uy)<1e-8,`${id}: x/y unit length differs`);}
+for(const [id,x,y] of [['#shape-plot',2,4],['#range-plot',-2,4],['#rate-plot',1,1],['#area-plot',-1,1]])equalUnits(id,x,y);
+for(const extent of ['20','100','5']){input('#shape-view',extent);equalUnits('#shape-plot',2,4);}
 assert.equal(w.QUADRATIC_QUESTIONS.length,44);
 const original=JSON.parse(source('materials/quadratic/questions.json'));
 for(const q of w.QUADRATIC_QUESTIONS){assert.deepEqual(JSON.parse(JSON.stringify(Object.fromEntries(Object.entries(q).filter(([k])=>!k.endsWith('HTML'))))),original[q.id-1]);assert.ok(!q.answerHTML.includes('downward'));assert.ok(!q.answerHTML.includes('>false<'));}
