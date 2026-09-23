@@ -42,7 +42,7 @@ function square(){
  if(split){
   const B=L+a+40;
   s+=rect('square-right',B,T,b,a,'#c7def1')+rect('square-bottom',B+b,T,b,a,'#a8cbe3');
-  s+=hd(B,B+b,T-28,`h=${h}`)+hd(B+b,B+2*b,T-28,`h=${h}`)+vd(T,T+a,B+2*b+57,'x');
+  s+=hd(B,B+b,T-28,'h')+hd(B+b,B+2*b,T-28,'h')+vd(T,T+a,B+2*b+57,'x');
   s+=svgText(B+b,T-62,`幅 2h = ${2*h}`,'middle',19)+svgText(B+b/2,T+a/2+6,`${h}x`)+svgText(B+1.5*b,T+a/2+6,`${h}x`);
   s+=svgText(280,T+a+55,`${2*h}x = ${h}x + ${h}x`,'middle',23)+svgText(280,T+a+88,'青い2枚は、どちらも長い辺がx、短い辺がh','middle',17);
  }else{
