@@ -158,3 +158,13 @@ python3 -m http.server 8000
 - 完成例 `monster_answers.ipynb` は画像を表示するだけで、既存画像を自動で上書きしない。`monster_reference.py` は描画・色変更・生成の関数を収録。
 - チェック保存キーは `family-python-pixel-monster-v1`。Notebookと絵の保存はチェックとは別。
 - 検証: `node tests/python-pixel.cjs` と `python3 tests/python-pixel.py`（Pillow・IPythonが必要）。npm testで既存教材と合わせて実行する。
+
+## 二次方程式：印刷と6つの実験
+
+`study/math/quadratic-equations/` に中3向けの教材を追加。平方根、因数分解、平方完成、解の公式、解法選択、文章題、二次関数とのつながりを扱う。
+
+- `print/quadratic-equations-{guide,workbook,answers}.pdf`：解説8ページ、40問の問題集12ページ、解答解説12ページ。
+- 数直線の±、積が0になる瞬間、平方完成の面積図、両辺への同じ操作、解の公式への代入、放物線と横線の交点を動かせる。
+- グラフは縦横同一縮尺・固定目盛り。実数解が2つ/1つ/ない場合を区別する。
+- 静的な解説とMathMLは外部通信不要。問題と自己評価はJavaScriptで操作。保存キー `family-quadratic-equations-v1` は既存教材と独立。
+- 原稿・生成方法は `materials/quadratic-equations/README.md`。紙とWebの問題を別々に編集しない。

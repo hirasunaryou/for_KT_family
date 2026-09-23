@@ -17,7 +17,7 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-      - run: python -m pip install pillow ipython
+      - run: python -m pip install pillow ipython sympy
       - run: npm install --no-audit --no-fund
       - run: npx playwright install --with-deps chromium
       - run: npm test
