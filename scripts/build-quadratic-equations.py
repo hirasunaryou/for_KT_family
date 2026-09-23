@@ -37,7 +37,8 @@ page=f'''<!doctype html><html lang="ja"><head><meta charset="utf-8"><meta name="
 (R/'study/math/quadratic-equations/index.html').write_text(page)
 
 parser=argparse.ArgumentParser();parser.add_argument('--font');args=parser.parse_args()
-if not args.font:raise SystemExit('Web built. Pass --font to also build print PDFs.')
+if not args.font:
+ print('Web built. Pass --font to also build print PDFs.');raise SystemExit(0)
 from reportlab.pdfgen import canvas
 from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
