@@ -168,3 +168,5 @@ python3 -m http.server 8000
 - グラフは縦横同一縮尺・固定目盛り。実数解が2つ/1つ/ない場合を区別する。
 - 静的な解説とMathMLは外部通信不要。問題と自己評価はJavaScriptで操作。保存キー `family-quadratic-equations-v1` は既存教材と独立。
 - 原稿・生成方法は `materials/quadratic-equations/README.md`。紙とWebの問題を別々に編集しない。
+
+二次方程式の実験では、式変形の直前の式と操作も表示する。平方完成の辺長と並べ替えを3段階で説明し、解の公式には係数連動の y=ax²+bx+c のグラフを追加した。x軸との交点と実数解の個数を対応させる。
