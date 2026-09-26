@@ -38,8 +38,8 @@ def scene(f,answer=False,guide=False,qid=0):
   C,A,B=(220,275),(220,95),(460,275)
   s.poly([C,A,B],INK,PALE_GREEN);s.line(C,A,BROWN,2.4);s.line(C,B,BLUE,2.4);s.line(A,B,INK,2.6);s.right(A,C,B,13)
   s.text(190,188,'b',24,BROWN,'middle');s.text(340,310,'a',24,BLUE,'middle');s.text(365,173,'c',24,INK,'middle')
-  s.text(32,42,'ここが90°',19);s.arrow((180,51),(231,264))
-  s.text(392,42,'斜辺 c',20);s.text(392,72,'直角の向かい',18);s.arrow((472,84),(345,185))
+  s.text(42,251,'ここが90°',19);s.arrow((158,249),(228,264))
+  s.text(392,42,'斜辺 c',20);s.text(392,72,'直角の向かい',18);s.arrow((410,86),(298,150))
   for x,label,color in [(243,'a²',BLUE),(282,'＋',INK),(321,'b²',BROWN),(361,'＝',INK),(400,'c²',INK)]:s.text(x,376,label,28,color,'middle')
  elif k=='triangle':
   a,b=f['a'],f['b'];ang=math.radians(f.get('angle',90));pts=[(0,0),(b*math.cos(ang),b*math.sin(ang)),(a,0)];t=math.radians(f.get('rotate',0));pts=[(x*math.cos(t)-y*math.sin(t),x*math.sin(t)+y*math.cos(t)) for x,y in pts];cv,_=s.fit(pts,(195,85,245,215));C,A,B=map(cv,pts)
@@ -58,15 +58,15 @@ def scene(f,answer=False,guide=False,qid=0):
    for p,name in [(A,'A'),(B,'B'),(C,'C')]:
     dx,dy=p[0]-center[0],p[1]-center[1];n=math.hypot(dx,dy);s.tag(p,name,dx/n*24-5,dy/n*24+6)
   if guide:
-   if f.get('mode')=='root':s.text(34,35,'2²＋3²＝13',21,INK);s.text(410,340,'c²からcへ',18,BLUE);s.text(410,370,'√13 を使う',20,BLUE);s.arrow((413,320),((A[0]+B[0])/2+18,(A[1]+B[1])/2))
-   else:s.text(30,35,'直角の向かいが斜辺',19);s.arrow((226,42),((A[0]+B[0])/2,(A[1]+B[1])/2));s.text(300,372,'x²＋3²＝5² → x＝4',21,INK,'middle')
+   if f.get('mode')=='root':s.text(34,35,'2²＋3²＝13',21,INK);s.text(448,237,'c²からcへ',18,BLUE);s.text(448,267,'√13 を使う',20,BLUE);s.arrow((433,235),(A[0]*.3+B[0]*.7+5,A[1]*.3+B[1]*.7))
+   else:s.text(30,105,'直角の向かい',19);s.text(30,135,'この辺が斜辺',19);s.arrow((159,147),(A[0]*.7+B[0]*.3-5,A[1]*.7+B[1]*.3));s.text(300,372,'x²＋3²＝5² → x＝4',21,INK,'middle')
  elif k=='squares':
   a,b=f['a'],f['b'];C=(0,0);A=(0,b);B=(a,0);polys=[[(0,0),(a,0),(a,-a),(0,-a)],[(0,0),(0,b),(-b,b),(-b,0)],[A,B,(a+b,a),(b,a+b)]];cv,sc=s.fit(sum(polys,[]),(160,50,330,290))
   for poly,c,fill,label in zip(polys,[BLUE,BROWN,INK],[PALE_BLUE,PALE_BROWN,PALE_GREEN],[f'{fmt(a*a)}',f'{fmt(b*b)}','?' if f.get('unknown') and not shown else fmt(a*a+b*b)]):
    ps=list(map(cv,poly));s.poly(ps,c,fill);s.text(sum(p[0] for p in ps)/4,sum(p[1] for p in ps)/4+7,label,23,c,'middle')
   s.poly(list(map(cv,[C,A,B])),INK,WHITE);s.right(cv(A),cv(C),cv(B));
   if not f.get('unknown') or shown:s.mid(cv(C),cv(B),'a' if qid==3 else fmt(a),(0,-7),BLUE,18);s.mid(cv(C),cv(A),'b' if qid==3 else fmt(b),(12,5),BROWN,18)
-  if guide:s.text(26,36,'数字は正方形の面積',18);s.arrow((195,44),cv((-b/2,b/2)));s.text(336,375,'9＋16＝25',23,INK,'middle')
+  if guide:s.text(26,36,'数字は正方形の面積',18);s.arrow((195,52),cv((-b/2,b*.75)));s.text(336,375,'9＋16＝25',23,INK,'middle')
  elif k=='rearrange':
   a,b=f['a'],f['b'];l=a+b;z=215/l
   for j,ox in enumerate([45,375]):
@@ -87,7 +87,7 @@ def scene(f,answer=False,guide=False,qid=0):
    transform(s,sub,.65,(-65 if i==0 else 255),20)
   s.text(167,320,'25＋144＝169',20,BLUE,'middle');s.text(478,320,'16＋25 ≠ 36',20,BROWN,'middle');s.text(167,357,'直角になる',19,BLUE,'middle');s.text(478,357,'直角ではない',19,BROWN,'middle')
  elif k=='rectangle':
-  a,b=f['a'],f['b'];cv,_=s.fit([(0,0),(a,b)],(195,80,245,230));A,B,C,D=map(cv,[(0,0),(a,0),(a,b),(0,b)]);s.poly([A,B,C,D],fill=WHITE);s.line(A,C,BLUE,2,'5 3');s.right(A,B,C);s.mid(A,B,fmt(a) if answer and 'x' in f['al'] else f['al'],(0,29));s.mid(A,D,fmt(b) if answer and f['bl']=='x' else f['bl'],(-33,7));s.mid(A,C,f.get('sol',f['cl']) if shown else f['cl'],(25,-9),BLUE)
+  a,b=f['a'],f['b'];cv,_=s.fit([(0,0),(a,b)],(195,80,245,230));A,B,C,D=map(cv,[(0,0),(a,0),(a,b),(0,b)]);s.poly([A,B,C,D],fill=WHITE);s.line(A,C,BLUE,2,'5 3');s.right(A,B,C);s.mid(A,B,fmt(a) if answer and 'x' in f['al'] else f['al'],(0,29));s.mid(A,D,fmt(b) if answer and f['bl']=='x' else f['bl'],(-33,7));s.mid(A,C,f.get('sol',f['cl']) if shown else f['cl'],(-22,-22),BLUE)
   if guide:s.text(25,35,'短い辺を x と置く',19);s.arrow((187,45),((A[0]+D[0])/2-5,(A[1]+D[1])/2));s.text(320,375,'x²＋(x＋1)²＝5²',23,INK,'middle')
  elif k in ['isosceles','special']:
   if k=='special':
@@ -98,7 +98,7 @@ def scene(f,answer=False,guide=False,qid=0):
    a,b=f['side'],f['base'];h=math.sqrt(a*a-b*b/4);cv,_=s.fit([(-b/2,0),(b/2,0),(0,h)],(185,65,275,235));A,B,C,H=map(cv,[(0,h),(-b/2,0),(b/2,0),(0,0)]);s.poly([A,B,C],fill=PALE_GREEN);s.mid(A,B,fmt(a),(-20,-4));s.mid(A,C,fmt(a),(20,-4));s.mid(B,C,fmt(b),(0,30));
    if shown:
     s.line(A,H,BLUE,2,'5 3');s.right(A,H,C);s.mid(B,H,fmt(b/2),(0,-10),BROWN);label='√3' if f.get('ratio') else '3√3' if a==b==6 else fmt(h);s.mid(A,H,label,(27,5),BLUE)
-   if guide:s.text(30,35,'ここから高さを下ろす',19,BLUE);s.arrow((238,42),A);s.text(395,367,'底辺も半分に',18,BROWN);s.arrow((396,342),((B[0]+H[0])/2,H[1]))
+   if guide:s.text(30,35,'ここから高さを下ろす',19,BLUE);s.arrow((238,42),A);s.text(30,367,'底辺も半分に',18,BROWN);s.arrow((167,344),((B[0]+H[0])/2,H[1]+5))
  elif k in ['diameter','chord','tangent']:
   circle_scene(s,f,shown,guide)
  elif k=='circle-pair':
@@ -132,7 +132,7 @@ def scene(f,answer=False,guide=False,qid=0):
    s.mid(C,B,'a',(0,30),BLUE);s.mid(C,A,'b',(-28,5),BROWN);s.mid(A,H,'p',(-2,-13),BROWN);s.mid(H,B,'q',(11,-8),BLUE)
    # c is the full sloping side, shown on a parallel dimension line.
    v=(B[0]-A[0],B[1]-A[1]);n=math.hypot(*v);off=(v[1]/n*42,-v[0]/n*42);AA=(A[0]+off[0],A[1]+off[1]);BB=(B[0]+off[0],B[1]+off[1]);s.line(AA,BB,GRAY,1,'4 3');s.mid(AA,BB,'c',(8,-6))
-   if guide:s.text(25,32,'斜辺へ高さを下ろす',19,BLUE);s.arrow((227,40),((C[0]+H[0])/2,(C[1]+H[1])/2));s.text(320,375,'p＋q＝c。部分を足すと全体。',20,INK,'middle')
+   if guide:s.text(301,248,'斜辺へ',18,BLUE);s.text(301,276,'高さを下ろす',18,BLUE);s.arrow((290,244),((C[0]+H[0])/2+5,(C[1]+H[1])/2));s.text(320,375,'p＋q＝c。部分を足すと全体。',20,INK,'middle')
  elif k=='box':box_scene(s,f,shown,guide)
  elif k=='cone':
   r=f['r'];h=math.sqrt(f['s']**2-r*r);sc=48;O=(315,294);V=(315,294-h*sc);A=(315+r*sc,294);B=(315-r*sc,294)

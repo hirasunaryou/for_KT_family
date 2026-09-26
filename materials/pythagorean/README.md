@@ -34,7 +34,7 @@
 - `scripts/build-pythagorean.py`：HTMLと3冊のPDFを生成。
 - `assets/pythagorean/model.js`：長さ、並べ替え、弦、座標、空間の純粋計算。
 - `assets/pythagorean/app.js`・`style.css`：操作・表示・保存。
-- `previews/`：版付きの確認用PDF（解説はv2が最新版）。正式なリンクは `print/pythagorean-*.pdf`。
+- `previews/`：版付きの確認用PDF（解説はv3、問題集・解答はv2が最新版）。正式なリンクは `print/pythagorean-*.pdf`。
 
 ```sh
 python3 -m pip install reportlab fonttools
@@ -61,3 +61,9 @@ npm test
 ## 教育内容の参照
 
 [文部科学省：中学校学習指導要領（平成29年告示）解説・数学編](https://www.mext.go.jp/component/a_menu/education/micro_detail/__icsFiles/afieldfile/2019/03/18/1387018_004.pdf)の三平方の定理の意味・証明・活用を範囲の基準にしました。原稿・問題・図はこの教材用に作成しています。
+
+## 図の丁寧さの改訂（2026-09-26）
+
+直角への指示を左側からの短い矢印にし、斜辺c・面積16・底辺6・相似のpを指示線が横切らない配置へ調整。斜辺と並走する矢印も短くし、正方形・長方形の対角線から長さ表示を離しました。図形の座標・縮尺・問題番号・本文の内容は維持しています。
+
+三冊47ページを画像化して確認し、Webの図・拡大表示、三平方の数学・操作・ブラウザ検証を確認。継続的な点検基準はルートAGENTS.mdへ追記しました。
