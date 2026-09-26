@@ -15,6 +15,8 @@
 
 円教材の原稿・構成・再生成方法は [materials/circle/README.md](materials/circle/README.md) を参照してください。
 
+三平方教材の構成・再生成方法は [materials/pythagorean/README.md](materials/pythagorean/README.md) を参照してください。
+
 ## 教材を制作・改訂する方へ
 
 [AGENTS.md](AGENTS.md) に、紙とWebの役割、図と式の対応、読みやすさ、良問・解答設計、検証・公開の方針をまとめています。

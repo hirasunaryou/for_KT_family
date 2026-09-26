@@ -1,0 +1,30 @@
+<section class="lab interactive" id="rearrange-lab">
+ <div class="lab-top"><p class="eyebrow">体験 1 · 問3のあと</p><h3>同じ4枚。空いている面積は？</h3><p>予想：4枚を並べ替えると、空いている部分の面積は変わる？</p></div>
+ <div class="lab-grid"><div class="lab-figure"><svg id="rearrange-plot" viewBox="0 0 640 420" role="img" aria-label="同じ正方形の中で、4枚の直角三角形を移動する"></svg></div><div class="controls">
+ <label class="control">直角をはさむ辺a <output id="rearrange-a-value"></output><input id="rearrange-a" type="range" min="2" max="5" step="0.5" value="3"></label><p class="muted">もう1辺bは4で固定。</p>
+ <label class="control">並べ替える <output id="rearrange-position-value"></output><input id="rearrange-position" type="range" min="0" max="100" value="0"></label>
+ <div class="actions"><button class="button" id="rearrange-left">最初の配置</button><button class="button" id="rearrange-right">並べ替えた配置</button></div><button class="button" id="rearrange-reveal" aria-pressed="false">面積を確かめる</button><p id="rearrange-result" class="lab-result" aria-live="polite"></p></div></div>
+ <details class="reflection"><summary>気づきを整理する</summary><p>大きい正方形も4枚の三角形も同じ。引いた残りも同じです。左のc²と右のa²＋b²が等しい。途中は三角形が重なるので、面積の比較は両端の配置で行います。</p><p>紙へ：a＝2、b＝4なら、左右の空きの面積はいくつ？ 式と理由を書こう。</p></details>
+</section>
+<section class="lab interactive" id="condition-lab">
+ <div class="lab-top"><p class="eyebrow">体験 2 · 問8〜10のあと</p><h3>直角を少し崩したら？</h3><p>予想：2辺が同じ長さのままなら、3つの正方形の面積の関係も同じ？</p></div>
+ <div class="lab-grid"><div class="lab-figure"><svg id="condition-plot" viewBox="0 0 640 420" role="img" aria-label="2辺の間の角度と、各辺に作った正方形"></svg></div><div class="controls">
+ <label class="control">辺a <output id="condition-a-value"></output><input id="condition-a" type="range" min="2" max="4" step="0.5" value="3"></label><p class="muted">辺b＝4。図の縮尺は固定。</p>
+ <label class="control">2辺の間の角 <output id="condition-angle-value"></output><input id="condition-angle" type="range" min="60" max="120" step="5" value="90"></label><button class="button" id="condition-right">直角に戻す</button><button class="button" id="condition-reveal" aria-pressed="false">面積を比べる</button><p id="condition-result" class="lab-result" aria-live="polite"></p><p class="muted">cは2辺の先端を結ぶ辺。直角のときに斜辺と呼びます。灰色の破線はひとつ前の三角形。</p></div></div>
+ <details class="reflection"><summary>気づきを整理する</summary><p>直角ならa²＋b²＝c²。角を崩すと、2辺は同じでもcの長さが変わります。動かした結果は発見の入口。理由は解説の並べ替えで確かめよう。</p><p>紙へ：3辺が6・8・10の三角形は直角？ 6・8・9なら？</p></details>
+</section>
+<section class="lab interactive" id="find-lab">
+ <div class="lab-top"><p class="eyebrow">体験 3 · 問15〜20のあと</p><h3>どこに直角三角形を作れる？</h3><p>先に予想：補助線をどこに引く？ 斜辺になるのはどの線？</p></div>
+ <div class="lab-grid"><div class="lab-figure"><svg id="find-plot" viewBox="0 0 640 420" role="img" aria-label="円の弦または放物線上の点から、直角三角形を見つける"></svg></div><div class="controls">
+ <label class="control">図を選ぶ<select id="find-case"><option value="circle">円の弦：半径5</option><option value="parabola">放物線：y＝x²/2</option></select></label>
+ <label class="control"><span id="find-label">中心から弦までの距離</span> <output id="find-value"></output><input id="find-position" type="range" min="1" max="4" step="0.5" value="3"></label>
+ <label class="check"><input type="checkbox" id="find-lines"> 補助線と直角を表示</label><button class="button" id="find-reveal" aria-pressed="false">式と長さを確かめる</button><p id="find-result" class="lab-result" aria-live="polite"></p></div></div>
+ <details class="reflection"><summary>気づきを整理する</summary><p>円では「半径・中心から弦までの距離・弦の半分」。放物線では「横・縦・原点から点までの距離」。同じ三平方でも、足すか引くかは斜辺から判断します。</p><p>紙へ：半径5、中心から弦までの距離4なら弦の長さは？ 放物線ではx＝2の点までの距離は？</p></details>
+</section>
+<section class="lab interactive" id="space-lab">
+ <div class="lab-top"><p class="eyebrow">体験 4 · 問23・24のあと</p><h3>箱の中の三角形を、手前に取り出す</h3><p>予想：底面の対角線を求めた後、それをどの三角形で使えばよい？</p></div>
+ <div class="controls"><label class="control">箱の高さ <output id="space-height-value"></output><input id="space-height" type="range" min="2" max="12" step="1" value="12"></label><p class="muted">底面は3×4。箱は見取り図、取り出した三角形は縦横同じ縮尺です。</p><div class="actions"><button class="button" id="space-prev">1つ前</button><button class="button" id="space-next">次の手順</button></div></div>
+ <div class="lab-figure"><svg id="space-plot" viewBox="0 0 640 420" role="img" aria-label="底面の三角形、次に高さと底面の対角線で作る三角形を取り出す"></svg></div>
+ <div class="controls"><p id="space-step"></p><p id="space-before" class="muted"></p><p id="space-result" class="lab-result" aria-live="polite"></p></div>
+ <p class="lab-foot">紙へ：底面6×8、高さ24の箱なら？ 相似を使う方法と、三平方を2回使う方法で比べよう。</p>
+</section>
