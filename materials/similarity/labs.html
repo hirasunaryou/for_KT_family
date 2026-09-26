@@ -1,0 +1,40 @@
+<section class="lab interactive" id="shape-lab" aria-labelledby="shape-title">
+ <div class="lab-top"><span class="eyebrow">体験 01 · 予想 → 操作 → 説明</span><h3 id="shape-title">「同じ形」を壊してみる</h3><p>縦横を2倍にする場合と、横だけ2倍にする場合。角と辺の倍率はどうなる？ 紙に予想してから動かそう。</p></div>
+ <div class="lab-grid"><svg class="sim-plot" id="shape-plot" viewBox="0 0 540 320" role="img" aria-label="もとの三角形と変形後の三角形"></svg><div class="controls">
+ <label class="control" for="shape-mode">変え方<select id="shape-mode"><option value="both">縦も横も同じ倍率</option><option value="wide">横だけ変える</option></select></label>
+ <label class="control" for="shape-k">倍率 k：<output id="shape-k-value">1</output><input id="shape-k" type="range" min="0.5" max="2" step="0.1" value="1"></label>
+ <div class="presets"><button type="button" data-shape="both,2">縦横2倍</button><button type="button" data-shape="wide,2">横だけ2倍</button><button type="button" data-shape="both,1">元に戻す</button></div>
+ <div class="lab-result" id="shape-result" aria-live="polite"></div></div></div>
+ <p class="lab-foot">左右は同じ縮尺。右の灰色の破線は変形前の輪郭。角度と斜辺の倍率は近似値です。角はBと、それに対応するEで比べます。</p>
+ <details class="reflect"><summary>確かめたあと：紙で説明する</summary><p>横だけ2倍では、どの辺の倍率がそろわなかった？ 相似になるのはkがいくつのとき？ → <a href="#q2">問2</a></p></details>
+</section>
+<section class="lab interactive" id="match-lab" aria-labelledby="match-title">
+ <div class="lab-top"><span class="eyebrow">体験 02 · 対応を見つける</span><h3 id="match-title">重なった図を、取り出してみよう</h3><p>△ABCのA・B・Cは、△DEFのどこに対応する？ 図の上・下ではなく、角と辺のつながりを手がかりに予想しよう。</p></div>
+ <div class="lab-grid"><svg class="sim-plot" id="match-plot" viewBox="0 0 540 340" role="img" aria-label="三角形の対応を段階的に確認"></svg><div class="controls">
+ <div class="steps" id="match-steps"><button type="button" data-match="0" aria-pressed="true">① 重なった図</button><button type="button" data-match="1" aria-pressed="false">② 取り出す</button><button type="button" data-match="2" aria-pressed="false">③ 回す</button><button type="button" data-match="3" aria-pressed="false">④ 裏返す</button><button type="button" data-match="4" aria-pressed="false">⑤ 大きさをそろえる</button></div>
+ <label class="check"><input id="match-colors" type="checkbox"> 対応する頂点の色をそろえる</label><div class="lab-result" id="match-result" aria-live="polite"></div></div></div>
+ <p class="lab-foot">元の△ABCを残して比べます。②〜⑤の灰色の破線は1つ前の△DEF。移動・回転・裏返しでは辺の長さは不変。⑤では大きい三角形を2/3倍にして移動します。</p>
+ <details class="reflect"><summary>確かめたあと：対応を言葉にする</summary><p>A↔D、B↔E、C↔F。ABの相手はDEです。向きを変えた別の問題で確かめよう。→ <a href="#q5">問5</a></p></details>
+</section>
+<section class="lab interactive" id="parallel-lab" aria-labelledby="parallel-title">
+ <div class="lab-top"><span class="eyebrow">体験 03 · 条件を変えて比べる</span><h3 id="parallel-title">平行を保つと？ 条件を外すと？</h3><p>DEを上下に動かすと、3つの比はそろったまま？ 次にEだけを動かして予想を確かめよう。</p></div>
+ <div class="lab-grid"><svg class="sim-plot" id="parallel-plot" viewBox="0 0 540 380" role="img" aria-label="三角形の2辺上の点DとEを結ぶ線"></svg><div class="controls">
+ <label class="check"><input type="checkbox" id="parallel-lock" checked> DEをBCに平行に保つ</label>
+ <label class="control" for="parallel-t">Dの位置 AD/AB：<output id="parallel-t-value">0.5</output><input id="parallel-t" type="range" min="0.2" max="0.8" step="0.05" value="0.5"></label>
+ <label class="control" for="parallel-u">Eの位置 AE/AC：<output id="parallel-u-value">0.5</output><input id="parallel-u" type="range" min="0.2" max="0.8" step="0.05" value="0.5" disabled></label>
+ <div class="presets"><button type="button" id="parallel-mid">中点に戻す</button><button type="button" id="parallel-break">Eだけずらす</button></div>
+ <div class="lab-result" id="parallel-result" aria-live="polite"></div></div></div>
+ <p class="lab-foot">A・B・Cは固定。点D・Eは辺の内側だけを動きます。小数は近似表示。平行の判定には丸める前の位置を使います。チェックを外しても、D・Eが同じ割合の位置なら平行です。</p>
+ <details class="reflect"><summary>確かめたあと：なぜ比がそろう？</summary><p>DE∥BC → 同位角が等しい → 2組の角がそれぞれ等しい → △ADE∽△ABC → 対応する辺の比が等しい。この順を紙に書こう。→ <a href="#q17">問17</a></p></details>
+</section>
+<section class="lab interactive" id="scale-lab" aria-labelledby="scale-title">
+ <div class="lab-top"><span class="eyebrow">体験 04 · 長さから面積・体積へ</span><h3 id="scale-title">2倍にしたら、何倍入る？</h3><p>長さを2倍にした正方形・立方体。面積と体積は何倍になるか、先に予想しよう。</p></div>
+ <div class="lab-grid"><svg class="sim-plot" id="scale-plot" viewBox="0 0 540 390" role="img" aria-label="もとの正方形と立方体、拡大後の図"></svg><div class="controls">
+ <label class="control" for="scale-kind">比べるもの<select id="scale-kind"><option value="area">正方形の面積</option><option value="volume">立方体の体積</option><option value="stretch">横はそのまま、縦だけ（比較）</option></select></label>
+ <label class="control" for="scale-k">長さの倍率 k：<output id="scale-k-value">2</output><input id="scale-k" type="range" min="0.5" max="3" step="0.5" value="2"></label>
+ <div class="presets"><button type="button" data-scale="0.5">1/2倍</button><button type="button" data-scale="2">2倍</button><button type="button" data-scale="3">3倍</button></div>
+ <button type="button" class="button" id="scale-reveal" aria-pressed="false">予想したので、結果を見る</button>
+ <div class="lab-result" id="scale-result" aria-live="polite">面積・体積の倍率を紙に予想してから、結果を開こう。</div></div></div>
+ <p class="lab-foot">平面図は固定縮尺。立体図は平行投影の模型で、画面上の角度・斜めの長さを測る図ではありません。格子の1区画はもとの1辺。半端な倍率では端に半区画ができます。</p>
+ <details class="reflect"><summary>確かめたあと：前の教材につなぐ</summary><p>縦だけ2倍と、縦横とも2倍では、面積の倍率が違います。→ <a href="#q28">問28</a> ／ <a href="../quadratic-functions/index.html#apply">二次関数の三角形で比較する</a></p></details>
+</section>

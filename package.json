@@ -4,8 +4,9 @@
   "private": true,
   "description": "Family learning hub with printable and interactive mathematics lessons",
   "scripts": {
-    "test": "node tests/dom.cjs && node tests/family.cjs && node tests/python-dice.cjs && node tests/smoke.cjs && node tests/quadratic-smoke.cjs && node tests/python-vault.cjs && python3 tests/python-vault.py && node tests/python-maze.cjs && python3 tests/python-maze.py && node tests/python-pixel.cjs && python3 tests/python-pixel.py && node tests/quadratic-equations.cjs && python3 tests/quadratic-equations-math.py && node tests/quadratic-equations-smoke.cjs",
-    "test:dom": "node tests/dom.cjs && node tests/family.cjs && node tests/python-dice.cjs && node tests/quadratic-equations.cjs"
+    "test": "node tests/dom.cjs && node tests/family.cjs && node tests/python-dice.cjs && node tests/smoke.cjs && node tests/quadratic-smoke.cjs && node tests/python-vault.cjs && python3 tests/python-vault.py && node tests/python-maze.cjs && python3 tests/python-maze.py && node tests/python-pixel.cjs && python3 tests/python-pixel.py && node tests/quadratic-equations.cjs && python3 tests/quadratic-equations-math.py && node tests/quadratic-equations-smoke.cjs && node tests/similarity.cjs && node tests/similarity-smoke.cjs",
+    "test:dom": "node tests/dom.cjs && node tests/family.cjs && node tests/python-dice.cjs && node tests/quadratic-equations.cjs",
+    "test:similarity": "node tests/similarity.cjs && node tests/similarity-smoke.cjs"
   },
   "devDependencies": {
     "jsdom": "30.0.1",

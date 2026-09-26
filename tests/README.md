@@ -36,3 +36,8 @@ python3 tests/python-dice-tools.py
 ```
 
 全ミッションのセルを順番に実行し、実物のipywidgetsボタンのコールバック、上限、保留、答え合わせ後の停止、再挑戦、不正な出目、HTMLへの安全なタイトル埋め込みを確認します。実際のJupyterLabフロントエンドでの表示確認とは別です。生成したゲームは `test-results/dice-export.html` に残ります。
+
+## 相似
+
+`npm run test:similarity` で幾何・紙とWebの原稿一致・4つの実験・保存・小画面・オフライン・JS無効時を検証します。
+新しいPDFを再生成した場合は、`pdftoppm -png print/similarity-guide.pdf /tmp/similarity-guide` などで全3冊を画像化して目視確認してください。
