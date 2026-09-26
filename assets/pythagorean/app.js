@@ -8,6 +8,67 @@
  const mid=(a,b,t,dx=0,dy=0,c=ink)=>text((a.x+b.x)/2+dx,(a.y+b.y)/2+dy,t,c,19,'middle');
  function right(a,o,b,z=11){const u={x:a.x-o.x,y:a.y-o.y},v={x:b.x-o.x,y:b.y-o.y},nu=Math.hypot(u.x,u.y),nv=Math.hypot(v.x,v.y);if(nu<1e-8||nv<1e-8)return '';const p=point(o.x+u.x/nu*z,o.y+u.y/nu*z),q=point(p.x+v.x/nv*z,p.y+v.y/nv*z),r=point(o.x+v.x/nv*z,o.y+v.y/nv*z);return line(p,q)+line(q,r);}
  function arrow(a,b){const r=Math.atan2(b.y-a.y,b.x-a.x);return line(a,b,gray,'',1.2)+line(b,point(b.x-8*Math.cos(r-.4),b.y-8*Math.sin(r-.4)),gray,'',1.2)+line(b,point(b.x-8*Math.cos(r+.4),b.y-8*Math.sin(r+.4)),gray,'',1.2);}
+ function initHeightSequence(){
+  const sequence=$('#height-sequence');if(!sequence)return;
+  const side=Number(sequence.dataset.side),base=Number(sequence.dataset.base),half=base/2;
+  if(!(side>half&&half>0))return;
+  const square=side*side-half*half,h=Math.sqrt(square),area=base*h/2;
+  const scale=Math.min(360/base,240/h),A=point(320,325-h*scale),B=point(320-half*scale,325),C=point(320+half*scale,325),H=point(320,325);
+  const number=n=>fmt(n),part=(s,c)=>`<span class="sequence-${c}">${s}</span>`;
+  const hTerm=part('h²','height'),baseTerm=part(number(half)+'²','base'),sideTerm=part(number(side)+'²','side');
+  const equation=`${hTerm} ＋ ${baseTerm} ＝ ${sideTerm}`;
+  const steps=[
+   {title:'高さは、どこからどこまで？',message:`等しい2辺が${number(side)}、底辺が${number(base)}の二等辺三角形。面積を求めるには、まず高さが必要です。`,caption:'どこに線を引くと、直角ができる？',description:`2辺が${number(side)}、底辺が${number(base)}。高さを表す補助線はまだありません。`},
+   {title:'頂点から、底辺へ垂線を下ろす',message:'青い線が高さ h。直角の印のところで、2つの直角三角形ができました。',caption:'ここに、直角ができた',description:'頂点から底辺へ青い垂線 h を引き、足元に直角の印が付きました。'},
+   {title:'二等辺三角形だから、底辺も半分',message:`左右は、斜辺${number(side)}と共通の高さ h が等しい直角三角形なので合同。底辺も等しく、${number(base)}÷2＝${number(half)}です。`,caption:'同じ印の2つの部分が等しい',description:`左右の直角三角形は合同。底辺の両半分に同じ印が付き、それぞれ${number(half)}と分かりました。`},
+   {title:'片側だけを見ると、三平方が使える',message:`斜辺は${number(side)}。直角をはさむ辺は h と${number(half)}。色と辺の名前を、式と見比べよう。`,caption:'左の直角三角形に注目',description:`左の直角三角形を強調。高さ h、底辺の半分${number(half)}、斜辺${number(side)}を使って式を作ります。`,formula:equation},
+   {title:'高さ h を求める',message:`h²＝${number(side*side)}−${number(half*half)}＝${number(square)}。h は長さなので、正の値${number(h)}を選びます。`,caption:'高さが分かった',description:`高さ h が${number(h)}に変わりました。`,previous:equation,formula:`${hTerm} ＝ ${number(square)} → ${part('h ＝ '+number(h),'height')}`},
+   {title:'三角形全体へ戻って、面積を求める',message:`面積で使う底辺は、全体の${number(base)}。さっきの${number(half)}は、三平方に使った「半分」でした。`,caption:'面積は「底辺全体 × 高さ ÷ 2」',description:`三角形全体を強調。底辺全体${number(base)}と高さ${number(h)}を使い、面積は${number(area)}です。`,formula:`面積 ＝ ${part(number(base),'base')} × ${part(number(h),'height')} ÷ 2 ＝ ${number(area)}`}
+  ];
+  let index=0;
+  function draw(){
+   const step=steps[index],focusHalf=index===3||index===4;
+   let g=poly([A,B,C],focusHalf?light:gray,index===5?'#edf2e7':'none');
+   if(index===2)g+=poly([A,B,H],light,'#edf3f9')+poly([A,H,C],light,'#edf3f9');
+   if(focusHalf)g+=poly([A,B,H],ink,'#edf3f9',2)+line(B,H,brown,'',2.8);
+   const leftLabel=mid(A,B,number(side),-28,-8,ink),rightLabel=mid(A,C,number(side),28,-8,focusHalf?light:ink);
+   g+=leftLabel+rightLabel;
+   // Equal-side marks establish the isosceles condition before the altitude appears.
+   for(const [P,Q]of [[A,B],[A,C]]){
+    const mx=(P.x+Q.x)/2,my=(P.y+Q.y)/2,dx=Q.x-P.x,dy=Q.y-P.y,len=Math.hypot(dx,dy);
+    g+=line(point(mx-dy/len*6,my+dx/len*6),point(mx+dy/len*6,my-dx/len*6),focusHalf&&Q===C?light:gray);
+   }
+   if(index>=1){
+    g+=`<path data-height-edge d="M ${A.x} ${A.y} L ${H.x} ${H.y}" fill="none" stroke="${blue}" stroke-width="2.8"${index===1?' class="height-draw" pathLength="1"':''}/>`;
+    g+=right(A,H,B)+text(H.x+18,(A.y+H.y)/2+5,index>=4?number(h):'h',blue,22);
+   }
+   if(index>=2&&index<=4){
+    for(const [P,Q]of [[B,H],[H,C]]){
+     const x=(P.x+Q.x)/2;g+=line(point(x,319),point(x,331),brown,'',2);
+     g+=text(x,352,number(half),focusHalf&&P===H?gray:brown,21,'middle');
+    }
+   }
+   if(index===5)g+=line(B,C,brown,'',3);
+   const baseColor=index===5?brown:gray;
+   g+=line(point(B.x,370),point(C.x,370),baseColor,'',1.2)+line(point(B.x,365),point(B.x,375),baseColor,'',1.2)+line(point(C.x,365),point(C.x,375),baseColor,'',1.2);
+   g+=text(320,397,number(base)+(index>=2?'（全体）':''),baseColor,20,'middle');
+   g+=text(320,35,step.caption,index===5?brown:ink,18,'middle');
+   $('#height-plot').innerHTML=g;$('#height-plot').setAttribute('aria-label',step.description);
+   $('#height-count').textContent=`${index+1} / ${steps.length}`;$('#height-title').textContent=step.title;$('#height-message').textContent=step.message;
+   $('#height-calculation').hidden=!step.formula;$('#height-formula').innerHTML=step.formula||'';
+   $('#height-previous').innerHTML=step.previous?'ひとつ前：'+step.previous:'';$('#height-previous').hidden=!step.previous;
+   // Keep boundary controls focusable so a keyboard user does not lose their place.
+   $('#height-prev').setAttribute('aria-disabled',String(index===0));$('#height-next').setAttribute('aria-disabled',String(index===steps.length-1));
+   $('#height-reset').setAttribute('aria-disabled',String(index===0));
+  }
+  $('#height-prev').addEventListener('click',()=>{if(index>0){index--;draw();}});
+  $('#height-next').addEventListener('click',()=>{if(index<steps.length-1){index++;draw();}});
+  $('#height-reset').addEventListener('click',()=>{if(index){index=0;sequence.querySelector('.height-summary').open=false;draw();}});
+  const card=sequence.closest('.concept-card'),notes=card.querySelector('.height-static ol');
+  sequence.querySelector('.height-summary').append(notes.cloneNode(true));
+  draw();sequence.hidden=false;card.classList.add('has-height-sequence');
+ }
+ initHeightSequence();
  let rearrangeShown=false;
  function rearrange(changed=false){
   if(changed)rearrangeShown=false;
@@ -90,7 +151,7 @@
   $('#space-plot').innerHTML=g;$('#space-height-value').textContent=h;$('#space-step').textContent=`手順 ${stage+1} / 4`;$('#space-before').textContent=stage?'ひとつ前：'+steps[stage-1]:'';$('#space-result').textContent=steps[stage];$('#space-prev').disabled=stage===0;$('#space-next').disabled=stage===3;
  }
  $('#space-height').addEventListener('input',()=>space(true));$('#space-prev').addEventListener('click',()=>{stage=Math.max(0,stage-1);space();});$('#space-next').addEventListener('click',()=>{stage=Math.min(3,stage+1);space();});space();
-const dialog=document.createElement('dialog');dialog.className='figure-dialog';dialog.setAttribute('aria-label','図を大きく表示');const close=document.createElement('button');close.textContent='閉じる';close.className='button';const large=document.createElement('div');large.className='large-figure';dialog.append(close,large);document.body.append(dialog);close.addEventListener('click',()=>dialog.close());document.querySelectorAll('.concept-card figure,.q-card figure,.lab-figure').forEach(f=>{const svg=f.querySelector('svg');if(!svg)return;const button=document.createElement('button');button.className='figure-open interactive';button.textContent='図を大きく見る';button.addEventListener('click',()=>{large.replaceChildren(svg.cloneNode(true));dialog.showModal();});f.append(button);});
+const dialog=document.createElement('dialog');dialog.className='figure-dialog';dialog.setAttribute('aria-label','図を大きく表示');const close=document.createElement('button');close.textContent='閉じる';close.className='button';const large=document.createElement('div');large.className='large-figure';dialog.append(close,large);document.body.append(dialog);close.addEventListener('click',()=>dialog.close());document.querySelectorAll('.concept-card figure,.q-card figure,.lab-figure').forEach(f=>{const svg=f.querySelector('svg');if(!svg)return;const button=document.createElement('button');button.className='figure-open interactive';button.textContent='図を大きく見る';button.addEventListener('click',()=>{const copy=svg.cloneNode(true);copy.removeAttribute('id');large.replaceChildren(copy);dialog.showModal();});f.append(button);});
 const key='family-pythagorean-v1' ,allowed=['own','hint','review'];let records={};try{const saved=JSON.parse(localStorage.getItem(key)||'{}');if(saved&&typeof saved==='object'&&!Array.isArray(saved)){for(const [id,v]of Object.entries(saved))if(/^([1-9]|1[0-9]|2[0-8])$/.test(id)&&allowed.includes(v))records[id]=v;}}catch{$('#storage-notice').hidden=false;}
 function render(){let own=0;$('#review-links').replaceChildren();for(const card of document.querySelectorAll('.q-card')){const id=card.id.slice(1),v=records[id];card.querySelector('.q-status').textContent=({own:'自力でできた',hint:'ヒントでできた',review:'もう一度'})[v]||'未記録';card.querySelectorAll('[data-grade]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.grade===v)));if(v==='own')own++;if(v==='hint'||v==='review'){const a=document.createElement('a');a.href='#q'+id;a.textContent='問'+id;$('#review-links').append(a);}}$('#progress-text').textContent=`自力でできた ${own} / 28問。図を使って理由も説明できた？`;}
 document.querySelectorAll('[data-grade]').forEach(b=>b.addEventListener('click',()=>{records[b.closest('.q-card').id.slice(1)]=b.dataset.grade;try{localStorage.setItem(key,JSON.stringify(records));}catch{$('#storage-notice').hidden=false;}render();}));render();
