@@ -6,6 +6,7 @@ from pathlib import Path
 import argparse,json,math,html
 from similarity_visuals import scene
 from similarity_boards import board_scene, BOARD_HEIGHT
+from similarity_workbook import exercise
 from reportlab.pdfgen import canvas
 from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
@@ -129,7 +130,7 @@ page=f'''<!doctype html><html lang="ja"><head><meta charset="utf-8"><meta name="
 <a class="skip" href="#main">本文へスキップ</a><header class="masthead"><a class="brand" href="../../../index.html"><span class="brand-icon">f.</span>家族のまなび帳</a><nav aria-label="家族サイト"><a href="../../index.html">勉強</a><a href="../../../questions/index.html">日々の疑問</a></nav></header>
 <main class="wrap" id="main"><div class="crumbs"><a href="../../../index.html">ホーム</a> / <a href="../index.html">数学</a> / 相似</div>
 <div class="sim-hero"><div><span class="eyebrow">MATHEMATICS / 中3</span><h1>相似。<br>形が同じ、その先へ。</h1><p>向きが違っても、重なっていても。<br>対応を見つけると、測れない長さが見えてくる。</p><div class="actions"><a class="button primary" href="#print">紙の3冊を開く</a><a class="button" href="#shape-lab">予想して、動かす</a></div></div><div class="sim-hero-art">{svg('pair')}</div></div>
-<section class="section" id="print"><h2>紙でじっくり。画面で、はっと気づく。</h2><p>解説を読む → 紙に図と途中式を書く → 解答で理由を確認 → Webで予想を確かめる。紙とWebは同じ32問です。A4・白黒印刷に対応しています。</p><div class="pdf-grid"><a class="button" href="../../../print/similarity-guide.pdf">① 解説 <small>18ページ · 図で一つずつ</small></a><a class="button" href="../../../print/similarity-workbook.pdf">② 問題集 <small>16ページ · 32問＋体験メモ</small></a><a class="button" href="../../../print/similarity-answers.pdf">③ 解答と解説 <small>14ページ · ヒント・途中式・理由</small></a></div>
+<section class="section" id="print"><h2>紙でじっくり。画面で、はっと気づく。</h2><p>解説を読む → 紙に図と途中式を書く → 解答で理由を確認 → Webで予想を確かめる。紙とWebは同じ32問です。A4・白黒印刷に対応しています。</p><div class="pdf-grid"><a class="button" href="../../../print/similarity-guide.pdf">① 解説 <small>18ページ · 図で一つずつ</small></a><a class="button" href="../../../print/similarity-workbook.pdf">② 問題集 <small>18ページ · 32問＋体験メモ</small></a><a class="button" href="../../../print/similarity-answers.pdf">③ 解答と解説 <small>14ページ · ヒント・途中式・理由</small></a></div>
 <div class="plan-strip">1回目：問1〜12と体験①② ／ 2回目：問13〜20と体験③ ／ 3回目：問21〜28と体験④。問29〜32は翌日以降に、解答を閉じて再挑戦。各回30〜45分を目安に、必要なところだけで大丈夫です。</div><p class="muted">前の単元へ：<a href="../square-roots/index.html">平方根</a> · <a href="../quadratic-equations/index.html">二次方程式</a> · <a href="../quadratic-functions/index.html">二次関数</a></p></section>
 <noscript><p class="notice">解説と全32問・解答はこのまま読めます。動く図と学習記録にはJavaScriptが必要です。紙の体験メモは予想や説明の練習にも使えます。</p></noscript>
 <div class="lesson-layout"><nav class="toc" aria-label="相似の目次"><strong>相似の道しるべ</strong>{nav}<a href="#practice">9. 紙と同じ32問</a><a href="#records">10. 振り返り</a></nav><div class="lesson-body">{''.join(chapters)}
@@ -221,17 +222,13 @@ b.save()
 pages=[Q[:4],Q[4:6],Q[6:8],Q[8:12]]+[Q[i:i+2] for i in range(12,32,2)]
 for kind,title in [('workbook','相似 ② 問題集'),('answers','相似 ③ 解答と解説')]:
  b=Book(kind,title)
- for qs in pages:
+ for qs in ([Q[i:i+2] for i in range(0,32,2)] if kind=='workbook' else pages):
   b.page(f'{qs[0]["group"]} | 問{qs[0]["id"]}〜{qs[-1]["id"]}','図に対応を書き、途中式と理由を残そう。図の長さは本文の条件を使います。' if kind=='workbook' else 'まずヒントだけ見る使い方もOK。解答を閉じて、もう一度説明しよう。')
   slot=650/len(qs)
   for i,q in enumerate(qs):
    start=126+i*slot;b.y=start
    if kind=='workbook':
-    b.para(f'問{q["id"]}  {q["prompt"]}',10.5,leading=17)
-    if q.get('figure'):b.figure(q['figure'],q['id'],height=72 if len(qs)==4 else 115)
-    end=start+slot-15;assert b.y<end-28,(q['id'],b.y,end)
-    b.c.setStrokeColor(HexColor(LINE));b.c.setLineWidth(.5);b.c.line(44,H-end,W-44,H-end)
-    b.text('□ 自力でできた   □ ヒントでできた   □ もう一度',44,end-15,8.5,GRAY)
+    exercise(b,q,start,start+slot-16)
    else:
     b.para(f'問{q["id"]}  ヒント：{q["hint"]}',9.5,leading=16)
     b.para(q['answer'],12,leading=20)
