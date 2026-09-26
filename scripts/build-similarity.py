@@ -5,6 +5,7 @@ Dependencies: reportlab, fonttools. No network or browser dependencies.
 from pathlib import Path
 import argparse,json,math,html
 from similarity_visuals import scene
+from similarity_boards import board_scene, BOARD_HEIGHT
 from reportlab.pdfgen import canvas
 from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
@@ -69,9 +70,10 @@ def svg(kind,qid=0):
 
 def figure(kind,qid=0):return '<figure class="reading-figure">'+svg(kind,qid)+'<figcaption>図は関係を整理するためのものです。長さや角度は本文の条件を使います。</figcaption></figure>'
 def visual_primitives(v):
+ if v.get('layout')=='board':return board_scene(v['figure'])
  return drawing('stretch') if v['figure']=='stretch' else scene(v['figure'])
 def visual_svg(v):
- parts=[f'<svg class="concept-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 550 290" role="img" aria-label="{esc(v["title"]+"。"+v["focus"])}">']
+ parts=[f'<svg class="concept-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 550 {BOARD_HEIGHT if v.get('layout')=='board' else 290}" role="img" aria-label="{esc(v["title"]+"。"+v["focus"])}">']
  for p in visual_primitives(v):
   typ=p[0]
   if typ in ('line','segment'):
@@ -96,6 +98,11 @@ def rich(s,v):
  return ''.join(f'<span class="math-key key-{m[t]}">{esc(t)}</span>' if t in m else esc(t) for t in re.split('('+'|'.join(sorted(m,key=len,reverse=True))+')',s))
 def visual_card(v,j):
  rows=''.join(f'<div class="reading-step"><span class="step-no">{i+1}</span><div><h4>{rich(h,v)}</h4><p>{rich(t,v)}</p></div></div>' for i,(h,t) in enumerate(v['steps']))
+ if v.get('layout')=='board':
+  board=visual_svg(v)
+  board_dir=R/'assets/similarity/boards';board_dir.mkdir(exist_ok=True)
+  (board_dir/(v['figure']+'.svg')).write_text(board.replace('<svg ', '<svg style="background:white" ',1))
+  return f'<article class="concept-card board-card"><p class="concept-page">解説PDF {j+1}ページ</p><h3>{esc(v["title"])}</h3><p class="concept-focus">{esc(v["focus"])}</p><figure>{board}<figcaption><a href="../../../assets/similarity/boards/{v['figure']}.svg" target="_blank" rel="noopener">図を大きく開く</a></figcaption></figure><details class="board-transcript"><summary>説明を文章で確かめる</summary><div class="concept-steps">{rows}</div></details></article>'
  return f'<article class="concept-card"><p class="concept-page">解説PDF {j+1}ページ</p><h3>{esc(v["title"])}</h3><p class="concept-focus">{esc(v["focus"])}</p><figure>{visual_svg(v)}</figure><div class="concept-steps">{rows}</div><p class="concept-take">{rich(v["take"],v)}</p></article>'
 raw=(R/'materials/similarity/labs.html').read_text()
 # Split complete top-level lab sections, and insert them beside the relevant chapter.
@@ -171,7 +178,7 @@ class Book:
  def check(self):assert self.y<787,(self.title,self.n,self.y)
  def save(self):self.c.save();print(self.title,self.n,'pages')
 def visual_pdf(b,v):
- scale=220/290;ox=(W-550*scale)/2;oy=b.y;c=b.c
+ scale=507/550 if v.get('layout')=='board' else 220/290;ox=(W-550*scale)/2;oy=b.y;c=b.c
  for p in visual_primitives(v):
   typ=p[0]
   if typ in ('text','label'):
@@ -183,7 +190,7 @@ def visual_pdf(b,v):
    _,pts,fill,col=p;c.setFillColor(HexColor(fill));c.setStrokeColor(HexColor(col));c.setLineWidth(.8);path=c.beginPath()
    for i,(x,y) in enumerate(pts):(path.moveTo if i==0 else path.lineTo)(ox+x*scale,H-oy-y*scale)
    path.close();c.drawPath(path,stroke=1,fill=1)
- b.y+=235
+ b.y+=(BOARD_HEIGHT*scale+8) if v.get('layout')=='board' else 235
 
 def richpara(b,s,v,size=12,x=66,width=478,leading=23):
  # Keep each mathematical token together, with redundant color + underline pattern.
@@ -205,7 +212,7 @@ b=Book('guide','相似 ① 解説')
 for v in V:
  ch=next(ch for ch in C if ch['id']==v['chapter'])
  b.page(v['title'],ch['lead']);b.para(v['focus'],12.5,leading=22);visual_pdf(b,v)
- for i,(heading,body) in enumerate(v['steps']):
+ for i,(heading,body) in enumerate([] if v.get('layout')=='board' else v['steps']):
   b.text(str(i+1),44,b.y,13,BLUE);richpara(b,heading,v,13);b.y+=6;richpara(b,body,v);b.y+=19
  b.y+=3;b.c.setStrokeColor(HexColor(LINE));b.c.line(44,H-b.y,W-44,H-b.y);b.y+=14;richpara(b,v['take'],v,11.5,x=44,width=507,leading=22)
  b.check()

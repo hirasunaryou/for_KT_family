@@ -4,11 +4,17 @@ const server=http.createServer((req,res)=>{let p=decodeURIComponent(req.url.spli
 (async()=>{await new Promise(r=>server.listen(0,'127.0.0.1',r));const base=`http://127.0.0.1:${server.address().port}/`,url=base+'study/math/similarity/index.html';const browser=await chromium.launch({headless:true,...(process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH?{executablePath:process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH}:{})});try{
  const context=await browser.newContext({viewport:{width:1440,height:1000}}),page=await context.newPage(),errors=[],external=[];page.on('pageerror',e=>errors.push(e.message));page.on('request',r=>{if(!r.url().startsWith(base))external.push(r.url());});await page.goto(base);await page.getByRole('link',{name:'相似を開く →',exact:true}).click();await expect(page.locator('h1')).toContainText('相似');await expect(page.locator('.lab.interactive:visible')).toHaveCount(4);
  await expect(page.locator('.concept-card')).toHaveCount(18);
+ await expect(page.locator('.board-card')).toHaveCount(3);
+ await expect(page.locator('.board-transcript[open]')).toHaveCount(0);
+ await page.locator('.board-transcript summary').first().click();
+ await expect(page.locator('.board-transcript').first()).toHaveAttribute('open','');
+ await page.locator('.board-transcript summary').first().click();
  for(const card of await page.locator('.concept-card').all()){
   await expect(card.locator('.reading-step')).toHaveCount(3);
   const box=await card.locator('svg').evaluate(s=>{const b=s.getBBox(),v=s.viewBox.baseVal;return {x:b.x,y:b.y,right:b.x+b.width,bottom:b.y+b.height,w:v.width,h:v.height};});
   assert(box.x>=0&&box.y>=0&&box.right<=box.w&&box.bottom<=box.h,JSON.stringify(box));
  }
+ await page.locator('#parallel .concept-card').nth(1).locator('svg').screenshot({path:path.join(out,'similarity-whiteboard-ratios.png')});
  await page.locator('#parallel .concept-card').nth(1).screenshot({path:path.join(out,'similarity-readability-desktop.png')});
  await page.screenshot({path:path.join(out,'similarity-desktop.png')});
  await page.locator('[data-shape="wide,2"]').click();await expect(page.locator('#shape-result')).toContainText('相似ではない');await page.locator('[data-shape="both,2"]').click();await expect(page.locator('#shape-result')).not.toContainText('相似ではない');
