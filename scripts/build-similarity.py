@@ -178,7 +178,7 @@ class Book:
  def check(self):assert self.y<787,(self.title,self.n,self.y)
  def save(self):self.c.save();print(self.title,self.n,'pages')
 def visual_pdf(b,v):
- scale=507/550 if v.get('layout')=='board' else 220/290;ox=(W-550*scale)/2;oy=b.y;c=b.c
+ scale=480/550 if v.get('layout')=='board' else 220/290;ox=(W-550*scale)/2;oy=b.y;c=b.c
  for p in visual_primitives(v):
   typ=p[0]
   if typ in ('text','label'):
