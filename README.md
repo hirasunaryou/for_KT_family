@@ -8,9 +8,14 @@
 - [Python続編：サイコロ金庫破り](https://hirasunaryou.github.io/for_KT_family/study/programming/python-dice-vault/)
 - [Python：JupyterLabでサイコロ探偵を作る](https://hirasunaryou.github.io/for_KT_family/study/programming/python-dice-jupyter/)
 - [Python：ブラウザで実行するサイコロ探偵](https://hirasunaryou.github.io/for_KT_family/study/programming/python-dice/)
+- [相似：紙の3冊と4つのWeb体験](https://hirasunaryou.github.io/for_KT_family/study/math/similarity/)
 - [二次関数：中3 y = ax²](https://hirasunaryou.github.io/for_KT_family/study/math/quadratic-functions/)
 - [平方根：中3](https://hirasunaryou.github.io/for_KT_family/study/math/square-roots/)
 - [日々の疑問](https://hirasunaryou.github.io/for_KT_family/questions/)：記事を追加するための入口。現在は記事なし。
+
+## 教材を制作・改訂する方へ
+
+[AGENTS.md](AGENTS.md) に、紙とWebの役割、図と式の対応、読みやすさ、良問・解答設計、検証・公開の方針をまとめています。
 
 ## ページの階層
 
