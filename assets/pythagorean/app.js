@@ -63,13 +63,28 @@
  let stage=0;
  function space(reset=false){
   if(reset)stage=0;const h=Number($('#space-height').value),m=M.box(3,4,h),scale=18,cv=p=>point(66+(p.x+.55*p.y)*scale,336-(p.z+.32*p.y)*scale),raw=[{x:0,y:0,z:0},{x:3,y:0,z:0},{x:3,y:4,z:0},{x:0,y:4,z:0},{x:0,y:0,z:h},{x:3,y:0,z:h},{x:3,y:4,z:h},{x:0,y:4,z:h}],p=raw.map(cv),[A,B,C,D,E,F,G,H]=p;
-  let g=text(100,35,'箱の見取り図',gray,18,'middle');
+  let g=text(114,35,'箱の見取り図',gray,18,'middle');
+  // Fill first, then redraw the wireframe, so the front edge stays in front.
+  if(stage>=2)g+=poly([A,C,G],blue,'#edf3f9');
+  if(stage>=1)g+=poly([A,B,C],brown,'#f7eee6');
   for(const [i,j]of [[0,1],[1,2],[2,3],[3,0],[4,5],[5,6],[6,7],[7,4],[0,4],[1,5],[2,6],[3,7]])g+=line(p[i],p[j],gray,([3].includes(i)||j===3)?'4 3':'');
-  g+=mid(A,B,'3',0,24)+mid(B,C,'4',28,40)+mid(C,G,fmt(h),24,5)+text(A.x-23,A.y+14,'A')+text(C.x+11,C.y+2,'C')+text(G.x+10,G.y-13,'G')+line(A,G,ink,'6 4',2);
-  if(stage>=1){g+=poly([A,C,stage===1?B:G],blue,'#edf3f9')+line(A,C,blue,'',2);}
-  if(stage>=2)g+=line(A,G,ink,'',2);
-  // The extracted triangle changes by stage; both axes use fixed 18 px/unit.
-  if(stage>=1){const u=stage===1?3:5,v=stage===1?4:h,origin=point(359,338),P=origin,Q=point(origin.x+u*18,origin.y),S=point(Q.x,Q.y-v*18);g+=arrow(point(207,228),point(284,228))+poly([P,Q,S],blue,'#edf3f9')+right(P,Q,S)+mid(P,Q,fmt(u),0,28,blue)+mid(Q,S,fmt(v),25,4,brown);if(stage===1)g+=mid(P,S,'d = 5',-24,-12);if(stage===3)g+=mid(P,S,`ℓ = ${M.radical(m.square)}`,-34,-13);g+=text(429,35,stage===1?'底面の三角形':'高さと作る三角形',blue,18,'middle');}
+  if(stage>=1)g+=line(A,B,brown,'',2)+line(B,C,brown,'',2)+line(A,C,blue,'',2.6);
+  g+=line(A,G,ink,stage>=2?'':'6 4',2);
+  if(stage>=2)g+=line(C,G,ink,'',2);
+  g+=line(B,F,'white','',4.2)+line(B,F,gray,'',1.7);
+  g+=mid(A,B,'3',0,28,stage?brown:ink)+mid(B,C,'4',27,28,stage?brown:ink)+mid(C,G,fmt(h),26,5)+text(A.x-23,A.y+14,'A')+text(B.x-4,B.y+16,'B')+text(C.x+13,C.y+4,'C')+text(G.x+10,G.y-13,'G');
+  // Extracted triangles keep one scale and the shared edge AC stays blue.
+  if(stage>=1){
+   const first=stage===1,u=first?3:5,v=first?4:h,P=point(358,338),Q=point(P.x+u*18,P.y),S=point(Q.x,Q.y-v*18),color=first?brown:blue;
+   const arrowY=(Q.y+S.y)/2;
+   g+=arrow(point(225,arrowY),point(284,arrowY))+poly([P,Q,S],first?brown:ink,first?'#f7eee6':'#edf3f9')+right(P,Q,S);
+   g+=line(P,first?S:Q,blue,'',2.6)+mid(P,Q,fmt(u),0,29,first?brown:blue)+mid(Q,S,fmt(v),28,5,first?brown:ink);
+   if(first)g+=mid(P,S,'5',-24,-10,blue);
+   if(stage===3)g+=mid(P,S,M.radical(m.square),-30,-10,ink);
+   g+=text(P.x-22,P.y+7,'A')+text(Q.x+11,Q.y+19,first?'B':'C')+text(S.x+10,S.y-12,first?'C':'G');
+   g+=text(429,35,first?'① 底面 ABC':'② 断面 ACG',color,20,'middle');
+   g+=text(429,70,first?'青いACを求める':'青いACを、次の底辺へ',blue,17,'middle');
+  }
   g+=text(320,400,'図を取り出しても、同じ辺には同じ長さ。',gray,18,'middle');
   const steps=['底面の対角線ACと、空間の対角線AG。どちらから求める？','底面でd² = 3²＋4² = 25。d = 5。',`AC = 5を次の三角形へ。CG = ${h}は底面に垂直なので、ACとも垂直。`,`ℓ² = 5²＋${h}² = ${m.square}。ℓ = ${M.radical(m.square)}。`];
   $('#space-plot').innerHTML=g;$('#space-height-value').textContent=h;$('#space-step').textContent=`手順 ${stage+1} / 4`;$('#space-before').textContent=stage?'ひとつ前：'+steps[stage-1]:'';$('#space-result').textContent=steps[stage];$('#space-prev').disabled=stage===0;$('#space-next').disabled=stage===3;

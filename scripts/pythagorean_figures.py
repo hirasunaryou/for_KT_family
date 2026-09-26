@@ -88,7 +88,8 @@ def scene(f,answer=False,guide=False,qid=0):
   s.text(167,320,'25＋144＝169',20,BLUE,'middle');s.text(478,320,'16＋25 ≠ 36',20,BROWN,'middle');s.text(167,357,'直角になる',19,BLUE,'middle');s.text(478,357,'直角ではない',19,BROWN,'middle')
  elif k=='rectangle':
   a,b=f['a'],f['b'];cv,_=s.fit([(0,0),(a,b)],(195,80,245,230));A,B,C,D=map(cv,[(0,0),(a,0),(a,b),(0,b)]);s.poly([A,B,C,D],fill=WHITE);s.line(A,C,BLUE,2,'5 3');s.right(A,B,C);s.mid(A,B,fmt(a) if answer and 'x' in f['al'] else f['al'],(0,29));s.mid(A,D,fmt(b) if answer and f['bl']=='x' else f['bl'],(-33,7));s.mid(A,C,f.get('sol',f['cl']) if shown else f['cl'],(-22,-22),BLUE)
-  if guide:s.text(25,35,'短い辺を x と置く',19);s.arrow((187,45),((A[0]+D[0])/2-5,(A[1]+D[1])/2));s.text(320,375,'x²＋(x＋1)²＝5²',23,INK,'middle')
+  if guide:
+   s.line(A,D,BROWN,2);s.text(20,253,'短い辺を',18,BROWN);s.text(20,281,'x と置く',18,BROWN);s.arrow((142,251),(A[0]-5,A[1]-42),BROWN);s.text(320,375,'x²＋(x＋1)²＝5²',23,INK,'middle')
  elif k in ['isosceles','special']:
   if k=='special':
    transform(s,scene(dict(kind='rectangle',a=1,b=1,al='1',bl='1',cl='√2'),True),.60,-50,25)
@@ -180,19 +181,34 @@ def circle_scene(s,f,shown,guide):
   if guide:s.text(20,35,'半径と接線は垂直',19,BLUE);s.arrow((219,43),A)
 
 def box_scene(s,f,shown,guide):
- a,b,h=f['a'],f['b'],f['h'];proj=lambda p:(p[0]+.55*p[1],p[2]+.32*p[1]);verts=[(0,0,0),(a,0,0),(a,b,0),(0,b,0),(0,0,h),(a,0,h),(a,b,h),(0,b,h)];raw=list(map(proj,verts));cv,sc=s.fit(raw,(53,73,235,230) if shown else (190,60,260,260));p=list(map(cv,raw));A,B,C,D,E,F,G,H=p
- for i,j in [(0,1),(1,2),(2,3),(3,0),(4,5),(5,6),(6,7),(7,4),(0,4),(1,5),(2,6),(3,7)]:s.line(p[i],p[j],GRAY,1.4,'4 3' if (i,j) in [(2,3),(3,0),(3,7)] else '')
- s.line(A,G,INK,2,'6 3');s.mid(A,B,fmt(a),(0,25));s.mid(B,C,fmt(b),(26,37));s.mid(C,G,fmt(h),(22,4));s.tag(A,'A',-22,15);s.tag(C,'C',13,0);s.tag(G,'G',10,-13)
+ a,b,h=f['a'],f['b'],f['h'];proj=lambda p:(p[0]+.55*p[1],p[2]+.32*p[1]);verts=[(0,0,0),(a,0,0),(a,b,0),(0,b,0),(0,0,h),(a,0,h),(a,b,h),(0,b,h)];raw=list(map(proj,verts));cv,sc=s.fit(raw,(40,68,210,242) if shown else (190,60,260,260));p=list(map(cv,raw));A,B,C,D,E,F,G,H=p
+ # Paint the two sections first; the wireframe in front must remain visible.
  if shown:
-  s.poly([A,C,G],BLUE,PALE_BLUE,w=1.5);s.line(A,C,BLUE,2);s.line(A,G,INK,2);d=math.hypot(a,b);diag=math.hypot(d,h)
-  # Both extracted triangles use one common scale, separate from the projection.
-  unit=min(40,192/max(h,b),110/max(a,d))
-  for idx,(u,v,label) in enumerate([(a,b,fmt(d) if d==int(d) else '2√2'),(d,h,fmt(diag) if diag==int(diag) else '2√3')]):
-   ox,oy=(342,171) if idx==0 else (404,351)
-   AA,CC,GG=(ox,oy),(ox+u*unit,oy),(ox+u*unit,oy-v*unit);s.poly([AA,CC,GG],BLUE,PALE_BLUE);s.right(AA,CC,GG,9);s.mid(AA,CC,fmt(u) if idx==0 or abs(d-round(d))<1e-9 else '2√2',(0,24),BLUE);s.mid(CC,GG,fmt(v),(26,6),BROWN);s.mid(AA,GG,label,(-24,-7));s.text(327 if idx==0 else 421,79 if idx==0 else 221,str(idx+1),20,BLUE)
-  s.arrow((297,191),(350,191));
-  if guide:s.text(167,361,'箱の見取り図',16,GRAY,'middle');s.text(458,38,'同じ縮尺で取り出す',16,GRAY,'middle')
- elif not guide:s.text(320,378,'見取り図。長さは数値を使う。',17,GRAY,'middle')
+  s.poly([A,C,G],BLUE,PALE_BLUE,w=1);s.poly([A,B,C],BROWN,PALE_BROWN,w=1)
+ edges=[(0,1),(1,2),(2,3),(3,0),(4,5),(5,6),(6,7),(7,4),(0,4),(1,5),(2,6),(3,7)]
+ for i,j in edges:s.line(p[i],p[j],GRAY,1.5,'4 3' if (i,j) in [(2,3),(3,0),(3,7)] else '')
+ if shown:
+  s.line(A,B,BROWN,2);s.line(B,C,BROWN,2);s.line(A,C,BLUE,2.6);s.line(C,G,INK,2);s.line(A,G,INK,2)
+ else:s.line(A,G,INK,2,'6 3')
+ # A thin white underlay distinguishes the front edge where it crosses AG.
+ s.line(B,F,WHITE,4.2);s.line(B,F,GRAY,1.6)
+ s.mid(A,B,fmt(a),(0,28),BROWN if shown else INK);s.mid(B,C,fmt(b),(27,27),BROWN if shown else INK);s.mid(C,G,fmt(h),(26,5));s.tag(A,'A',-22,12);s.tag(C,'C',13,6);s.tag(G,'G',10,-14)
+ if shown:
+  s.tag(B,'B',-4,15);d=math.hypot(a,b);diag=math.hypot(d,h)
+  dl=fmt(d) if abs(d-round(d))<1e-9 else '2√2';ll=fmt(diag) if abs(diag-round(diag))<1e-9 else '2√3'
+  # A common scale is used for BOTH extracted triangles, separate from projection.
+  unit=min(38,185/max(h,b),88/max(a,d));u=a*unit;v=b*unit
+  P,Q,T=(318,216),(318+u,216),(318+u,216-v)
+  s.text(305,59,'① 底面 ABC',19,BROWN);s.poly([P,Q,T],BROWN,PALE_BROWN);s.line(P,T,BLUE,2.6);s.right(P,Q,T,9)
+  s.mid(P,Q,fmt(a),(0,27),BROWN);s.mid(Q,T,fmt(b),(25,5),BROWN);s.mid(P,T,dl,(-25,-8),BLUE)
+  for pt,label,dx,dy in [(P,'A',-19,3),(Q,'B',10,21),(T,'C',7,-10)]:s.tag(pt,label,dx,dy)
+  u=d*unit;v=h*unit;P,Q,T=(458,344),(458+u,344),(458+u,344-v)
+  s.text(442,114,'② 断面 ACG',19,BLUE);s.poly([P,Q,T],INK,PALE_BLUE);s.line(P,Q,BLUE,2.6);s.right(P,Q,T,9)
+  s.mid(P,Q,dl,(0,29),BLUE);s.mid(Q,T,fmt(h),(26,5));s.mid(P,T,ll,(-24,-8))
+  for pt,label,dx,dy in [(P,'A',-20,7),(Q,'C',11,17),(T,'G',10,-11)]:s.tag(pt,label,dx,dy)
+  if guide:s.text(142,370,'箱の見取り図',16,GRAY,'middle')
+  s.text(299,280,'共通の辺 AC',18,BLUE);s.text(299,311,'①の斜辺が',17,BLUE);s.text(299,338,'②の底辺に',17,BLUE)
+ else:s.text(320,378,'見取り図。長さは数値を使う。',17,GRAY,'middle')
 
 def svg(primitives,title='三平方の図'):
  parts=[f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 400" role="img" aria-label="{html.escape(title)}">']
