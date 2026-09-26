@@ -13,6 +13,8 @@
 - [平方根：中3](https://hirasunaryou.github.io/for_KT_family/study/math/square-roots/)
 - [日々の疑問](https://hirasunaryou.github.io/for_KT_family/questions/)：記事を追加するための入口。現在は記事なし。
 
+円教材の原稿・構成・再生成方法は [materials/circle/README.md](materials/circle/README.md) を参照してください。
+
 ## 教材を制作・改訂する方へ
 
 [AGENTS.md](AGENTS.md) に、紙とWebの役割、図と式の対応、読みやすさ、良問・解答設計、検証・公開の方針をまとめています。
