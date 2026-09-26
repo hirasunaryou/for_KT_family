@@ -2,33 +2,100 @@ import {lessons, gameCode} from './lessons.js';
 const assetURL=name=>new URL(name,import.meta.url).href;
 const $=s=>document.querySelector(s);
 const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-let saved={};try{saved=JSON.parse(localStorage.getItem('family-python-dice-v1')||'{}')||{}}catch{}
+let storageState='idle';
+let saved={};try{saved=JSON.parse(localStorage.getItem('family-python-dice-v1')||'{}')||{}}catch{storageState='unavailable';}
 let current=Number.isInteger(saved.current)&&saved.current>=0&&saved.current<lessons.length?saved.current:0;
 let drafts=saved.drafts&&typeof saved.drafts==='object'?saved.drafts:{}, completed=Array.isArray(saved.completed)?[...new Set(saved.completed.filter(i=>Number.isInteger(i)&&i>=0&&i<7))]:[], notes=saved.notes&&typeof saved.notes==='object'?saved.notes:{};
 let epoch=0;
-let worker=null,ready=false,busy=false,timer=null,initTimer=null,pending=null,game=null,lastCode='',runSucceeded=false,workerText=null,storageWarned=false;
+let worker=null,ready=false,busy=false,timer=null,initTimer=null,pending=null,game=null,lastCode='',runSucceeded=false,workerText=null;
 const app=$('#app');
 function toast(msg){let x=$('#notice');if(x)x.remove();x=document.createElement('div');x.id='notice';x.className='notice';x.setAttribute('role','status');x.textContent=msg;document.body.append(x);setTimeout(()=>x.remove(),5000)}
-function save(){try{localStorage.setItem('family-python-dice-v1',JSON.stringify({current,drafts,completed,notes}));}catch{if(!storageWarned){toast('このブラウザでは保存できないよ。「Python保存」でコードを残そう。');storageWarned=true;}}}
+function save(){
+ try{localStorage.setItem('family-python-dice-v1',JSON.stringify({current,drafts,completed,notes}));storageState='saved';}
+ catch{storageState='unavailable';}
+ showStorageState();
+}
+function showStorageState(){
+ const unavailable=storageState==='unavailable';
+ const message=unavailable
+  ? 'このブラウザに保存できていません。閉じる・再読み込みの前に、各ミッションで「Python保存」を押して、コードとメモを残そう。'
+  : storageState==='saved' ? 'コード・メモ・進み具合を、このブラウザに保存しました。' : '編集すると、コード・メモ・進み具合をこのブラウザに自動保存します。';
+ const status=$('#storage-status');
+ if(status&&status.textContent!==message)status.textContent=message;
+ $('#storage-panel')?.classList.toggle('storage-unavailable',unavailable);
+ if($('#storage-export'))$('#storage-export').hidden=!unavailable;
+ const summary=$('#storage-summary');
+ if(summary)summary.textContent=unavailable ? 'このブラウザに保存できていません。コード欄の「Python保存」を使おう。' : '自動保存はこのブラウザだけ。大切なコードは「Python保存」でも残そう。';
+ const note=$('#notes-storage');
+ if(note)note.textContent=unavailable ? 'メモもまだ保存できていません。このミッションの「Python保存」に一緒に入るよ。' : 'メモも自動保存の対象です。このミッションの「Python保存」にも入るよ。';
+}
 function code(){return drafts[current]??lessons[current].starter}
 function render(){const l=lessons[current];app.innerHTML=`
 <header class="masthead"><div class="brand"><span class="brandmark" aria-hidden="true">⚄</span><div><div class="eyebrow">PYTHON GAME WORKSHOP</div><strong>サイコロ探偵</strong></div></div><div class="top-actions"><a href="../../../index.html">家族の入口</a><a href="../python-dice-jupyter/index.html">JupyterLabで作る</a><button id="demo">完成ゲームで遊ぶ</button><button id="pack">教材HTMLを保存</button><a href="#help">困ったとき</a></div></header>
-<div class="shell"><aside class="sidebar"><div class="sidebar-title"><strong>制作ミッション</strong><span class="small">${completed.length} / 7</span></div><div class="progress-track"><div class="progress-fill" style="width:${completed.length/7*100}%"></div></div><nav class="mission-nav" aria-label="ミッション">${lessons.map((x,i)=>`<button class="mission-link ${current===i?'active':''}" data-lesson="${i}" ${current===i?'aria-current="step"':''}><span class="mission-num">${completed.includes(i)?'✓':String(i+1).padStart(2,'0')}</span><span>${esc(x.title)}<span class="meta">${x.tag} · ${x.time}</span></span></button>`).join('')}</nav><div class="sidebar-footer"><span class="chip">きょうは1つでもOK</span><p style="margin-top:10px">動かす。変える。<br>おもしろくする。</p><p class="small" style="margin-top:12px">コードと進み具合は、このブラウザに保存されるよ。</p></div></aside>
+<div class="shell"><aside class="sidebar"><div class="sidebar-title"><strong>制作ミッション</strong><span class="small">${completed.length} / 7</span></div><div class="progress-track"><div class="progress-fill" style="width:${completed.length/7*100}%"></div></div><nav class="mission-nav" aria-label="ミッション">${lessons.map((x,i)=>`<button class="mission-link ${current===i?'active':''}" data-lesson="${i}" ${current===i?'aria-current="step"':''}><span class="mission-num">${completed.includes(i)?'✓':String(i+1).padStart(2,'0')}</span><span>${esc(x.title)}<span class="meta">${x.tag} · ${x.time}</span></span></button>`).join('')}</nav><div class="sidebar-footer"><span class="chip">きょうは1つでもOK</span><p style="margin-top:10px">動かす。変える。<br>おもしろくする。</p><p id="storage-summary" class="small" style="margin-top:12px"></p></div></aside>
 <main class="main"><div class="chapter-head"><div><div class="eyebrow">MISSION ${String(current+1).padStart(2,'0')} / 07</div><h1>${esc(l.title)}</h1><p>${esc(l.goal)}</p></div><span class="chapter-tag">${esc(l.tag)} · 約${l.time}</span></div>
 <div class="workbench"><section class="guide" aria-label="学びとヒント"><div class="card story"><div class="card-body"><div class="section-label">今回のミッション</div><p>${esc(l.story)}</p>${l.reading.map(([t,p])=>`<div class="reading-item"><h3>${esc(t)}</h3><p>${esc(p)}</p></div>`).join('')}<div class="prediction"><h3>動かす前に、予想しよう</h3><p>${esc(l.predict)}</p><details><summary>考えてから答えを見る</summary><p>${esc(l.answer)}</p></details></div></div></div>
 <div class="card task"><div class="card-body"><span class="chip">自分で書く・変える</span><h3 style="margin-top:10px">やってみよう</h3><p>${esc(l.task)}</p></div></div>
 <div class="card hints-card"><div class="card-body"><h3>詰まっても、大丈夫。</h3><p class="small" style="margin:5px 0 12px">必要なところまで、少しずつ開こう。</p><details><summary>ヒント1 · 考え方</summary><p>${esc(l.hints[0])}</p></details><details><summary>ヒント2 · 書き方</summary><p>${esc(l.hints[1])}</p></details><details><summary>ヒント3 · 完成例を見る</summary><p>自分のコードと、どこが違うかな？</p><pre class="sample-code">${esc(l.solution)}</pre><button id="use-solution">完成例をエディタに入れる</button><p class="small">今のコードは「ひとつ前に戻す」で戻せるよ。</p></details><div class="challenge"><h3>もっと改造したい君へ</h3><p class="small">${esc(l.challenge)}</p></div></div></div>
-<div class="card"><div class="card-body"><label for="notes"><strong>実験・アイデアメモ</strong></label><p class="small">変えたところ、起きたこと、次に試したいこと。</p><textarea id="notes" class="notes" placeholder="例：100回だと6が22%。もう一度試したら…">${esc(notes[current]??'')}</textarea><p class="small">このブラウザに自動保存。Python保存にもメモが入るよ。</p></div></div>
+<div class="card"><div class="card-body"><label for="notes"><strong>実験・アイデアメモ</strong></label><p class="small">変えたところ、起きたこと、次に試したいこと。</p><textarea id="notes" class="notes" placeholder="例：100回だと6が22%。もう一度試したら…">${esc(notes[current]??'')}</textarea><p id="notes-storage" class="small"></p></div></div>
 <div class="card"><div class="card-body"><p>${esc(l.takeaway)}</p><label class="completion" style="margin-top:15px"><input id="complete" type="checkbox" ${completed.includes(current)?'checked':''}>自分で動かして、確かめた！</label><div class="nextrow"><button id="prev" ${current===0?'disabled':''}>前へ</button><button class="primary" id="next" ${current===6?'disabled':''}>次のミッションへ</button></div></div></div></section>
-<section class="studio" aria-label="Pythonを実行する"><div class="card editor-card"><div class="editor-top"><span>my_game.py</span><span class="chip">書いて動かそう</span></div><label class="sr-only" for="editor">Pythonコード</label><div class="editor-wrap"><div class="line-numbers" aria-hidden="true"></div><textarea id="editor" class="code-editor" spellcheck="false" autocapitalize="off" autocomplete="off" autocorrect="off" wrap="off">${esc(code())}</textarea></div><div class="editor-controls"><button id="run" class="run">▶ 実行する</button><button id="stop" class="quiet" disabled>停止</button><button id="reset" class="quiet">最初のコード</button><button id="undo" class="quiet">ひとつ前に戻す</button><span id="runtime-status" class="runtime-status" role="status">${ready?'Python準備OK':'実行するとPythonを準備するよ'}</span></div><div class="editor-tip">Tabで4マス字下げ / Ctrl・⌘ + Enterで実行<br>実行は毎回まっさらな状態から。前の実行の変数は残らないよ。</div></div>
+<section class="studio" aria-label="Pythonを実行する"><div class="card editor-card"><div class="editor-top"><span>my_game.py</span><span class="chip">書いて動かそう</span></div><label class="sr-only" for="editor">Pythonコード</label><div class="editor-wrap"><div class="line-numbers" aria-hidden="true"></div><textarea id="editor" class="code-editor" aria-describedby="editor-keys" spellcheck="false" autocapitalize="off" autocomplete="off" autocorrect="off" wrap="off">${esc(code())}</textarea></div><div class="editor-controls"><button id="run" class="run">▶ 実行する</button><button id="stop" class="quiet" disabled>停止</button><button id="reset" class="quiet">最初のコード</button><button id="undo" class="quiet">ひとつ前に戻す</button><span id="runtime-status" class="runtime-status" role="status">${ready?'Python準備OK':'実行するとPythonを準備するよ'}</span></div><div class="editor-tip"><span id="editor-keys">Tabで字下げ / Shift + Tabで戻す<br>EscのあとTabで入力欄の外へ / Ctrl・⌘ + Enterで実行</span><span id="editor-key-status" class="sr-only" role="status"></span><br>実行は毎回まっさらな状態から。前の実行の変数は残らないよ。</div><div id="storage-panel" class="storage-panel"><p id="storage-status" role="status"></p><button id="storage-export" hidden>↓ このミッションのPython保存</button></div></div>
 <div class="card" id="result-card"><div class="output-head"><strong>実行結果</strong><span class="small">表示は200行まで</span></div><pre id="output" class="output" tabindex="0">${current===6?'実行すると、君のサイコロがゲームになる！':'上の「実行する」を押してみよう。'}</pre><div id="error" role="alert"></div><div id="chart"></div></div><div id="game"></div>
 <div class="download-row"><button id="download-py">↓ Python保存</button><button id="download-game" disabled>↓ 作品HTML</button></div><div class="export-info"><strong>保存先に迷ったら</strong><br>通常はPCの「ダウンロード」に入るよ。教材は <code>dice-lab.html</code>、友達用は <code>dice-game.html</code> をブラウザで開く。<code>my_dice_game.py</code> はJupyterLab用。<br><a href="../python-dice-jupyter/index.html">フォルダ作成から順に知りたい →</a><br>「教材HTMLを保存」で、別のPCでも教材を開けるよ。教材と作品のPython実行には、初回の準備などにインターネット接続が必要。</div>
 <div id="help" class="card help-panel"><div class="card-body"><h3>困ったときの救急箱</h3><details><summary>赤いエラーが出た</summary><p>エラーは「ここを見て」の手紙。下に出る日本語の案内と行番号を見よう。最初は : 、括弧、引用符、字下げを確認。コードは消えないよ。</p></details><details><summary>ずっと動いて止まらない</summary><p>「停止」を押そう。実行だけを止めて、コードは残すよ。15秒を超えた処理は自動で止まる。rangeの数を小さくして試そう。</p></details><details><summary>Pythonの準備が終わらない</summary><p>最初は読み込みに時間がかかることがあるよ。ネット接続を確認してから実行を押して再試行。学校や家庭のフィルターがPython配布元（cdn.jsdelivr.net）を止めている場合は、おうちの人に相談しよう。</p></details><details><summary>JupyterLabでも動かしたい</summary><p>「Python保存」のファイルには、完成部品の文字版も入るよ。JupyterLabでファイルを開いてコードをセルに貼れば実行できる。グラフとゲーム画面は、このページの方が見やすいよ。</p></details><details><summary>作ったゲームを友達に見せたい</summary><p>ミッション7を実行し、動きを確かめて「作品HTML」を保存。そのファイルを渡してブラウザで開いてもらおう。チャットへのログインは不要。コードとゲームの仕掛けはファイルに入るので、本気の秘密を守る仕組みではないよ。</p></details><details><summary>はじめての命令メモ</summary><p><code>print(x)</code> 表示する<br><code>for i in range(n):</code> n回繰り返す<br><code>if 条件:</code> 条件が合えば動く<br><code>def 名前():</code> 関数を作る<br><code>return x</code> 結果を返す<br><code>=</code> 代入 / <code>==</code> 同じか調べる<br><code>#</code> ここから右は人間向けのメモ</p></details></div></div><p class="footer-note">AIチャットは使わない教材です。出目はシミュレーション。公平でも、偶然の偏りは起こります。</p></section></div></main></div>`;
- bind();lines();controls();}
+ bind();lines();controls();showStorageState();}
 let previous={};
+function bindEditorKeys(editor){
+ let leaveOnTab=false;
+ const status=$('#editor-key-status');
+ const reset=()=>{leaveOnTab=false;status.textContent='';};
+ editor.onblur=reset;
+ editor.onkeydown=e=>{
+  if(e.isComposing)return;
+  if(e.key==='Escape'){
+   leaveOnTab=true;
+   status.textContent='次のTabで入力欄の外へ移ります。Shift + Tabなら前へ移ります。';
+   return;
+  }
+  if(['Shift','Control','Alt','Meta'].includes(e.key))return;
+  if(e.key==='Tab'&&leaveOnTab){reset();return;}
+  reset();
+  if(e.key==='Tab'&&!e.ctrlKey&&!e.metaKey&&!e.altKey){
+   e.preventDefault();indentCode(editor,e.shiftKey);
+  }
+  if(e.key==='Enter'&&(e.ctrlKey||e.metaKey)){e.preventDefault();if(!busy)run();}
+ };
+}
+function indentCode(editor,unindent){
+ const {value,selectionStart:start,selectionEnd:end,selectionDirection:direction}=editor;
+ if(!unindent&&start===end){
+  editor.setRangeText('    ',start,end,'end');
+ }else{
+  const first=start===0?0:value.lastIndexOf('\n',start-1)+1;
+  // A selection ending at the next line's start does not include that line.
+  const limit=end>start&&value[end-1]==='\n'?end-1:end;
+  const lastBreak=value.indexOf('\n',limit);
+  const last=lastBreak===-1?value.length:lastBreak;
+  const rows=value.slice(first,last).split('\n');
+  const shifts=rows.map(row=>unindent?-(row.match(/^(?: {1,4}|\t)/)?.[0].length??0):4);
+  const replacement=rows.map((row,i)=>unindent?row.slice(-shifts[i]):'    '+row).join('\n');
+  if(replacement===value.slice(first,last))return;
+  editor.setRangeText(replacement,first,last,'preserve');
+  const positionAfter=position=>{
+   let offset=first,change=0;
+   rows.forEach((row,i)=>{
+    if(position>=offset)change+=unindent?-Math.min(-shifts[i],position-offset):shifts[i];
+    offset+=row.length+1;
+   });
+   return position+change;
+  };
+  editor.setSelectionRange(positionAfter(start),positionAfter(end),direction);
+ }
+ editor.dispatchEvent(new Event('input',{bubbles:true}));
+}
 function replaceCode(v){previous[current]=code();drafts[current]=v;$('#editor').value=v;save();lines();runSucceeded=false;$('#download-game').disabled=true;}
 function changeLesson(i){if(i<0||i>=lessons.length)return;if(busy)stop(false);current=i;save();game=null;runSucceeded=false;render();window.scrollTo({top:0,behavior:'instant'});}
-function bind(){document.querySelectorAll('[data-lesson]').forEach(b=>b.onclick=()=>changeLesson(Number(b.dataset.lesson)));$('#editor').oninput=()=>{drafts[current]=$('#editor').value;save();lines();$('#download-game').disabled=true;};$('#editor').onkeydown=e=>{if(e.key==='Tab'){e.preventDefault();const t=e.target,start=t.selectionStart,end=t.selectionEnd;t.setRangeText('    ',start,end,'end');t.dispatchEvent(new Event('input'));}if(e.key==='Enter'&&(e.ctrlKey||e.metaKey)){e.preventDefault();if(!busy)run();}};$('#run').onclick=run;$('#stop').onclick=()=>stop(true);$('#reset').onclick=()=>{replaceCode(lessons[current].starter);toast('最初のコードに戻したよ。ひとつ前に戻すこともできる。');};$('#undo').onclick=()=>{if(previous[current]===undefined)return toast('まだ戻せるコードがないよ。');const p=previous[current];replaceCode(p);toast('コードをひとつ前に戻したよ。');};$('#use-solution').onclick=()=>{replaceCode(lessons[current].solution);toast('完成例を入れたよ。実行して、一か所変えてみよう。');$('#editor').focus();};$('#notes').oninput=e=>{notes[current]=e.target.value;save();};$('#complete').onchange=e=>{if(e.target.checked){if(!completed.includes(current))completed.push(current);}else completed=completed.filter(i=>i!==current);save();document.querySelectorAll('[data-lesson] .mission-num').forEach((el,i)=>el.textContent=completed.includes(i)?'✓':String(i+1).padStart(2,'0'));const p=$('.progress-fill');if(p)p.style.width=completed.length/7*100+'%';$('.sidebar-title .small').textContent=completed.length+' / 7';};$('#prev').onclick=()=>changeLesson(current-1);$('#next').onclick=()=>changeLesson(current+1);$('#demo').onclick=()=>{changeLesson(6);if(drafts[6]===undefined)drafts[6]=gameCode;run();};$('#pack').onclick=async()=>{try{if(window.__packHTML){download('dice-lab.html',window.__packHTML,'text/html');}else{const r=await fetch('dice-lab.html');if(!r.ok)throw Error();download('dice-lab.html',await r.text(),'text/html');}toast('保存したHTMLを、別のPCのブラウザでも開けるよ。');}catch{toast('教材を取得できなかったよ。接続を確認してもう一度試そう。');}};$('#download-py').onclick=exportPython;$('#download-game').onclick=exportGame;}
+function bind(){document.querySelectorAll('[data-lesson]').forEach(b=>b.onclick=()=>changeLesson(Number(b.dataset.lesson)));$('#editor').oninput=()=>{drafts[current]=$('#editor').value;save();lines();$('#download-game').disabled=true;};bindEditorKeys($('#editor'));$('#run').onclick=run;$('#stop').onclick=()=>stop(true);$('#reset').onclick=()=>{replaceCode(lessons[current].starter);toast('最初のコードに戻したよ。ひとつ前に戻すこともできる。');};$('#undo').onclick=()=>{if(previous[current]===undefined)return toast('まだ戻せるコードがないよ。');const p=previous[current];replaceCode(p);toast('コードをひとつ前に戻したよ。');};$('#use-solution').onclick=()=>{replaceCode(lessons[current].solution);toast('完成例を入れたよ。実行して、一か所変えてみよう。');$('#editor').focus();};$('#notes').oninput=e=>{notes[current]=e.target.value;save();};$('#complete').onchange=e=>{if(e.target.checked){if(!completed.includes(current))completed.push(current);}else completed=completed.filter(i=>i!==current);save();document.querySelectorAll('[data-lesson] .mission-num').forEach((el,i)=>el.textContent=completed.includes(i)?'✓':String(i+1).padStart(2,'0'));const p=$('.progress-fill');if(p)p.style.width=completed.length/7*100+'%';$('.sidebar-title .small').textContent=completed.length+' / 7';};$('#prev').onclick=()=>changeLesson(current-1);$('#next').onclick=()=>changeLesson(current+1);$('#demo').onclick=()=>{changeLesson(6);if(drafts[6]===undefined)drafts[6]=gameCode;run();};$('#pack').onclick=async()=>{try{if(window.__packHTML){download('dice-lab.html',window.__packHTML,'text/html');}else{const r=await fetch('dice-lab.html');if(!r.ok)throw Error();download('dice-lab.html',await r.text(),'text/html');}toast('保存したHTMLを、別のPCのブラウザでも開けるよ。');}catch{toast('教材を取得できなかったよ。接続を確認してもう一度試そう。');}};$('#download-py').onclick=exportPython;$('#storage-export').onclick=exportPython;$('#download-game').onclick=exportGame;}
 function lines(){const n=$('#editor').value.split('\n').length;$('.line-numbers').textContent=Array.from({length:n},(_,i)=>i+1).join('\n');$('#editor').style.height=Math.min(540,Math.max(235,n*25.9))+'px';}
 function controls(){if(!$('#run'))return;$('#run').disabled=busy;$('#stop').disabled=!busy;$('#reset').disabled=busy;$('#undo').disabled=busy;$('#use-solution').disabled=busy;$('#runtime-status').textContent=busy?(ready?'実行中…':'Pythonを準備中…'):(ready?'Python準備OK':'実行するとPythonを準備するよ');}
 async function getWorkerText(){if(workerText)return workerText;if(window.__workerSource)return workerText=window.__workerSource;const r=await fetch(assetURL('worker.js'));if(!r.ok)throw Error('Pythonの実行部品を読み込めませんでした');return workerText=await r.text();}
