@@ -12,7 +12,7 @@ input('shape-k',shape);input('shape-mode',shape);document.querySelectorAll('[dat
 let stage=0;function match(){const source=M.match(4),p=M.match(stage),colors=$('match-colors').checked;
  const notes=['まず対応を予想しよう。2つの三角形は重なり、向きも違います。','△DEFを右へ移動しました。辺の長さと角は変わりません。','△DEFを回しました。まだ左右が逆です。長さは変わりません。','△DEFを裏返しました。A↔D、B↔E、C↔Fの向きがそろいました。','△DEFを2/3倍に縮めて移動すると、△ABCと重なります。各辺が同じ倍率で変わり、角は変わりません。'];
  $('match-plot').innerHTML=T(270,30,`手順 ${stage+1} / 5`)+(stage?poly(M.match(stage-1),'ghost'):'')+poly(source,'shape')+poly(p,'target')+dots(source,stage===4?['A/D','B/E','C/F']:'ABC',colors)+(stage===4?'':dots(p,'DEF',colors));
- $('match-result').innerHTML=`<strong>${['予想する','移動する','回転する','裏返す','倍率をそろえる'][stage]}</strong><p>${notes[stage]}</p>`;
+ $('match-result').innerHTML=`<strong>${['予想する','移動する','回転する','裏返す','倍率をそろえる'][stage]}</strong><p>${notes[stage].split('。').filter(Boolean).map(t=>`<span class="short-line">${t}。</span>`).join('')}</p>`;
  document.querySelectorAll('[data-match]').forEach(b=>b.setAttribute('aria-pressed',String(+b.dataset.match===stage)));
 }document.querySelectorAll('[data-match]').forEach(b=>b.addEventListener('click',()=>{stage=+b.dataset.match;match();}));input('match-colors',match);match();
 function parallel(){const t=+$('parallel-t').value;if($('parallel-lock').checked)$('parallel-u').value=t;$('parallel-u').disabled=$('parallel-lock').checked;const u=+$('parallel-u').value,v=M.parallel(t,u),map=p=>[245+40*p[0],50+40*p[1]],A=map(v.A),B=map(v.B),C=map(v.C),D=map(v.D),E=map(v.E);$('parallel-t-value').value=f(t);$('parallel-u-value').value=f(u);

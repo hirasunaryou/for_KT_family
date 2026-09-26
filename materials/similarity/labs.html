@@ -1,5 +1,5 @@
 <section class="lab interactive" id="shape-lab" aria-labelledby="shape-title">
- <div class="lab-top"><span class="eyebrow">体験 01 · 予想 → 操作 → 説明</span><h3 id="shape-title">「同じ形」を壊してみる</h3><p>縦横を2倍にする場合と、横だけ2倍にする場合。角と辺の倍率はどうなる？ 紙に予想してから動かそう。</p></div>
+ <div class="lab-top"><span class="eyebrow">体験 01 · 予想 → 操作 → 説明</span><h3 id="shape-title">「同じ形」を壊してみる</h3><p>縦横を2倍にする場合と、横だけ2倍にする場合。<br>角と辺の倍率はどうなる？<br>紙に予想してから動かそう。</p></div>
  <div class="lab-grid"><svg class="sim-plot" id="shape-plot" viewBox="0 0 540 320" role="img" aria-label="もとの三角形と変形後の三角形"></svg><div class="controls">
  <label class="control" for="shape-mode">変え方<select id="shape-mode"><option value="both">縦も横も同じ倍率</option><option value="wide">横だけ変える</option></select></label>
  <label class="control" for="shape-k">倍率 k：<output id="shape-k-value">1</output><input id="shape-k" type="range" min="0.5" max="2" step="0.1" value="1"></label>
@@ -9,7 +9,7 @@
  <details class="reflect"><summary>確かめたあと：紙で説明する</summary><p>横だけ2倍では、どの辺の倍率がそろわなかった？ 相似になるのはkがいくつのとき？ → <a href="#q2">問2</a></p></details>
 </section>
 <section class="lab interactive" id="match-lab" aria-labelledby="match-title">
- <div class="lab-top"><span class="eyebrow">体験 02 · 対応を見つける</span><h3 id="match-title">重なった図を、取り出してみよう</h3><p>△ABCのA・B・Cは、△DEFのどこに対応する？ 図の上・下ではなく、角と辺のつながりを手がかりに予想しよう。</p></div>
+ <div class="lab-top"><span class="eyebrow">体験 02 · 対応を見つける</span><h3 id="match-title">重なった図を、取り出してみよう</h3><p>△ABCのA・B・Cは、△DEFのどこに対応する？ <br>角と辺のつながりを手がかりに予想しよう。</p></div>
  <div class="lab-grid"><svg class="sim-plot" id="match-plot" viewBox="0 0 540 340" role="img" aria-label="三角形の対応を段階的に確認"></svg><div class="controls">
  <div class="steps" id="match-steps"><button type="button" data-match="0" aria-pressed="true">① 重なった図</button><button type="button" data-match="1" aria-pressed="false">② 取り出す</button><button type="button" data-match="2" aria-pressed="false">③ 回す</button><button type="button" data-match="3" aria-pressed="false">④ 裏返す</button><button type="button" data-match="4" aria-pressed="false">⑤ 大きさをそろえる</button></div>
  <label class="check"><input id="match-colors" type="checkbox"> 対応する頂点の色をそろえる</label><div class="lab-result" id="match-result" aria-live="polite"></div></div></div>
@@ -17,7 +17,7 @@
  <details class="reflect"><summary>確かめたあと：対応を言葉にする</summary><p>A↔D、B↔E、C↔F。ABの相手はDEです。向きを変えた別の問題で確かめよう。→ <a href="#q5">問5</a></p></details>
 </section>
 <section class="lab interactive" id="parallel-lab" aria-labelledby="parallel-title">
- <div class="lab-top"><span class="eyebrow">体験 03 · 条件を変えて比べる</span><h3 id="parallel-title">平行を保つと？ 条件を外すと？</h3><p>DEを上下に動かすと、3つの比はそろったまま？ 次にEだけを動かして予想を確かめよう。</p></div>
+ <div class="lab-top"><span class="eyebrow">体験 03 · 条件を変えて比べる</span><h3 id="parallel-title">平行を保つと？ 条件を外すと？</h3><p>DEを上下に動かすと、3つの比はそろったまま？ <br>次にEだけを動かして予想を確かめよう。</p></div>
  <div class="lab-grid"><svg class="sim-plot" id="parallel-plot" viewBox="0 0 540 380" role="img" aria-label="三角形の2辺上の点DとEを結ぶ線"></svg><div class="controls">
  <label class="check"><input type="checkbox" id="parallel-lock" checked> DEをBCに平行に保つ</label>
  <label class="control" for="parallel-t">Dの位置 AD/AB：<output id="parallel-t-value">0.5</output><input id="parallel-t" type="range" min="0.2" max="0.8" step="0.05" value="0.5"></label>
