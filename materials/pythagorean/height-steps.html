@@ -1,0 +1,18 @@
+<div id="height-sequence" class="height-sequence" data-side="{{SIDE}}" data-base="{{BASE}}" hidden>
+ <p class="sequence-intro">線を引く前に、少し予想。「次の手順」で、図を一段ずつ見よう。</p>
+ <div class="sequence-controls" role="group" aria-label="高さの説明の手順">
+  <button type="button" id="height-prev" class="button" aria-controls="height-plot height-explanation">ひとつ前</button>
+  <span id="height-count" class="sequence-count"></span>
+  <button type="button" id="height-next" class="button primary" aria-controls="height-plot height-explanation">次の手順</button>
+  <button type="button" id="height-reset" class="sequence-reset" aria-controls="height-plot height-explanation">最初から</button>
+ </div>
+ <div id="height-explanation" class="sequence-explanation" aria-live="polite" aria-atomic="true">
+  <h3 id="height-title"></h3><p id="height-message"></p>
+ </div>
+ <figure><svg id="height-plot" viewBox="0 0 640 420" role="img" aria-label="二等辺三角形に高さを引いて考える"></svg></figure>
+ <div id="height-calculation" class="sequence-calculation" hidden>
+  <p id="height-previous" class="sequence-previous"></p>
+  <p id="height-formula"></p>
+ </div>
+ <details class="height-summary"><summary>解き方をまとめて読む</summary></details>
+</div>

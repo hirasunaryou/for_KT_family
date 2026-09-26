@@ -73,7 +73,11 @@ for kind,name in [('workbook','三平方 ② 問題集'),('answers','三平方 �
 esc=html.escape;cards=[]
 for page_number,l in enumerate(L,1):
  fig=svg(scene(l['figure'],guide=True),l['title'])
- cards.append(f'<article class="concept-card" id="lesson-{l["id"]}"><p class="eyebrow">解説PDF {page_number}ページ</p><h2>{esc(l["title"])}</h2><p>{esc(l["focus"])}</p><figure>{fig}</figure><ol>'+''.join('<li>'+esc(t)+'</li>' for t in l['notes'])+f'</ol><p class="take">{esc(l["take"])}</p></article>')
+ explanation=f'<figure>{fig}</figure><ol>'+''.join('<li>'+esc(t)+'</li>' for t in l['notes'])+'</ol>'
+ if l['id']==7:
+  sequence=(R/'materials/pythagorean/height-steps.html').read_text().replace('{{SIDE}}',str(l['figure']['side'])).replace('{{BASE}}',str(l['figure']['base']))
+  explanation=f'<div class="height-static">{explanation}</div>'+sequence
+ cards.append(f'<article class="concept-card" id="lesson-{l["id"]}"><p class="eyebrow">解説PDF {page_number}ページ</p><h2>{esc(l["title"])}</h2><p>{esc(l["focus"])}</p>{explanation}<p class="take">{esc(l["take"])}</p></article>')
 qs=[]
 for q in Q:
  fig=svg(scene(q['figure'],qid=q['id']),f'問{q["id"]}の図');ans=svg(scene(q['figure'],answer=True,qid=q['id']),f'問{q["id"]}の解答図')

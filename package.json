@@ -4,11 +4,11 @@
   "private": true,
   "description": "Family learning hub with printable and interactive mathematics lessons",
   "scripts": {
-    "test": "node tests/dom.cjs && node tests/family.cjs && node tests/python-dice.cjs && node tests/python-editor-reliability.cjs && node tests/python-skip-links.cjs && node tests/smoke.cjs && node tests/quadratic-smoke.cjs && node tests/python-vault.cjs && python3 tests/python-vault.py && node tests/python-maze.cjs && python3 tests/python-maze.py && node tests/python-pixel.cjs && python3 tests/python-pixel.py && node tests/quadratic-equations.cjs && python3 tests/quadratic-equations-math.py && node tests/quadratic-equations-smoke.cjs && node tests/similarity.cjs && node tests/similarity-smoke.cjs && node tests/circle.cjs && node tests/circle-smoke.cjs && node tests/pythagorean.cjs && python3 tests/pythagorean-math.py && node tests/pythagorean-smoke.cjs",
+    "test": "node tests/dom.cjs && node tests/family.cjs && node tests/python-dice.cjs && node tests/python-editor-reliability.cjs && node tests/python-skip-links.cjs && node tests/smoke.cjs && node tests/quadratic-smoke.cjs && node tests/python-vault.cjs && python3 tests/python-vault.py && node tests/python-maze.cjs && python3 tests/python-maze.py && node tests/python-pixel.cjs && python3 tests/python-pixel.py && node tests/quadratic-equations.cjs && python3 tests/quadratic-equations-math.py && node tests/quadratic-equations-smoke.cjs && node tests/similarity.cjs && node tests/similarity-smoke.cjs && node tests/circle.cjs && node tests/circle-smoke.cjs && node tests/pythagorean.cjs && python3 tests/pythagorean-math.py && node tests/pythagorean-smoke.cjs && node tests/pythagorean-height.cjs",
     "test:dom": "node tests/dom.cjs && node tests/family.cjs && node tests/python-dice.cjs && node tests/quadratic-equations.cjs",
     "test:similarity": "node tests/similarity.cjs && node tests/similarity-smoke.cjs",
     "test:circle": "node tests/circle.cjs && node tests/circle-smoke.cjs",
-    "test:pythagorean": "node tests/pythagorean.cjs && python3 tests/pythagorean-math.py && node tests/pythagorean-smoke.cjs",
+    "test:pythagorean": "node tests/pythagorean.cjs && python3 tests/pythagorean-math.py && node tests/pythagorean-smoke.cjs && node tests/pythagorean-height.cjs",
     "test:reliability": "node tests/python-editor-reliability.cjs && node tests/python-skip-links.cjs"
   },
   "devDependencies": {

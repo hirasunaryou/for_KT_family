@@ -5,3 +5,30 @@
 .lab-grid{grid-template-columns:minmax(0,1.45fr) minmax(235px,1fr)}.lab>.plot,.lab>svg{display:block;width:100%;height:auto}.check{display:block;margin:18px 0;font-size:14px;line-height:1.8}.check input{width:18px;height:18px;vertical-align:middle}.connection{border-left:3px solid var(--blue);padding:8px 16px;background:#edf3f9}.concept-card .eyebrow{font-size:11px}.q-card figure{overflow:visible}@media(max-width:900px){.lab-grid{grid-template-columns:1fr}.lab-grid svg{max-width:640px;margin:auto}}
 
 .lab-figure{min-width:0;margin:0}.lab-figure svg{display:block;width:100%;height:auto}.lab-figure .figure-open{display:block}
+
+/* The paper explanation stays complete; the Web reveals its reasoning one step at a time. */
+.has-height-sequence .height-static{display:none}
+.height-sequence[hidden],.sequence-calculation[hidden],.sequence-previous[hidden]{display:none}
+.height-sequence .sequence-intro{font-size:14px;color:var(--muted);margin-top:22px}
+.sequence-controls{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:16px 0 22px}
+.sequence-controls .button{min-height:44px;padding:9px 14px}
+.sequence-controls [aria-disabled=true]{opacity:.45;cursor:default}
+.sequence-count{font-size:14px;color:var(--muted);min-width:38px;text-align:center;font-variant-numeric:tabular-nums}
+.sequence-reset{border:0;background:transparent;color:var(--green);font:inherit;font-size:13px;padding:10px;cursor:pointer}
+.sequence-explanation{border-left:3px solid #3566a0;padding:4px 0 4px 16px;min-height:120px}
+.sequence-explanation h3{font-size:18px;line-height:1.7;margin:0 0 6px}
+.sequence-explanation p{font-size:15px;margin:0}
+.height-sequence figure{margin:20px 0 12px}
+.sequence-calculation{padding:16px 18px;margin-bottom:20px;background:#f1f4ee;border-radius:8px}
+.sequence-calculation #height-formula{font-size:19px;line-height:1.9;margin:0}
+.sequence-calculation .sequence-previous{font-size:14px;color:#64736e;margin:0 0 10px;border-bottom:1px solid var(--line);padding-bottom:10px}
+.sequence-height{color:#3566a0}.sequence-base{color:#98502f}.sequence-side{color:#253b39}
+.sequence-previous span{color:inherit}
+.height-summary{padding:12px 0;font-size:14px;border-top:1px solid var(--line)}
+.height-summary summary{cursor:pointer;color:var(--green)}
+.height-summary li{font-size:15px}
+.height-draw{stroke-dasharray:1;stroke-dashoffset:0;animation:height-draw .5s ease-out}
+@keyframes height-draw{from{stroke-dashoffset:1}to{stroke-dashoffset:0}}
+@media(prefers-reduced-motion:reduce){.height-draw{animation:none}}
+@media(max-width:480px){.sequence-controls{gap:7px}.sequence-controls .button{padding-inline:10px}.sequence-reset{padding-inline:5px}.sequence-explanation{min-height:155px}.sequence-calculation{padding:14px 12px}.sequence-calculation #height-formula{font-size:17px}}
+@media print{.height-sequence{display:none!important}.has-height-sequence .height-static{display:block!important}}
