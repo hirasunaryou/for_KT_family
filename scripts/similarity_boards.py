@@ -74,5 +74,43 @@ def board_scene(kind):
         text(155,436,'その間の角も、同じ。',20)
         text(47,491,'だから、小さい三角形は全体の1/2倍。',22)
         text(125,538,'DE ∥ BC、長さは半分。',22)
+    elif kind=='connections':
+        # Three concrete bridges, drawn to scale with nearby explanations.
+        text(14,25,'01  面積から長さへ｜平方根・方程式',19,BLUE)
+        for x,side,area,label in [(25,45,'1','1'),(139,45*math.sqrt(2),'2','√2')]:
+            y=126;poly([(x,y),(x+side,y),(x+side,y-side),(x,y-side)],'#edf3f9')
+            text(x+side/2-7,y-side/2+7,area,20,BLUE)
+            line((x,y),(x+side,y),BLUE,2.2);text(x+side/2-12,150,label,18,BLUE)
+        text(31,57,'面積',16,GRAY);text(276,57,'面積を2倍にしたい。',18)
+        text(276,84,'辺を2倍にすると、4倍。',17)
+        text(276,108,'大きい方の1辺をkとすると',15)
+        text(276,134,'k × k = 2',21);text(276,160,'だから k=√2（k>0）',18)
+        arrow([(257,129),(211,116)],BLUE)
+        line((14,174),(535,174),'#d8dfd6',1)
+
+        text(14,203,'02  縦だけ？ 縦横とも？｜二次関数',19,BLUE)
+        for x,w,h,label,n in [(23,34,26,'もと','1倍'),(102,34,52,'yだけ2倍','2倍'),(188,68,52,'縦横2倍','4倍')]:
+            y=309;poly([(x,y),(x+w,y),(x+w,y-h)],'#f4f6f0')
+            line((x,y),(x+w,y),BLUE,2.2);line((x+w,y),(x+w,y-h),BROWN,2.2)
+            text(x-8,334,label,15);text(x+1,357,n,17)
+        text(19,235,'三角形の面積で比べると',16,GRAY)
+        text(286,249,'aを2倍 → yだけ2倍。',18,BROWN)
+        text(286,280,'y=x² → y=2x²',19)
+        text(286,320,'相似拡大は、',18);text(286,347,'xもyも同じ倍率。',18,BLUE)
+        line((14,377),(535,377),'#d8dfd6',1)
+
+        text(14,406,'03  同じ形のまま大きく｜三平方・三角比',19,BLUE)
+        for x,u in [(35,13),(136,26)]:
+            y=520;a=(x,y);b=(x+4*u,y);c=(x+4*u,y-3*u);poly([a,b,c],'#edf3f9')
+            line(a,b,BLUE,2.2);line(b,c,BROWN,2.2);arc(a,b,c,c=GRAY,r=18)
+            line((b[0]-7,b[1]),(b[0]-7,b[1]-7));line((b[0]-7,b[1]-7),(b[0],b[1]-7))
+            text(x+2*u-5,542,'4' if u==13 else '8',17,BLUE)
+            text(b[0]+8,y-1.5*u+5,'3' if u==13 else '6',17,BROWN)
+            text(x+2*u-10,y-1.5*u-9,'5' if u==13 else '10',17)
+        text(286,431,'直角三角形の辺には',16)
+        text(286,455,'3²+4²=5²',18);text(286,479,'6²+8²=10²',18)
+        text(286,511,'高さ÷横の長さも同じ。',17)
+        text(286,537,'3/4 = 6/8',20,BLUE)
+        text(40,562,'同じ角なら、同じ比。これが三角比につながる。',17)
     else:raise ValueError(kind)
     return out
