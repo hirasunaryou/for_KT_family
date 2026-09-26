@@ -34,7 +34,14 @@ class Scene:
 
 def scene(f,answer=False,guide=False,qid=0):
  s=Scene();k=f.get('kind');shown=answer or guide
- if k=='triangle':
+ if k=='intro':
+  C,A,B=(220,275),(220,95),(460,275)
+  s.poly([C,A,B],INK,PALE_GREEN);s.line(C,A,BROWN,2.4);s.line(C,B,BLUE,2.4);s.line(A,B,INK,2.6);s.right(A,C,B,13)
+  s.text(190,188,'b',24,BROWN,'middle');s.text(340,310,'a',24,BLUE,'middle');s.text(365,173,'c',24,INK,'middle')
+  s.text(32,42,'ここが90°',19);s.arrow((180,51),(231,264))
+  s.text(392,42,'斜辺 c',20);s.text(392,72,'直角の向かい',18);s.arrow((472,84),(345,185))
+  for x,label,color in [(243,'a²',BLUE),(282,'＋',INK),(321,'b²',BROWN),(361,'＝',INK),(400,'c²',INK)]:s.text(x,376,label,28,color,'middle')
+ elif k=='triangle':
   a,b=f['a'],f['b'];ang=math.radians(f.get('angle',90));pts=[(0,0),(b*math.cos(ang),b*math.sin(ang)),(a,0)];t=math.radians(f.get('rotate',0));pts=[(x*math.cos(t)-y*math.sin(t),x*math.sin(t)+y*math.cos(t)) for x,y in pts];cv,_=s.fit(pts,(195,85,245,215));C,A,B=map(cv,pts)
   s.poly([C,A,B],fill=PALE_GREEN);s.line(C,A,BROWN,2);s.line(C,B,BLUE,2);s.line(A,B,INK,2.5)
   if f.get('angle',90)==90 and (not f.get('noRight') or shown):s.right(A,C,B)
