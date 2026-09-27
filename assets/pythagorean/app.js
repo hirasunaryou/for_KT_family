@@ -69,6 +69,46 @@
   draw();sequence.hidden=false;card.classList.add('has-height-sequence');
  }
  initHeightSequence();
+ function initDiameterSequence(){
+  const sequence=$('#diameter-sequence');if(!sequence)return;
+  const A=point(135,250),B=point(505,250),P=point(268.2,72.4),O=point(320,250);
+  const term=(s,c)=>`<span class="sequence-${c}">${s}</span>`;
+  const equation=`${term('6²','base')} ＋ ${term('x²','height')} ＝ ${term('10²','side')}`;
+  const steps=[
+   ['直径がある。どの角に使える？','ABは中心Oを通る直径で、長さは10。Pは円周上の点です。AP＝6のとき、BPの長さを考えよう。','条件：ABは直径、Pは円周上の点'],
+   ['円で学んだことから、直角が分かる','直径ABに対する円周角だから、∠APB＝90°。Pのところに、三平方を使える直角が見つかりました。','直径に対する円周角は90°'],
+   ['直角の向かいが、斜辺','直角はP。向かい側のAB＝10が斜辺です。求めたいBPをxと置きます。','斜辺ABと、直角をはさむ2辺に注目'],
+   ['辺と式を、色と名前でつなぐ','直角をはさむ辺はAP＝6とBP＝x。2つの平方を足すと、斜辺AB＝10の平方になります。','AP² ＋ BP² ＝ AB²',equation],
+   ['平方根で、長さに戻る','x²＝100−36＝64。xは長さなので正の値を選び、BP＝8。円の角の知識が、長さを求める道具になりました。','BPの長さが分かった',`${term('x²','height')} ＝ 64 → ${term('x ＝ 8','height')}`]
+  ];
+  let index=0;
+  function draw(){
+   const step=steps[index];
+   let g=`<circle cx="320" cy="250" r="185" fill="none" stroke="${index>=2?light:gray}" stroke-width="1.5"/>`;
+   g+=poly([A,P,B],gray,index>=2?'#edf3f9':'none');
+   if(index>=2)g+=line(A,P,brown,'',3)+line(P,B,blue,'',3)+line(A,B,ink,'',3);
+   g+=text(113,261,'A')+text(523,261,'B')+text(P.x,P.y-18,'P',ink,20,'middle');
+   g+=`<circle cx="320" cy="250" r="3" fill="${gray}"/>`+text(320,276,'O',gray,17,'middle');
+   g+=mid(A,P,'AP = 6',42,36,index>=2?brown:ink)+mid(P,B,index===4?'BP = 8':index>=2?'BP = x':'BP = ?',-36,36,index>=2?blue:ink);
+   g+=text(320,309,'直径 AB = 10',ink,19,'middle');
+   if(index>=1)g+=`<g data-diameter-right>${right(A,P,B,18)}</g>`+text(P.x+4,P.y+56,'90°',blue,18,'middle');
+   if(index>=2)g+=text(320,340,'斜辺',ink,18,'middle');
+   g+=text(320,462,step[2],ink,18,'middle');
+   $('#diameter-plot').innerHTML=g;$('#diameter-plot').setAttribute('aria-label',step[1]);
+   $('#diameter-count').textContent=`${index+1} / ${steps.length}`;
+   $('#diameter-title').textContent=step[0];$('#diameter-message').textContent=step[1];
+   $('#diameter-calculation').hidden=!step[3];$('#diameter-formula').innerHTML=step[3]||'';
+   $('#diameter-previous').hidden=index!==4;$('#diameter-previous').innerHTML=index===4?'ひとつ前：'+equation:'';
+   for(const [id,disabled]of [['prev',index===0],['reset',index===0],['next',index===4]])$('#diameter-'+id).setAttribute('aria-disabled',String(disabled));
+  }
+  $('#diameter-prev').addEventListener('click',()=>{if(index>0){index--;draw();}});
+  $('#diameter-next').addEventListener('click',()=>{if(index<4){index++;draw();}});
+  $('#diameter-reset').addEventListener('click',()=>{if(index){index=0;sequence.querySelector('details').open=false;draw();}});
+  const card=sequence.closest('.concept-card');sequence.querySelector('details').append(card.querySelector('.height-static ol').cloneNode(true));
+  draw();sequence.hidden=false;card.classList.add('has-height-sequence');
+ }
+ initDiameterSequence();
+
  let rearrangeShown=false;
  function rearrange(changed=false){
   if(changed)rearrangeShown=false;

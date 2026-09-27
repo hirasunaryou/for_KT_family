@@ -1,0 +1,18 @@
+<div id="diameter-sequence" class="height-sequence" hidden>
+ <p class="sequence-intro">どこが直角になるか、少し予想。「次の手順」で、図を一段ずつ見よう。</p>
+ <div class="sequence-controls" role="group" aria-label="円の説明の手順">
+  <button type="button" id="diameter-prev" class="button" aria-controls="diameter-plot diameter-explanation">ひとつ前</button>
+  <span id="diameter-count" class="sequence-count"></span>
+  <button type="button" id="diameter-next" class="button primary" aria-controls="diameter-plot diameter-explanation">次の手順</button>
+  <button type="button" id="diameter-reset" class="sequence-reset" aria-controls="diameter-plot diameter-explanation">最初から</button>
+ </div>
+ <div id="diameter-explanation" class="sequence-explanation" aria-live="polite" aria-atomic="true">
+  <h3 id="diameter-title"></h3><p id="diameter-message"></p>
+ </div>
+ <figure><svg id="diameter-plot" viewBox="0 0 640 480" role="img" aria-label="直径と円周角から長さを考える"></svg></figure>
+ <div id="diameter-calculation" class="sequence-calculation" hidden>
+  <p id="diameter-previous" class="sequence-previous"></p>
+  <p id="diameter-formula"></p>
+ </div>
+ <details class="height-summary"><summary>解き方をまとめて読む</summary></details>
+</div>

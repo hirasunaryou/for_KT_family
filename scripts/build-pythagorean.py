@@ -77,6 +77,9 @@ for page_number,l in enumerate(L,1):
  if l['id']==7:
   sequence=(R/'materials/pythagorean/height-steps.html').read_text().replace('{{SIDE}}',str(l['figure']['side'])).replace('{{BASE}}',str(l['figure']['base']))
   explanation=f'<div class="height-static">{explanation}</div>'+sequence
+ if l['id']==8:
+  sequence=(R/'materials/pythagorean/diameter-steps.html').read_text()
+  explanation=f'<div class="height-static">{explanation}</div>'+sequence
  cards.append(f'<article class="concept-card" id="lesson-{l["id"]}"><p class="eyebrow">解説PDF {page_number}ページ</p><h2>{esc(l["title"])}</h2><p>{esc(l["focus"])}</p>{explanation}<p class="take">{esc(l["take"])}</p></article>')
 qs=[]
 for q in Q:
