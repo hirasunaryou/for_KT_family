@@ -17,8 +17,10 @@
  <details class="reflect"><summary>確かめたあと：対応を言葉にする</summary><p>A↔D、B↔E、C↔F。ABの相手はDEです。向きを変えた別の問題で確かめよう。→ <a href="#q5">問5</a></p></details>
 </section>
 <section class="lab interactive" id="parallel-lab" aria-labelledby="parallel-title">
- <div class="lab-top"><span class="eyebrow">体験 03 · 条件を変えて比べる</span><h3 id="parallel-title">平行を保つと？ 条件を外すと？</h3><p>DEを上下に動かすと、3つの比はそろったまま？ <br>次にEだけを動かして予想を確かめよう。</p></div>
+ <div class="lab-top"><span class="eyebrow">体験 03 · 条件を変えて比べる</span><h3 id="parallel-title">平行を保つと？ 条件を外すと？</h3><p>まず左右の角を一組ずつ比べ、それから辺の比へ。<br>平行を保って動かすと？ Eだけずらすと、何が変わる？</p></div>
+ <div class="presets parallel-views" role="group" aria-label="比べる角を選ぶ"><button type="button" data-parallel-view="left" aria-pressed="true">① 左の角を比べる</button><button type="button" data-parallel-view="right" aria-pressed="false">② 右の角を比べる</button><button type="button" data-parallel-view="ratios" aria-pressed="false">③ 相似と辺の比へ</button></div>
  <div class="lab-grid"><svg class="sim-plot" id="parallel-plot" viewBox="0 0 540 380" role="img" aria-label="三角形の2辺上の点DとEを結ぶ線"></svg><div class="controls">
+ <div id="parallel-angle-result" class="parallel-angle-result" aria-live="polite"></div>
  <label class="check"><input type="checkbox" id="parallel-lock" checked> DEをBCに平行に保つ</label>
  <label class="control" for="parallel-t">Dの位置 AD/AB：<output id="parallel-t-value">0.5</output><input id="parallel-t" type="range" min="0.2" max="0.8" step="0.05" value="0.5"></label>
  <label class="control" for="parallel-u">Eの位置 AE/AC：<output id="parallel-u-value">0.5</output><input id="parallel-u" type="range" min="0.2" max="0.8" step="0.05" value="0.5" disabled></label>

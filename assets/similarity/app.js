@@ -15,11 +15,30 @@ let stage=0;function match(){const source=M.match(4),p=M.match(stage),colors=$('
  $('match-result').innerHTML=`<strong>${['予想する','移動する','回転する','裏返す','倍率をそろえる'][stage]}</strong><p>${notes[stage].split('。').filter(Boolean).map(t=>`<span class="short-line">${t}。</span>`).join('')}</p>`;
  document.querySelectorAll('[data-match]').forEach(b=>b.setAttribute('aria-pressed',String(+b.dataset.match===stage)));
 }document.querySelectorAll('[data-match]').forEach(b=>b.addEventListener('click',()=>{stage=+b.dataset.match;match();}));input('match-colors',match);match();
+let parallelView='left';
+function angleArc(a,o,b,color,double=false,dashed=false){
+ const start=Math.atan2(a[1]-o[1],a[0]-o[0]);let delta=Math.atan2(b[1]-o[1],b[0]-o[0])-start;
+ while(delta>Math.PI)delta-=2*Math.PI;while(delta< -Math.PI)delta+=2*Math.PI;
+ return (double?[17,23]:[20]).map(r=>{const p=[o[0]+r*Math.cos(start),o[1]+r*Math.sin(start)],q=[o[0]+r*Math.cos(start+delta),o[1]+r*Math.sin(start+delta)];return `<path data-angle-arc d="M${p} A${r},${r} 0 0 ${delta>0?1:0} ${q}" fill="none" stroke="${color}" stroke-width="2.5"${dashed?' stroke-dasharray="3 3"':''}/>`;}).join('');
+}
 function parallel(){const t=+$('parallel-t').value;if($('parallel-lock').checked)$('parallel-u').value=t;$('parallel-u').disabled=$('parallel-lock').checked;const u=+$('parallel-u').value,v=M.parallel(t,u),map=p=>[245+40*p[0],50+40*p[1]],A=map(v.A),B=map(v.B),C=map(v.C),D=map(v.D),E=map(v.E);$('parallel-t-value').value=f(t);$('parallel-u-value').value=f(u);
  $('parallel-plot').innerHTML=poly([A,B,C],'shape')+poly([A,D,E],'inner')+[A,B,C].map(([x,y])=>`<circle cx="${x}" cy="${y}" r="4" fill="#253b39"/>`).join('')+T(A[0],A[1]-14,'A')+T(B[0]-12,B[1]+23,'B')+T(C[0]+12,C[1]+23,'C')+T(D[0]-16,D[1],'D')+T(E[0]+16,E[1],'E')+T(270,345,v.parallel?'DE ∥ BC':'DEはBCと平行ではない');
+ const left=parallelView==='left',right=parallelView==='right',color=left?'#3566a0':'#98502f',moving=v.parallel?color:'#61716b';
+ if(left||right){
+  $('parallel-plot').innerHTML+=left?angleArc(A,D,E,moving,false,!v.parallel)+angleArc(A,B,C,color):angleArc(A,E,D,moving,v.parallel,!v.parallel)+angleArc(A,C,B,color,true);
+  const names=left?['ADE','ABC']:['AED','ACB'],values=v.angles[parallelView],degrees=n=>(Math.round(n*10)/10).toFixed(1);
+  $('parallel-angle-result').innerHTML=`<strong>${left?'DとB':'EとC'}の角に注目</strong><p><span style="color:${moving}">∠${names[0]} ≈ ${degrees(values[0])}°</span><br><span style="color:${color}">∠${names[1]} ≈ ${degrees(values[1])}°</span></p><p>${v.parallel?'同じ向きの平行線が作る同位角なので、等しくなります。':'破線の角が変わり、2つの角は等しくありません。平行の条件が大切です。'}</p>`;
+ }else{
+  $('parallel-plot').innerHTML+=angleArc(A,D,E,v.parallel?'#3566a0':'#61716b',false,!v.parallel)+angleArc(A,B,C,'#3566a0')+angleArc(A,E,D,v.parallel?'#98502f':'#61716b',v.parallel,!v.parallel)+angleArc(A,C,B,'#98502f',true);
+  $('parallel-angle-result').innerHTML=`<strong>${v.parallel?'2組の角が、それぞれ等しい':'今は、平行ではありません'}</strong><p>${v.parallel?'D ↔ B、E ↔ C。2組の角がそろうので、△ADE ∽ △ABC。だから対応する辺の比もそろいます。':'AD/ABとAE/ACが違うので、この対応の相似や比の式は使えません。「平行に保つ」を選び、角と比がそろう様子を確かめよう。'}</p>`;
+ }
+ $('parallel-plot').setAttribute('aria-label',`${v.parallel?'DEとBCは平行':'DEとBCは平行ではない'}。${$('parallel-angle-result').textContent}`);
+ document.querySelectorAll('[data-parallel-view]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.parallelView===parallelView)));
+ $('parallel-result').hidden=parallelView!=='ratios';
  $('parallel-result').innerHTML=`<strong>${v.parallel?'平行 → 2組の角が等しい':'平行の条件を外した状態'}</strong><div class="ratio-list"><span>AD / AB = ${f(v.ratios[0])}</span><span>AE / AC = ${f(v.ratios[1])}</span><span>DE / BC ≈ ${f(v.ratios[2])}</span></div><p>${v.parallel?'△ADE ∽ △ABC。対応する3組の辺の比がそろいます。':'AD/ABとAE/ACが違うので、この対応で相似とは言えません。平行のときの比の式をそのまま使えません。'}</p>`;
 }
-['parallel-t','parallel-u','parallel-lock'].forEach(id=>input(id,parallel));$('parallel-mid').addEventListener('click',()=>{$('parallel-lock').checked=true;$('parallel-t').value=.5;parallel();});$('parallel-break').addEventListener('click',()=>{$('parallel-lock').checked=false;$('parallel-t').value=.4;$('parallel-u').value=.7;parallel();});parallel();
+document.querySelectorAll('[data-parallel-view]').forEach(b=>b.addEventListener('click',()=>{parallelView=b.dataset.parallelView;parallel();}));
+['parallel-t','parallel-u','parallel-lock'].forEach(id=>input(id,parallel));$('parallel-mid').addEventListener('click',()=>{$('parallel-lock').checked=true;$('parallel-t').value=.5;parallel();});$('parallel-break').addEventListener('click',()=>{$('parallel-lock').checked=false;const t=+$('parallel-t').value;$('parallel-u').value=f(t+(t<=.55?.25:-.25));parallel();});parallel();
 let revealed=false;
 function square(x,y,w,h,unit,cls){let s=poly([[x,y],[x+w,y],[x+w,y-h],[x,y-h]],cls);for(let a=unit;a<w-1e-8;a+=unit)s+=line([x+a,y],[x+a,y-h]);for(let a=unit;a<h-1e-8;a+=unit)s+=line([x,y-a],[x+w,y-a]);return s;}
 function cube(x,y,k){const n=32,kx=k*n,dx=.48*kx,dy=.4*kx;let s=poly([[x,y],[x+kx,y],[x+kx,y-kx],[x,y-kx]],'shape')+poly([[x,y-kx],[x+dx,y-kx-dy],[x+kx+dx,y-kx-dy],[x+kx,y-kx]],'inner')+poly([[x+kx,y],[x+kx+dx,y-dy],[x+kx+dx,y-kx-dy],[x+kx,y-kx]],'target');
