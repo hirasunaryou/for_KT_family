@@ -30,13 +30,14 @@
  <details class="reflect"><summary>確かめたあと：なぜ比がそろう？</summary><p>DE∥BC → 同位角が等しい → 2組の角がそれぞれ等しい → △ADE∽△ABC → 対応する辺の比が等しい。この順を紙に書こう。→ <a href="#q17">問17</a></p></details>
 </section>
 <section class="lab interactive" id="scale-lab" aria-labelledby="scale-title">
- <div class="lab-top"><span class="eyebrow">体験 04 · 長さから面積・体積へ</span><h3 id="scale-title">2倍にしたら、何倍入る？</h3><p>長さを2倍にした正方形・立方体。面積と体積は何倍になるか、先に予想しよう。</p></div>
+ <div class="lab-top"><span class="eyebrow">体験 04 · 長さから面積・体積へ</span><h3 id="scale-title">一方向ずつ変えると、何倍になる？</h3><p>①は縦だけ。②で横も同じ倍率に。面積はどう変わる？<br>図の区画を手がかりに予想してから、結果を開こう。</p></div>
+ <div class="presets scale-directions" role="group" aria-label="変える方向を選ぶ"><button type="button" data-scale-kind="stretch" aria-pressed="true">① 縦だけ</button><button type="button" data-scale-kind="area" aria-pressed="false">② 横も同じ倍率に</button><button type="button" data-scale-kind="volume" aria-pressed="false">③ 立体で、奥行きも</button></div>
  <div class="lab-grid"><svg class="sim-plot" id="scale-plot" viewBox="0 0 540 390" role="img" aria-label="もとの正方形と立方体、拡大後の図"></svg><div class="controls">
- <label class="control" for="scale-kind">比べるもの<select id="scale-kind"><option value="area">正方形の面積</option><option value="volume">立方体の体積</option><option value="stretch">横はそのまま、縦だけ（比較）</option></select></label>
+ <p id="scale-focus" class="scale-focus"></p>
  <label class="control" for="scale-k">長さの倍率 k：<output id="scale-k-value">2</output><input id="scale-k" type="range" min="0.5" max="3" step="0.5" value="2"></label>
  <div class="presets"><button type="button" data-scale="0.5">1/2倍</button><button type="button" data-scale="2">2倍</button><button type="button" data-scale="3">3倍</button></div>
  <button type="button" class="button" id="scale-reveal" aria-pressed="false">予想したので、結果を見る</button>
  <div class="lab-result" id="scale-result" aria-live="polite">面積・体積の倍率を紙に予想してから、結果を開こう。</div></div></div>
- <p class="lab-foot">平面図は固定縮尺。立体図は平行投影の模型で、画面上の角度・斜めの長さを測る図ではありません。格子の1区画はもとの1辺。半端な倍率では端に半区画ができます。</p>
+ <p class="lab-foot">平面図は固定縮尺。立体図は平行投影の模型で、画面上の角度・斜めの長さを測る図ではありません。格子の1辺は、もとの1辺と同じ長さです。半端な倍率では端に半区画ができます。</p>
  <details class="reflect"><summary>確かめたあと：前の教材につなぐ</summary><p>縦だけ2倍と、縦横とも2倍では、面積の倍率が違います。→ <a href="#q28">問28</a> ／ <a href="../quadratic-functions/index.html#apply">二次関数の三角形で比較する</a></p></details>
 </section>
