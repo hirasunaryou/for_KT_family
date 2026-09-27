@@ -11,6 +11,7 @@ const server=http.createServer((req,res)=>{
  try{
  const url=process.env.PUBLIC_URL||`http://127.0.0.1:${server.address().port}/study/math/pythagorean/index.html#lesson-6`;
  const page=await browser.newPage();const errors=[];page.on('pageerror',e=>errors.push(e.message));await page.goto(url);
+ assert(!(await page.locator('#lesson-6').innerText()).includes('√'),'Do not reveal the ratios in the opening text');
  for(const width of [1440,768,390]){
  await page.setViewportSize({width,height:1100});
  for(const [id,count,answerStep,radical] of [['square',5,3,'√2'],['equilateral',6,4,'√3']]){

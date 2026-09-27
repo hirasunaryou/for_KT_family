@@ -83,7 +83,8 @@ for page_number,l in enumerate(L,1):
  if l['id']==8:
   sequence=(R/'materials/pythagorean/diameter-steps.html').read_text()
   explanation=f'<div class="height-static">{explanation}</div>'+sequence
- cards.append(f'<article class="concept-card" id="lesson-{l["id"]}"><p class="eyebrow">解説PDF {page_number}ページ</p><h2>{esc(l["title"])}</h2><p>{esc(l["focus"])}</p>{explanation}<p class="take">{esc(l["take"])}</p></article>')
+ focus='正方形と正三角形を半分にして、よく使う辺の比の理由をたどろう。' if l['id']==6 else l['focus']
+ cards.append(f'<article class="concept-card" id="lesson-{l["id"]}"><p class="eyebrow">解説PDF {page_number}ページ</p><h2>{esc(l["title"])}</h2><p>{esc(focus)}</p>{explanation}<p class="take">{esc(l["take"])}</p></article>')
 qs=[]
 for q in Q:
  fig=svg(scene(q['figure'],qid=q['id']),f'問{q["id"]}の図');ans=svg(scene(q['figure'],answer=True,qid=q['id']),f'問{q["id"]}の解答図')
