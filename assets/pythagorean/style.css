@@ -45,3 +45,9 @@
 .height-sequence figure[hidden]{display:none}
 
 .sequence-area-square{color:#6f5885}.sequence-area-strip{color:#476b48}.sequence-area-unit{color:#8b671d}
+
+/* Optional prior knowledge stays outside the main problem-solving path. */
+.sequence-option{margin:20px 0;padding:18px;border:1px solid var(--line);border-radius:8px}
+.sequence-option h4{margin:0 0 6px;font-size:14px;font-weight:600;color:var(--muted)}
+.height-sequence .sequence-option p,.height-sequence .sequence-detour p{font-size:14px;margin:0 0 12px}
+.sequence-detour{margin-top:18px;padding:16px 18px;background:#f4f0f7;border-left:3px solid #6f5885}
