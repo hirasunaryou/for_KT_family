@@ -11,12 +11,12 @@ for(const width of [1440,768,390]){await page.setViewportSize({width,height:1000
 await page.locator(`[data-parallel-view="${view}"]`).focus();await page.keyboard.press('Enter');await page.locator('#parallel-mid').click();
 await expect(lab.locator('[data-parallel-view][aria-pressed=true]')).toHaveCount(1);await expect(plot.locator('[data-angle-arc]')).toHaveCount(view==='left'?2:view==='right'?4:6);
 if(view==='ratios')await expect(page.locator('#parallel-result')).toBeVisible();else{await expect(page.locator('#parallel-result')).toBeHidden();await expect(result).toContainText(view==='left'?'63.4°':'56.3°');}
-for(const broken of [false,true]){if(broken)await page.locator('#parallel-break').click();await expect(plot.locator('[data-angle-arc][stroke-dasharray]')).toHaveCount(broken?(view==='ratios'?2:1):0);
+for(const broken of [false,true]){if(broken){const before=await page.locator('#parallel-t').inputValue();await page.locator('#parallel-break').click();await expect(page.locator('#parallel-t')).toHaveValue(before);}await expect(plot.locator('[data-angle-arc][stroke-dasharray]')).toHaveCount(broken?(view==='ratios'?2:1):0);
 assert(await plot.evaluate(svg=>{const b=svg.getBBox();return b.x>=0&&b.y>=0&&b.x+b.width<=540&&b.y+b.height<=380&&!svg.innerHTML.match(/NaN|Infinity/);}));
 assert(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1));await lab.screenshot({path:`test-results/parallel-${width}-${view}-${broken}.png`});
 }
 // Unlocked sliders at equal ratios still give parallel lines and equal angle marks.
-await page.locator('#parallel-u').evaluate(e=>{e.value='0.4';e.dispatchEvent(new Event('input',{bubbles:true}));});await expect(plot.locator('[data-angle-arc][stroke-dasharray]')).toHaveCount(0);await expect(result).toContainText('等し');
+await page.locator('#parallel-u').evaluate(e=>{e.value=document.getElementById('parallel-t').value;e.dispatchEvent(new Event('input',{bubbles:true}));});await expect(plot.locator('[data-angle-arc][stroke-dasharray]')).toHaveCount(0);await expect(result).toContainText('等し');
 // Extremes: the arcs stay inside the SVG, without touching vertex labels.
 for(const [t,u]of [['0.2','0.8'],['0.8','0.2'],['0.2','0.2'],['0.8','0.8']]){for(const [id,v]of [['parallel-t',t],['parallel-u',u]])await page.locator('#'+id).evaluate((e,v)=>{e.value=v;e.dispatchEvent(new Event('input',{bubbles:true}));},v);assert(await plot.evaluate(svg=>{const boxes=[...svg.querySelectorAll('text')].map(e=>e.getBBox());return [...svg.querySelectorAll('[data-angle-arc]')].every(p=>{for(let i=0;i<=30;i++){const q=p.getPointAtLength(p.getTotalLength()*i/30);if(boxes.some(b=>q.x>b.x-2&&q.x<b.x+b.width+2&&q.y>b.y-2&&q.y<b.y+b.height+2))return false;}return true;});}));}
 }}
