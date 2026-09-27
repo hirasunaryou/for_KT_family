@@ -52,11 +52,43 @@
    ['30°・60°・90°の三角形の比になる','正三角形の角は60°。頂点の角は合同な2つの三角形に分かれるので30°ずつ。同じ角の三角形は相似だから、この比が使えます。',`${term('1','base')} ： ${term('√3','height')} ： ${term('2','side')}`]
   ]}
  ];
+ function ratioExplorer(ex,seq){
+  const panel=document.createElement('details');panel.className='ratio-explorer';panel.hidden=true;
+  const id=ex.id+'-ratio',sq=ex.id==='square',root=sq?'√2':'√3';
+  panel.innerHTML=`<summary>大きさを変えて、同じ比になるか確かめる</summary><p>角を保ったまま拡大・縮小します。3辺の長さは変わるけれど、比はどうなる？</p><label class="control" for="${id}-k">長さの倍率 <output id="${id}-value"></output><input id="${id}-k" type="range" min="0.5" max="2" step="0.5" value="1"></label><div class="actions"><button type="button" class="button" data-ratio-reset>1倍に戻す</button></div><figure><svg viewBox="0 0 640 490" role="img" id="${id}-plot"></svg></figure><button type="button" class="figure-open" data-ratio-zoom>図を大きく見る</button><p class="muted">灰色の破線は1倍の輪郭。重なる辺は色の線に隠れます。図の縮尺は固定です。</p><button type="button" class="button" data-ratio-reveal aria-pressed="false">比を確かめる</button><div class="ratio-result" aria-live="polite"></div><p class="ratio-reason">同じ角の三角形は相似。だから3辺が同じ倍率になり、比は変わりません。</p><p>紙へ：<a href="#q${sq?'11':'12'}">問${sq?'11':'12'}</a>で、今度は自分で辺の長さを求めよう。<a href="../similarity/index.html">相似を振り返る</a></p>`;
+  seq.append(panel);
+  const slider=panel.querySelector('input'),plot=panel.querySelector('svg'),button=panel.querySelector('[data-ratio-reveal]'),result=panel.querySelector('.ratio-result');let shown=false;
+  const radical=k=>k===1?root:`${k}${root}`;
+  function draw(reset=false){
+   if(reset)shown=false;const k=Number(slider.value),h=sq?1:Math.sqrt(3),A=point(130,400),B=point(130+100*k,400),C=point(B.x,400-100*k*h),baseB=point(230,400),baseC=point(230,400-100*h);
+   let g=text(320,30,`${k}倍にすると、3辺は？`,ink,20);
+   g+=poly([A,B,C],gray,'#edf3f9','data-ratio-triangle');
+   if(k!==1)g+=poly([A,baseB,baseC],gray,'none','data-ratio-original stroke-dasharray="6 5"');
+   const vc=sq?ink:blue,hc=sq?blue:ink;
+   g+=line(A,B,brown,3)+line(B,C,vc,3)+line(A,C,hc,3)+right(B,-1)+arc(A,27,sq?-45:-60,0);
+   g+=text(A.x-37,A.y-6,sq?'45°':'60°',gray,17);
+   g+=text((A.x+B.x)/2,437,String(k),brown,22);
+   g+=text(Math.max(B.x,baseB.x)+53,(B.y+C.y)/2+7,sq?String(k):radical(k),vc,22);
+   g+=text((A.x+C.x)/2-47,(A.y+C.y)/2-17,sq?radical(k):String(2*k),hc,22);
+   g+=text(320,475,'角は同じ。辺の長さは、どれも同じ倍率。',gray,18);
+   plot.innerHTML=g;plot.setAttribute('aria-label',`${sq?'45°・45°・90°':'30°・60°・90°'}の直角三角形。倍率${k}。底辺${k}、高さ${sq?k:radical(k)}、斜辺${sq?radical(k):2*k}。`);
+   panel.querySelector('output').textContent=k+'倍';button.setAttribute('aria-pressed',String(shown));button.textContent=shown?'比を隠す':'比を確かめる';
+   const values=[term(String(k),'base'),term(sq?String(k):radical(k),sq?'side':'height'),term(sq?radical(k):String(2*k),sq?'height':'side')];
+   const units=[term('1','base'),term(sq?'1':'√3',sq?'side':'height'),term(sq?'√2':'2',sq?'height':'side')];
+   result.innerHTML=shown?`<p>${values.join(' ： ')}</p><p class="muted">3つとも ${k} で割る ↓</p><p>${units.join(' ： ')} <span class="muted">同じ比に戻った</span></p>`:'<p>3つの長さを、どれも同じ数で割ると？ 予想してから確かめよう。</p>';
+  }
+  slider.addEventListener('input',()=>draw(true));button.addEventListener('click',()=>{shown=!shown;draw();});
+  panel.querySelector('[data-ratio-reset]').addEventListener('click',()=>{slider.value='1';draw(true);});
+  panel.querySelector('[data-ratio-zoom]').addEventListener('click',()=>{const dialog=document.querySelector('.figure-dialog'),copy=plot.cloneNode(true);copy.removeAttribute('id');dialog.querySelector('.large-figure').replaceChildren(copy);dialog.showModal();});
+  draw();return {panel,reset(){panel.open=false;slider.value='1';draw(true);}};
+ }
  for(const ex of examples){
   const seq=document.getElementById(ex.id+'-sequence');if(!seq)continue;
   const find=name=>seq.querySelector('#'+ex.id+'-'+name);let index=0;
+  const explorer=ratioExplorer(ex,seq);
   function render(){
    const [title,message,formula,previous]=ex.steps[index];
+   explorer.panel.hidden=index!==ex.steps.length-1;
    find('plot').innerHTML=ex.draw(index);find('plot').setAttribute('aria-label',title+'。'+message);
    find('count').textContent=`${index+1} / ${ex.steps.length}`;find('title').textContent=title;find('message').textContent=message;
    find('calculation').hidden=!formula;find('formula').innerHTML=formula||'';
@@ -65,7 +97,7 @@
   }
   find('prev').addEventListener('click',()=>{if(index>0){index--;render();}});
   find('next').addEventListener('click',()=>{if(index<ex.steps.length-1){index++;render();}});
-  find('reset').addEventListener('click',()=>{if(index){index=0;seq.querySelector('details').open=false;render();}});
+  find('reset').addEventListener('click',()=>{if(index){index=0;seq.querySelector('details').open=false;explorer.reset();render();}});
   const card=seq.closest('.concept-card'),notes=card.querySelectorAll('.height-static li'),list=document.createElement('ol');
   list.append(notes[ex.note].cloneNode(true),notes[2].cloneNode(true));seq.querySelector('details').append(list);
   render();seq.hidden=false;

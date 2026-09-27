@@ -44,15 +44,39 @@ const server=http.createServer((req,res)=>{
  }
  await expect(page.locator('#'+id+'-next')).toHaveAttribute('aria-disabled','true');
  await page.keyboard.press('Enter');await expect(page.locator('#'+id+'-count')).toHaveText(`${count} / ${count}`);
- await seq.locator('.figure-open').click();await expect(page.locator('dialog[open]')).toBeVisible();await page.keyboard.press('Escape');
- await seq.locator('summary').click();await expect(seq.locator('details ol')).toContainText(radical);
- await page.locator('#'+id+'-reset').click();await expect(plot).not.toContainText(radical);await expect(seq.locator('details')).not.toHaveAttribute('open','');
+ const explorer=seq.locator('.ratio-explorer');await expect(explorer).toBeVisible();await explorer.locator('summary').click();
+ for(const k of [.5,1,1.5,2]){
+  await explorer.locator('input').fill(String(k));await expect(explorer.locator('[data-ratio-reveal]')).toHaveAttribute('aria-pressed','false');
+  const geometry=await explorer.locator('svg').evaluate(svg=>{
+   const ps=Array.from(svg.querySelector('[data-ratio-triangle]').points),lengths=ps.map((p,i)=>Math.hypot(p.x-ps[(i+1)%3].x,p.y-ps[(i+1)%3].y));
+   const texts=Array.from(svg.querySelectorAll('text'),e=>({text:e.textContent,...Object.fromEntries(['x','y','width','height'].map(k=>[k,e.getBBox()[k]]))}));
+   const overlaps=[];for(let i=0;i<texts.length;i++)for(let j=i+1;j<texts.length;j++){let a=texts[i],b=texts[j];if(a.x<b.x+b.width&&a.x+a.width>b.x&&a.y<b.y+b.height&&a.y+a.height>b.y)overlaps.push([a.text,b.text]);}
+   const collisions=[];for(const e of svg.querySelectorAll('line,polygon,path'))for(let i=0;i<=200;i++){const p=e.getPointAtLength(e.getTotalLength()*i/200);for(const t of texts)if(p.x>t.x-1&&p.x<t.x+t.width+1&&p.y>t.y-1&&p.y<t.y+t.height+1)collisions.push(t.text);}
+   const b=svg.getBBox();return {lengths,overlaps,collisions,inside:b.x>=0&&b.y>=0&&b.x+b.width<=640&&b.y+b.height<=490};
+  });
+  const wanted=id==='square'?[1,1,Math.sqrt(2)]:[1,Math.sqrt(3),2];geometry.lengths.forEach((v,i)=>assert(Math.abs(v-100*k*wanted[i])<.001));
+  assert(geometry.inside&&!geometry.overlaps.length&&!geometry.collisions.length,JSON.stringify({id,k,width,geometry}));
+  await expect(explorer.locator('[data-ratio-original]')).toHaveCount(k===1?0:1);
+  await explorer.locator('[data-ratio-reveal]').focus();await page.keyboard.press('Enter');await expect(explorer.locator('.ratio-result')).toContainText(`3つとも ${k} で割る`);
+  const rad=(n,r)=>n===1?r:String(n)+r;
+  await expect(explorer.locator('.ratio-result p').first()).toHaveText(id==='square'?`${k} ： ${k} ： ${rad(k,'√2')}`:`${k} ： ${rad(k,'√3')} ： ${2*k}`);
+  const norm=explorer.locator('.ratio-result p').last();await expect(norm).toContainText(id==='square'?'1 ： 1 ： √2':'1 ： √3 ： 2');
+  await explorer.screenshot({path:`test-results/ratio-${id}-${width}-${k}.png`});assert(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1));
+ }
+ await explorer.locator('[data-ratio-zoom]').click();await expect(page.locator('dialog[open]')).toBeVisible();await page.keyboard.press('Escape');
+ await explorer.locator('[data-ratio-reset]').click();await expect(explorer.locator('input')).toHaveValue('1');await expect(explorer.locator('[data-ratio-reveal]')).toHaveAttribute('aria-pressed','false');
+ await explorer.locator('input').focus();await page.keyboard.press('ArrowRight');await expect(explorer.locator('input')).toHaveValue('1.5');
+ const question=id==='square'?11:12;await explorer.locator(`a[href="#q${question}"]`).click();await expect(page).toHaveURL(new RegExp(`#q${question}$`));await expect(page.locator(`#q${question}`)).toBeFocused();
+ await page.locator('#'+id+'-prev').click();await expect(explorer).toBeHidden();await page.locator('#'+id+'-next').click();
+ await seq.locator('figure > .figure-open').click();await expect(page.locator('dialog[open]')).toBeVisible();await page.keyboard.press('Escape');
+ await seq.locator('.height-summary summary').click();await expect(seq.locator('details ol')).toContainText(radical);
+ await page.locator('#'+id+'-reset').click();await expect(plot).not.toContainText(radical);await expect(seq.locator('.height-summary')).not.toHaveAttribute('open','');await expect(explorer).toBeHidden();await expect(explorer).not.toHaveAttribute('open','');
  await page.locator('#'+id+'-next').click();await page.locator('#'+id+'-prev').click();await expect(plot.locator('[data-auxiliary]')).toHaveCount(0);
  }
  }
  await page.locator('#square-next').click();await expect(page.locator('#equilateral-count')).toHaveText('1 / 6');
  await page.emulateMedia({media:'print'});for(const id of ['square','equilateral'])await expect(page.locator('#'+id+'-sequence')).toBeHidden();await expect(page.locator('#lesson-6 .height-static')).toBeVisible();
  const nojs=await browser.newPage({javaScriptEnabled:false});await nojs.goto(url);await expect(nojs.locator('#lesson-6 .height-static')).toBeVisible();
- assert.deepEqual(errors,[]);console.log('PASS special ratios: 11 stages, three widths, exact shapes, labels, answers, independent controls, keyboard, reset, zoom, print and no-JS');
+ assert.deepEqual(errors,[]);console.log('PASS special ratios: 11 stages and 2 shapes × 4 multipliers × 3 widths; exact lengths, labels, ratio calculations, keyboard, reset, zoom, paper links, print and no-JS');
  }finally{await browser.close();server.close();}
 })().catch(e=>{console.error(e);server.close();process.exitCode=1;});
