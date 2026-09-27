@@ -34,3 +34,14 @@
 @media print{.height-sequence{display:none!important}.has-height-sequence .height-static{display:block!important}}
 
 #equilateral-sequence{border-top:1px solid var(--line);margin-top:32px;padding-top:24px}
+
+/* A focused sub-lesson prevents area reasoning and algebra from arriving together. */
+.sequence-chapters{display:flex;flex-wrap:wrap;gap:8px;margin-top:20px}
+.sequence-chapters button{font:inherit;font-size:14px;padding:9px 12px;min-height:42px;border:1px solid var(--line);border-radius:6px;background:white;color:var(--green);cursor:pointer}
+.sequence-chapters button[aria-current=step]{background:var(--green);border-color:var(--green);color:white}
+.height-sequence .sequence-phase{margin:18px 0 0;font-size:14px;color:var(--muted)}
+.sequence-change{background:#f7ebcc;border-bottom:2px solid #b69245;padding:2px 3px;box-decoration-break:clone;-webkit-box-decoration-break:clone}
+.sequence-previous .sequence-change{background:none;border:0;padding:0}
+.height-sequence figure[hidden]{display:none}
+
+.sequence-area-square{color:#6f5885}.sequence-area-strip{color:#476b48}.sequence-area-unit{color:#8b671d}
