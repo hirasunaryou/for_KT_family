@@ -1,0 +1,19 @@
+<div id="coordinate-sequence" class="height-sequence" hidden>
+ <p class="sequence-intro">斜めの距離を、横と縦から考えよう。「次の手順」で、図を一段ずつ見よう。</p>
+ <div class="sequence-controls" role="group" aria-label="座標から距離を求める手順">
+  <button type="button" id="coordinate-prev" class="button" aria-controls="coordinate-plot coordinate-explanation">ひとつ前</button>
+  <span id="coordinate-count" class="sequence-count"></span>
+  <button type="button" id="coordinate-next" class="button primary" aria-controls="coordinate-plot coordinate-explanation">次の手順</button>
+  <button type="button" id="coordinate-reset" class="sequence-reset" aria-controls="coordinate-plot coordinate-explanation">最初から</button>
+ </div>
+ <div id="coordinate-explanation" class="sequence-explanation" aria-live="polite" aria-atomic="true">
+  <h3 id="coordinate-title"></h3><p id="coordinate-message"></p>
+ </div>
+ <figure><svg id="coordinate-plot" viewBox="0 0 640 480" role="img" aria-label="座標の差から直角三角形を作る"></svg></figure>
+ <div id="coordinate-calculation" class="sequence-calculation" hidden>
+  <p id="coordinate-previous" class="sequence-previous"></p>
+  <p id="coordinate-formula" class="sequence-formula"></p>
+ </div>
+ <p id="coordinate-practice" class="sequence-intro" hidden>紙で自分の手を動かそう：<a href="#q19">問19で確かめる</a> · <a href="#q20">問20で二次関数につなぐ</a></p>
+ <details class="height-summary"><summary>解き方をまとめて読む</summary></details>
+</div>
