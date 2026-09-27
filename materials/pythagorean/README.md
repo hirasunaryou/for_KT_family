@@ -87,3 +87,7 @@ npm test
 ### 円から三平方へ：段階表示
 
 解説8は `diameter-steps.html` と `initDiameterSequence()` により、条件→円周角の直角→斜辺→式→平方根の5段階で表示する。図は6・8・10の直角三角形を同一縮尺で描き、答え8は最後に出す。戻る・リセット・拡大に対応し、印刷とJavaScript無効時は元の完成図を使う。検証は `tests/pythagorean-diameter.cjs`。PDFは変更していない。
+
+### 特別な辺の比を作る：2つの段階表示
+
+解説6は `special-steps.html` と `assets/pythagorean/special-steps.js` を使用。正方形は5段階、正三角形は6段階で、補助線→直角三角形→式→平方根→角と相似による一般化へつなぐ。操作は独立し、答えは計算の段階まで隠す。生成元とPDFの数値・問題番号は変更しない。`tests/pythagorean-special.cjs` で全段階の形・文字・操作と印刷／JavaScript無効時を検証する。
