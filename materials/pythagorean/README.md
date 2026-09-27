@@ -91,3 +91,7 @@ npm test
 ### 特別な辺の比を作る：2つの段階表示
 
 解説6は `special-steps.html` と `assets/pythagorean/special-steps.js` を使用。正方形は5段階、正三角形は6段階で、補助線→直角三角形→式→平方根→角と相似による一般化へつなぐ。操作は独立し、答えは計算の段階まで隠す。生成元とPDFの数値・問題番号は変更しない。`tests/pythagorean-special.cjs` で全段階の形・文字・操作と印刷／JavaScript無効時を検証する。
+
+### 長さを文字で置く：図と二次方程式の7段階
+
+解説12は `unknown-steps.html` と `assets/pythagorean/unknown-steps.js` を使用。条件→短い辺x→長い辺x＋1を棒で比較→三平方→面積図で展開→因数分解と2候補→正の長さと元の条件の確認。負の長さを実線分として描かず、候補カードで不適合を説明する。PDFと問14は変更なし。検証は `tests/pythagorean-unknown.cjs`。
