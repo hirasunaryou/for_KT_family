@@ -22,9 +22,11 @@ const server=http.createServer((req,res)=>{const p=path.resolve(root,'.'+new URL
      const boxes=[...svg.querySelectorAll('text')].map(e=>({text:e.textContent,...Object.fromEntries(['x','y','width','height'].map(k=>[k,e.getBBox()[k]]))}));
      const overlaps=[];for(let i=0;i<boxes.length;i++)for(let j=i+1;j<boxes.length;j++){const a=boxes[i],b=boxes[j];if(a.x<b.x+b.width&&a.x+a.width>b.x&&a.y<b.y+b.height&&a.y+a.height>b.y)overlaps.push([a.text,b.text]);}
      const data=e=>{const b=e.getBBox();return {x:b.x,y:b.y,w:b.width,h:b.height};};
-     const b=svg.getBBox();return {original:data(svg.querySelector('[data-scale-original]')),target:data(svg.querySelector('[data-scale-target]')),overlaps,inside:b.x>=0&&b.y>=0&&b.x+b.width<=540&&b.y+b.height<=390};
+     const edges=[...svg.querySelectorAll('line,polygon')],edgeCollisions=[];
+     for(const e of edges)for(let i=0;i<=200;i++){const p=e.getPointAtLength(e.getTotalLength()*i/200);for(const t of boxes)if(p.x>t.x-1.5&&p.x<t.x+t.width+1.5&&p.y>t.y-1.5&&p.y<t.y+t.height+1.5)edgeCollisions.push(t.text);}
+     const b=svg.getBBox();return {original:data(svg.querySelector('[data-scale-original]')),target:data(svg.querySelector('[data-scale-target]')),overlaps,edgeCollisions,inside:b.x>=0&&b.y>=0&&b.x+b.width<=540&&b.y+b.height<=390};
     });
-    assert(geometry.inside&&!geometry.overlaps.length,JSON.stringify({kind,k,width,geometry}));
+    assert(geometry.inside&&!geometry.overlaps.length&&!geometry.edgeCollisions.length,JSON.stringify({kind,k,width,geometry}));
     const near=(a,b)=>assert(Math.abs(a-b)<.001,`${a} vs ${b}`),g=geometry.target,o=geometry.original;
     near(o.x,65);near(g.x,280);near(o.y+o.h,270);near(g.y+g.h,270);
     near(g.w/o.w,kind==='stretch'?1:k);near(g.h/o.h,k);
