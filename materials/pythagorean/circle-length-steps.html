@@ -1,0 +1,20 @@
+<div id="circle-length-sequence" class="height-sequence" hidden>
+ <p class="sequence-intro">弦と接線。それぞれの図で、直角の位置から考えよう。「次の手順」で、図を一段ずつ見よう。</p>
+ <div class="sequence-chapters circle-length-modes" role="group" aria-label="考える図を選ぶ"><button type="button" data-circle-mode="chord" aria-pressed="true">弦：中心からの距離</button><button type="button" data-circle-mode="tangent" aria-pressed="false">接線：接点までの長さ</button></div>
+ <div class="sequence-controls" role="group" aria-label="円の弦・接線から長さを求める手順">
+  <button type="button" id="circle-length-prev" class="button" aria-controls="circle-length-plot circle-length-explanation">ひとつ前</button>
+  <span id="circle-length-count" class="sequence-count"></span>
+  <button type="button" id="circle-length-next" class="button primary" aria-controls="circle-length-plot circle-length-explanation">次の手順</button>
+  <button type="button" id="circle-length-reset" class="sequence-reset" aria-controls="circle-length-plot circle-length-explanation">最初から</button>
+ </div>
+ <div id="circle-length-explanation" class="sequence-explanation" aria-live="polite" aria-atomic="true">
+  <h3 id="circle-length-title"></h3><p id="circle-length-message"></p>
+ </div>
+ <figure><svg id="circle-length-plot" viewBox="0 0 640 520" role="img" aria-label="弦・接線と半径から直角三角形を見つける"></svg></figure>
+ <div id="circle-length-calculation" class="sequence-calculation" hidden>
+  <p id="circle-length-previous" class="sequence-previous"></p>
+  <p id="circle-length-formula" class="sequence-formula"></p>
+ </div>
+ <p id="circle-length-practice" class="sequence-intro" hidden></p>
+ <details class="height-summary"><summary>解き方をまとめて読む</summary></details>
+</div>
