@@ -15,5 +15,7 @@ def literal(value):
 inline = 'window.__packHTML="<!doctype html>"+document.documentElement.outerHTML;\nwindow.__styleText='+literal(css)+';\nwindow.__workerSource='+literal((ASSETS/'worker.js').read_text())+';\n'+lessons+'\n'+app
 inline = inline.replace('</script', '<\\/script')
 html = html.replace('<link rel="stylesheet" href="../../../assets/python-dice/style.css">', '<style>'+css+'</style>').replace('<script type="module" src="../../../assets/python-dice/app.js"></script>', '<script type="module">'+inline+'</script>')
+html = html.replace('<link rel="stylesheet" href="../../../assets/family/navigation.css">', '<style>'+(ROOT/'assets/family/navigation.css').read_text()+'</style>')
+html = html.replace('href="../../../index.html"', f'href="{base}index.html"').replace('href="../index.html"', f'href="{base}study/programming/index.html"')
 (PAGE/'dice-lab.html').write_text(html)
 print('Portable browser lesson rebuilt.')
