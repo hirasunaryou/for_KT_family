@@ -20,7 +20,7 @@
 .sequence-explanation p{font-size:15px;margin:0}
 .height-sequence figure{margin:20px 0 12px}
 .sequence-calculation{padding:16px 18px;margin-bottom:20px;background:#f1f4ee;border-radius:8px}
-.sequence-calculation :is(#height-formula,#diameter-formula){font-size:19px;line-height:1.9;margin:0}
+.sequence-calculation :is(#height-formula,#diameter-formula,.sequence-formula){font-size:19px;line-height:1.9;margin:0}
 .sequence-calculation .sequence-previous{font-size:14px;color:#64736e;margin:0 0 10px;border-bottom:1px solid var(--line);padding-bottom:10px}
 .sequence-height{color:#3566a0}.sequence-base{color:#98502f}.sequence-side{color:#253b39}
 .sequence-previous span{color:inherit}
@@ -30,5 +30,7 @@
 .height-draw{stroke-dasharray:1;stroke-dashoffset:0;animation:height-draw .5s ease-out}
 @keyframes height-draw{from{stroke-dashoffset:1}to{stroke-dashoffset:0}}
 @media(prefers-reduced-motion:reduce){.height-draw{animation:none}}
-@media(max-width:480px){.sequence-controls{gap:7px}.sequence-controls .button{padding-inline:10px}.sequence-reset{padding-inline:5px}.sequence-explanation{min-height:155px}.sequence-calculation{padding:14px 12px}.sequence-calculation :is(#height-formula,#diameter-formula){font-size:17px}}
+@media(max-width:480px){.sequence-controls{gap:7px}.sequence-controls .button{padding-inline:10px}.sequence-reset{padding-inline:5px}.sequence-explanation{min-height:155px}.sequence-calculation{padding:14px 12px}.sequence-calculation :is(#height-formula,#diameter-formula,.sequence-formula){font-size:17px}}
 @media print{.height-sequence{display:none!important}.has-height-sequence .height-static{display:block!important}}
+
+#equilateral-sequence{border-top:1px solid var(--line);margin-top:32px;padding-top:24px}
