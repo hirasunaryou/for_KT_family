@@ -52,8 +52,8 @@ const server=http.createServer((req,res)=>{
    await prev.click();await prev.click();await expect(page.locator('#height-count')).toHaveText('4 / 6');assert(!(await plot.locator('text').allTextContents()).includes('4'));
   }
   await page.locator('#height-sequence .figure-open').click();await expect(page.locator('dialog')).toBeVisible();await expect(page.locator('dialog [data-height-edge]')).toHaveCount(1);await page.keyboard.press('Escape');
-  await page.locator('.height-summary summary').click();await expect(page.locator('.height-summary ol')).toContainText('面積は6×4÷2＝12');
-  await page.locator('#height-reset').click();await expect(page.locator('.height-summary')).not.toHaveAttribute('open','');
+  await page.locator('#height-sequence .height-summary summary').click();await expect(page.locator('#height-sequence .height-summary ol')).toContainText('面積は6×4÷2＝12');
+  await page.locator('#height-reset').click();await expect(page.locator('#height-sequence .height-summary')).not.toHaveAttribute('open','');
   await expect(page.locator('#height-count')).toHaveText('1 / 6');await expect(page.locator('#height-calculation')).toBeHidden();
   await prev.focus();await page.keyboard.press('Enter');await expect(page.locator('#height-count')).toHaveText('1 / 6');
   await page.emulateMedia({reducedMotion:'reduce'});await next.click();
