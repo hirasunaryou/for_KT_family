@@ -1,0 +1,30 @@
+/* The two entry pages share a hierarchy; lesson layouts keep their own styles. */
+.entrance-intro{padding:44px 0 28px}
+.entrance-intro .eyebrow{letter-spacing:.1em;font-size:12px;margin-bottom:14px}
+.entrance-intro h1{font-size:clamp(27px,3.3vw,39px);line-height:1.55;margin-bottom:14px}
+.entrance-intro>p:last-child{color:var(--muted);font-size:15px;margin:0}
+.entrance-page .crumbs{margin-bottom:0}
+.crumbs+.entrance-intro{padding-top:28px}
+.subject-section{margin:8px 0 40px}
+.subject-section>h2{font-size:15px;font-weight:500;color:var(--muted);margin-bottom:18px}
+.subject-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:24px}
+.subject-card{display:flex;flex-direction:column;background:var(--white);border:1px solid var(--line);border-radius:14px;padding:30px 32px}
+.subject-heading{display:flex;align-items:center;gap:16px;margin-bottom:22px}
+.subject-mark{display:grid;place-items:center;width:54px;height:58px;flex-shrink:0;border-radius:10px;background:#eaf0e5;color:var(--green);font-family:Georgia,serif;font-size:26px}
+.subject-programming .subject-mark{background:#edf0f6;color:var(--blue);font-family:monospace;font-size:23px}
+.subject-level{font-size:12px;color:var(--muted);margin:0 0 3px}
+.subject-heading h3{font-size:25px;margin:0;line-height:1.5}
+.subject-message{font-size:21px;line-height:1.75;font-weight:600;margin-bottom:14px}
+.subject-description{font-size:14px;color:var(--muted);margin-bottom:22px}
+.subject-topics{display:grid;gap:7px;font-size:12px;line-height:1.7;border-top:1px solid var(--line);padding:18px 0 24px}
+.subject-link{align-self:flex-start;margin-top:auto;font-size:14px;gap:14px}
+.subject-programming .primary{background:#365e83;border-color:#365e83}
+.subject-link:hover{filter:brightness(.92)}
+.curiosity-note{display:flex;justify-content:space-between;align-items:center;gap:24px;border-top:1px solid var(--line);padding:24px 0 0;margin-bottom:32px}
+.curiosity-note h2{font-size:16px;margin-bottom:5px}
+.curiosity-note p{font-size:13px;color:var(--muted);margin:0}
+.curiosity-note>a{font-size:13px;flex-shrink:0;padding:10px 0}
+.entrance-page .footer{margin-top:36px}
+@media(max-width:760px){.subject-grid{gap:16px}.subject-card{padding:24px}.subject-heading h3{font-size:21px}.subject-mark{width:44px;height:48px}.subject-heading{gap:12px}.subject-link{padding:12px 14px;font-size:13px}}
+@media(max-width:600px){.entrance-page .masthead{flex-wrap:wrap;gap:14px}.entrance-page .masthead nav{gap:24px}.entrance-intro{padding-top:30px}.subject-grid{grid-template-columns:1fr;gap:20px}.subject-card{padding:25px}.subject-heading{margin-bottom:18px}.subject-message{font-size:20px}.subject-link{font-size:14px}.curiosity-note{display:block}.curiosity-note>a{display:inline-block;margin-top:7px}}
+@media print{.subject-card{break-inside:avoid}.subject-grid{gap:16px}.entrance-intro{padding-top:0}.subject-link{color:var(--ink);background:white!important}.curiosity-note{display:block}}
