@@ -1,8 +1,12 @@
 <div id="unknown-sequence" class="height-sequence" hidden>
  <p class="sequence-intro">長さが分からないとき、どこから式を作る？「次の手順」で、図を一段ずつ見よう。</p>
  <nav class="sequence-chapters" aria-label="説明のまとまり">
-  <button type="button" data-chapter="0">1 図と式</button><button type="button" data-chapter="4">2 平方の意味</button><button type="button" data-chapter="11">3 式変形</button><button type="button" data-chapter="19">4 解と条件</button>
+  <button type="button" data-chapter="0">1 図と式</button><button type="button" data-chapter="11">2 式変形</button><button type="button" data-chapter="19">3 解と条件</button>
  </nav>
+ <div id="unknown-detour" class="sequence-detour" hidden>
+  <p>ここは、展開を面積で考える補足です。いつでも元の説明に戻れます。</p>
+  <button type="button" id="unknown-expansion-close" class="button" aria-controls="unknown-plot unknown-explanation">式の説明に戻る</button>
+ </div>
  <p id="unknown-phase" class="sequence-phase"></p>
  <div class="sequence-controls" role="group" aria-label="長さを文字で置く説明の手順">
   <button type="button" id="unknown-prev" class="button" aria-controls="unknown-plot unknown-explanation">ひとつ前</button>
@@ -11,12 +15,17 @@
   <button type="button" id="unknown-reset" class="sequence-reset" aria-controls="unknown-plot unknown-explanation">最初から</button>
  </div>
  <div id="unknown-explanation" class="sequence-explanation" aria-live="polite" aria-atomic="true">
-  <h3 id="unknown-title"></h3><p id="unknown-message"></p>
+  <h3 id="unknown-title" tabindex="-1"></h3><p id="unknown-message"></p>
  </div>
  <figure><svg id="unknown-plot" viewBox="0 0 640 500" role="img" aria-label="長方形の辺を文字で置いて考える"></svg></figure>
  <div id="unknown-calculation" class="sequence-calculation" hidden>
   <p id="unknown-previous" class="sequence-previous"></p>
   <p id="unknown-formula" class="sequence-formula"></p>
  </div>
+ <aside id="unknown-expansion-option" class="sequence-option" hidden aria-labelledby="unknown-option-title">
+  <h4 id="unknown-option-title">別の見方（任意）</h4>
+  <p>(x＋1)²の展開は、面積でも確かめられます。</p>
+  <button type="button" id="unknown-expansion-open" class="button" aria-controls="unknown-plot unknown-explanation">展開を面積図で確かめる</button>
+ </aside>
  <details class="height-summary"><summary>解き方をまとめて読む</summary></details>
 </div>

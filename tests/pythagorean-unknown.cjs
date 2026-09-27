@@ -16,10 +16,14 @@ const server=http.createServer((req,res)=>{
  const roots=[];for(let x=-10;x<=10;x++)if(x*x+(x+1)**2===25)roots.push(x);assert.deepEqual(roots,[-4,3]);assert.deepEqual(roots.filter(x=>x>0),[3]);
  for(const width of [1440,768,390]){
  await page.setViewportSize({width,height:1100});await page.locator('#unknown-reset').focus();await page.keyboard.press('Enter');
+ // The default route must never enter the optional area explanation, even backwards.
+ const mainSteps=[0,1,2,3,11,12,13,14,15,16,17,18,19,20,21,22];
+ for(const i of mainSteps){await expect(seq).toHaveAttribute('data-step',String(i));await expect(seq).toHaveAttribute('data-branch','main');await expect(plot.locator('[data-expansion]')).toHaveCount(0);await expect(page.locator('#unknown-detour')).toBeHidden();if(i<22)await page.locator('#unknown-next').click();}
+ for(const i of [...mainSteps].reverse()){await expect(seq).toHaveAttribute('data-step',String(i));if(i>0)await page.locator('#unknown-prev').click();}
  let previousFormula='';
  for(let i=0;i<23;i++){
  await expect(seq).toBeVisible();await expect(page.locator('#lesson-12 .height-static')).toBeHidden();await expect(seq).toHaveAttribute('data-step',String(i));
- const phase=i<4?[0,4,'図と式']:i<11?[4,7,'平方の意味']:i<19?[11,8,'式変形']:[19,4,'解と条件'];
+ const phase=i<4?[0,4,'図と式']:i<11?[4,7,'補足 · 展開を面積図で確かめる']:i<19?[11,8,'式変形']:[19,4,'解と条件'];
  await expect(page.locator('#unknown-count')).toHaveText(`${i-phase[0]+1} / ${phase[1]}`);await expect(page.locator('#unknown-phase')).toHaveText(phase[2]);
  const labels=await plot.locator('text').allTextContents();assert.equal(labels.includes('3'),i===22);assert.equal(labels.includes('4'),i===22);
  assert.equal((await plot.textContent()).includes('候補 x＝−4'),i>=21);
@@ -59,7 +63,9 @@ const server=http.createServer((req,res)=>{
  if(!(i>=4&&i<=10)){assert.equal(shape.short/shape.long,3/4);assert.equal(shape.short**2+shape.long**2,shape.diagonal**2);}assert(shape.inside&&shape.equal&&!shape.overlap&&!shape.collision,JSON.stringify(shape));
  }else await expect(plot).toBeHidden();
  assert(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1));await seq.screenshot({path:`test-results/unknown-${width}-${i}.png`});
- if(i<22){await page.locator('#unknown-next').focus();await page.keyboard.press('Enter');}
+ if(i===3){await page.locator('#unknown-expansion-open').focus();await page.keyboard.press('Enter');await expect(page.locator('#unknown-title')).toBeFocused();}
+ else if(i===10){await page.locator('#unknown-next').click();await expect(seq).toHaveAttribute('data-step','3');await expect(page.locator('#unknown-expansion-open')).toBeFocused();await page.locator('#unknown-next').click();}
+ else if(i<22){await page.locator('#unknown-next').focus();await page.keyboard.press('Enter');}
  }
  await expect(page.locator('#unknown-next')).toHaveAttribute('aria-disabled','true');await page.keyboard.press('Enter');await expect(page.locator('#unknown-count')).toHaveText('4 / 4');
  await seq.locator('.figure-open').click();await expect(page.locator('dialog[open]')).toBeVisible();await page.keyboard.press('Escape');
@@ -67,12 +73,26 @@ const server=http.createServer((req,res)=>{
  await seq.locator('summary').click();await expect(seq.locator('details ol')).toContainText('辺は3 cmと4 cm');
  await page.locator('#unknown-reset').click();await expect(seq.locator('details')).not.toHaveAttribute('open','');await expect(plot).not.toContainText('候補');
  }
- await seq.locator('[data-chapter=\"4\"]').click();await expect(seq).toHaveAttribute('data-step','4');await expect(plot.locator('[data-cell]')).toHaveCount(0);
- await seq.locator('[data-chapter=\"11\"]').click();await expect(seq).toHaveAttribute('data-step','11');await expect(page.locator('#unknown-formula')).toContainText('x²＋2x＋1');
- await seq.locator('[data-chapter=\"19\"]').click();await expect(seq).toHaveAttribute('data-step','19');await expect(plot).toBeHidden();
- await seq.locator('[data-chapter=\"0\"]').click();await expect(seq).toHaveAttribute('data-step','0');
+ // Entry after expansion also restores its own position. Every exit is keyboard-accessible.
+ await seq.locator('[data-chapter="11"]').click();await expect(seq).toHaveAttribute('data-step','11');await expect(page.locator('#unknown-formula')).toContainText('x²＋2x＋1');
+ await page.locator('#unknown-expansion-open').focus();await page.keyboard.press('Space');await expect(seq).toHaveAttribute('data-step','4');
+ await expect(seq.locator('[aria-current="step"]')).toHaveCount(0);await expect(page.locator('#unknown-detour')).toBeVisible();
+ await page.locator('#unknown-prev').focus();await page.keyboard.press('Enter');await expect(seq).toHaveAttribute('data-step','4');
+ await page.locator('#unknown-next').click();await page.locator('#unknown-next').click();await expect(seq).toHaveAttribute('data-step','6');
+ await page.locator('#unknown-prev').click();await expect(seq).toHaveAttribute('data-step','5');
+ await page.locator('#unknown-reset').click();await expect(seq).toHaveAttribute('data-step','4');
+ await page.locator('#unknown-next').click();await page.locator('#unknown-expansion-close').focus();await page.keyboard.press('Enter');
+ await expect(seq).toHaveAttribute('data-step','11');await expect(page.locator('#unknown-expansion-open')).toBeFocused();
+ await page.locator('#unknown-prev').click();await expect(seq).toHaveAttribute('data-step','3');await page.locator('#unknown-next').click();
+ await page.locator('#unknown-expansion-open').click();for(let i=4;i<10;i++)await page.locator('#unknown-next').click();
+ await page.locator('#unknown-next').click();await expect(seq).toHaveAttribute('data-step','11');
+ await page.locator('#unknown-expansion-open').click();await page.locator('#unknown-next').click();
+ await seq.locator('[data-chapter="19"]').click();await expect(seq).toHaveAttribute('data-step','19');await expect(plot).toBeHidden();await expect(page.locator('#unknown-detour')).toBeHidden();
+ await page.locator('#unknown-reset').click();await expect(seq).toHaveAttribute('data-step','0');
+ await seq.locator('[data-chapter="11"]').click();await page.locator('#unknown-expansion-open').click();
+ await seq.locator('[data-chapter="0"]').click();await expect(seq).toHaveAttribute('data-step','0');
  await page.emulateMedia({media:'print'});await expect(seq).toBeHidden();await expect(page.locator('#lesson-12 .height-static')).toBeVisible();
  const nojs=await browser.newPage({javaScriptEnabled:false});await nojs.goto(url);await expect(nojs.locator('#lesson-12 .height-static')).toBeVisible();
- assert.deepEqual(errors,[]);console.log('PASS unknown lengths: 23 steps in 4 chapters, area meaning and progressive partition, equivalent equations, exact geometry, no false area colors, 3 widths, labels, keyboard, reset, back, zoom, print, no-JS');
+ assert.deepEqual(errors,[]);console.log('PASS unknown lengths: 16 main steps and 7 optional expansion steps, default skip/back, detour return/reset/chapter exits, area meaning and progressive partition, equivalent equations, exact geometry, no false area colors, 3 widths, labels, keyboard, reset, back, zoom, print, no-JS');
  }finally{await browser.close();server.close();}
 })().catch(e=>{console.error(e);server.close();process.exitCode=1;});

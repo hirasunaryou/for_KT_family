@@ -45,8 +45,8 @@
   ['細い長方形は、それぞれ面積x','右側は縦x・横1で、x×1＝x。下側は縦1・横xで、1×x＝x。同じ面積xの長方形が2枚あります。'],
   ['右下は、1 × 1','残った小さな正方形は、縦も横も1。面積は1です。これで4つの部分がそろいました。'],
   ['4つを足すと、正方形全体の面積','すき間も重なりもないので、4つの面積を足せます。全体の(x＋1)²は、x²＋x＋x＋1と同じです。'],
-  ['面積xが2枚あるから、2x','x＋xを2xとまとめます。これで(x＋1)²＝x²＋2x＋1。次に、この結果をもとの三平方の式へ戻します。'],
-  ['もとの式の、茶色の部分を置き換える','短い辺から来た青いx²は、そのまま残します。長い辺から来た(x＋1)²だけを、今調べたx²＋2x＋1に置き換えます。'],
+  ['面積xが2枚あるから、2x','x＋xを2xとまとめます。これで(x＋1)²＝x²＋2x＋1。確かめ終えたら、もとの式の説明に戻ろう。'],
+  ['(x＋1)²を展開する','(x＋1)²＝x²＋2x＋1を使います。短い辺から来た青いx²はそのまま。茶色の部分だけを置き換えます。'],
   ['まず、右辺の5²を計算する','5²は5×5なので25。左辺はまだ変えません。色の付いたところだけが、一つ前の式から変わっています。'],
   ['＋の後のかっこを外す','かっこの前が＋なので、中の各項の符号を変えずに外せます。x²が2つあることに注目しよう。'],
   ['x²とx²をまとめる','x²＋x²＝2x²。2xと1は、そのまま残します。'],
@@ -59,8 +59,10 @@
   ['それぞれの式から、候補を求める','x＋4＝0からx＝−4。x−3＝0からx＝3。方程式の解は2つですが、どちらを長さに使えるでしょう？'],
   ['元の条件へ戻して、確かめる','長さは正なので、x＝−4は使えません。x＝3なら短い辺は3 cm、長い辺は4 cm。差は1、3²＋4²＝25で対角線も5 cmになります。']
  ].map((step,i)=>[...step,f[i],i===11?equation:i===4?equation:i>=10?f[i-1]:null]);
- const chapters=[{name:'図と式',start:0,end:3},{name:'平方の意味',start:4,end:10},{name:'式変形',start:11,end:18},{name:'解と条件',start:19,end:22}];
- let index=0;
+ const chapters=[{name:'図と式',start:0,end:3},{name:'式変形',start:11,end:18},{name:'解と条件',start:19,end:22}];
+ // Area reasoning is an optional detour; the ordinary path skips indices 4–10.
+ let index=0,returnIndex=null;
+ const inExpansion=()=>index>=4&&index<=10;
  function diagram(){
   const solved=index===22;
   let g=text(270,35,'長方形（長さの単位：cm）',gray,17);
@@ -121,18 +123,34 @@
   const [title,message,formula,previous]=steps[index];
   find('plot').innerHTML=index>=4&&index<=10?areaDiagram():diagram();
   find('plot').closest('figure').hidden=index>=12&&index<=20;find('plot').setAttribute('aria-label',title+'。'+message);
-  const chapter=chapters.find(c=>index>=c.start&&index<=c.end);
+  const optional=inExpansion();
+  const chapter=optional?{name:'補足 · 展開を面積図で確かめる',start:4,end:10}:chapters.find(c=>index>=c.start&&index<=c.end);
   find('count').textContent=`${index-chapter.start+1} / ${chapter.end-chapter.start+1}`;
-  find('phase').textContent=chapter.name;seq.dataset.step=String(index);
+  find('phase').textContent=chapter.name;seq.dataset.step=String(index);seq.dataset.branch=optional?'expansion':'main';
   seq.querySelectorAll('[data-chapter]').forEach(b=>{if(Number(b.dataset.chapter)===chapter.start)b.setAttribute('aria-current','step');else b.removeAttribute('aria-current');});find('title').textContent=title;find('message').textContent=message;
   find('calculation').hidden=!formula;find('formula').innerHTML=formula||'';
   find('previous').hidden=!previous;find('previous').innerHTML=previous?'ひとつ前：'+previous:'';
-  for(const [name,disabled]of [['prev',index===0],['reset',index===0],['next',index===steps.length-1]])find(name).setAttribute('aria-disabled',String(disabled));
+  find('expansion-option').hidden=optional||![3,11].includes(index);
+  find('detour').hidden=!optional;
+  find('next').textContent=optional&&index===10?'式の説明に戻る':index===3?'展開した式へ':'次の手順';
+  find('reset').textContent=optional?'補足を最初から':'最初から';
+  for(const [name,disabled]of [['prev',index===(optional?4:0)],['reset',index===(optional?4:0)],['next',index===steps.length-1]])find(name).setAttribute('aria-disabled',String(disabled));
  }
- find('prev').addEventListener('click',()=>{if(index){index--;render();}});
- find('next').addEventListener('click',()=>{if(index<steps.length-1){index++;render();}});
- find('reset').addEventListener('click',()=>{if(index){index=0;seq.querySelector('details').open=false;render();}});
- seq.querySelectorAll('[data-chapter]').forEach(b=>b.addEventListener('click',()=>{index=Number(b.dataset.chapter);seq.querySelector('details').open=false;render();}));
+ function closeExpansion(){
+  if(returnIndex===null)return;
+  index=returnIndex;returnIndex=null;render();find('expansion-open').focus();
+ }
+ find('expansion-open').addEventListener('click',()=>{
+  returnIndex=index;index=4;seq.querySelector('details').open=false;render();find('title').focus();
+ });
+ find('expansion-close').addEventListener('click',closeExpansion);
+ find('prev').addEventListener('click',()=>{if(index>(inExpansion()?4:0)){index=index===11?3:index-1;render();}});
+ find('next').addEventListener('click',()=>{
+  if(inExpansion()&&index===10){closeExpansion();return;}
+  if(index<steps.length-1){index=index===3?11:index+1;render();}
+ });
+ find('reset').addEventListener('click',()=>{index=inExpansion()?4:0;seq.querySelector('details').open=false;render();});
+ seq.querySelectorAll('[data-chapter]').forEach(b=>b.addEventListener('click',()=>{index=Number(b.dataset.chapter);returnIndex=null;seq.querySelector('details').open=false;render();}));
  const card=seq.closest('.concept-card');seq.querySelector('details').append(card.querySelector('.height-static ol').cloneNode(true));
  render();seq.hidden=false;card.classList.add('has-height-sequence');
 })();
