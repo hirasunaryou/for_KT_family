@@ -40,7 +40,8 @@ const server=http.createServer((req,res)=>{
         await expect(main.locator('h1')).toHaveText(heading);
         await expect(details).toHaveAttribute('open','');
         const top=await main.evaluate(el=>el.getBoundingClientRect().top);
-        assert(Math.abs(top)<=1,`${course}: main content should scroll into view (${top})`);
+        const barBottom=await page.locator('.site-return-nav').evaluate(el=>el.getBoundingClientRect().bottom);
+        assert(top>=barBottom&&top<=barBottom+20,`${course}: main content should appear below site navigation (${top})`);
         await page.keyboard.press('Tab');
         assert(await main.evaluate(el=>el.contains(document.activeElement)),`${course}: Tab must continue inside the main content`);
         await originalMain.dispose();

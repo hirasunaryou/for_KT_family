@@ -190,3 +190,9 @@ python3 -m http.server 8000
 - 紙とWebを同じ原稿から生成。静的な図も共通の図データを使用。
 - JavaScript無効時も本文・全問題・解答・PDFを利用可能。自己評価は `family-similarity-v1` に保存。
 - 原稿・再生成・検証の手順は [materials/similarity/README.md](materials/similarity/README.md)。
+
+## 長い教材からの共通の戻り道
+
+ホーム以外の全16 HTMLページに、上端に残る「サイトのトップ」を配置。単元内では数学／プログラミングの教材一覧も併記し、ページ内の先頭への移動と区別する。JavaScriptに依存せず、章の再描画でも消えない。印刷には出さない。
+
+共通生成処理は `scripts/site_navigation.py`、見た目は `assets/family/navigation.css`。4つの数学ビルダーから呼び出し、直接編集するページには `python3 scripts/site_navigation.py` で反映する。サイコロの単体HTMLは `python3 scripts/build-python-dice-portable.py` でCSSを埋め込み、公開サイトへの絶対URLを保持する。検証は `tests/site-navigation.cjs` と `tests/python-skip-links.cjs`。

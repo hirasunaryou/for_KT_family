@@ -1,0 +1,15 @@
+/* Small, persistent exits from long lessons. Kept outside each app's render root. */
+html:has(.site-return-nav){scroll-padding-top:60px}
+.site-return-nav{position:sticky;top:0;z-index:30;display:flex;align-items:center;justify-content:flex-end;gap:8px;box-sizing:border-box;min-height:44px;margin:0;padding:0 24px;background:#f7f6f0;border-bottom:1px solid #d8dfd6;font:13px/1.5 system-ui,-apple-system,"Hiragino Kaku Gothic ProN","Yu Gothic",Meiryo,sans-serif}
+.site-return-nav a{display:inline-flex;align-items:center;min-height:44px;box-sizing:border-box;padding:8px 12px;color:#285c50;text-decoration:none;white-space:nowrap}
+.site-return-nav a+a{border-left:1px solid #d8dfd6}
+.site-return-nav a:hover{background:#e8eedc;text-decoration:underline;text-underline-offset:4px}
+.site-return-nav a:focus-visible{outline:3px solid #b6502f;outline-offset:-4px;border-radius:4px}
+.has-site-navigation .skip{z-index:40}
+.has-site-navigation .toc{top:66px}
+@media(min-width:901px){.has-site-navigation .toc{max-height:min(70vh,calc(100vh - 88px));overflow:auto;scrollbar-width:thin}}
+@media(min-width:761px){.has-site-navigation>.sidebar{top:45px;overflow:auto}}
+@media(min-width:721px){.has-site-navigation .nav{top:45px;height:calc(100vh - 45px)}}
+@media(min-width:971px){.has-site-navigation #app .sidebar{top:45px;height:calc(100vh - 45px)}}
+@media(max-width:600px){.site-return-nav{justify-content:space-between;padding:0 8px;gap:0;font-size:12px}.site-return-nav a{padding:8px}}
+@media print{.site-return-nav{display:none}html:has(.site-return-nav){scroll-padding-top:0}}

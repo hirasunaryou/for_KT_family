@@ -3,6 +3,7 @@ Usage: python scripts/build-similarity.py --font /path/to/static-Japanese.ttf
 Dependencies: reportlab, fonttools. No network or browser dependencies.
 """
 from pathlib import Path
+from site_navigation import add_site_navigation
 import argparse,json,math,html
 from similarity_visuals import scene
 from similarity_boards import board_scene, BOARD_HEIGHT
@@ -138,7 +139,7 @@ page=f'''<!doctype html><html lang="ja"><head><meta charset="utf-8"><meta name="
 <section class="chapter" id="practice"><h2>紙で解いて、理由を確かめる</h2><p>図の対応に印を付け、途中式と理由を紙に残そう。答えを見た問題は、閉じてもう一度。自動採点ではなく、自分の解答と比べて記録します。</p><div class="practice-tabs interactive">{tabs}</div>{''.join(questions)}</section>
 <section class="chapter interactive" id="records"><h2>できたことを、次につなげよう</h2><p>自力で解けた？ 比の式にした理由も言えた？ 問29〜32は、時間をおいて確かめるための問題です。</p><progress id="progress" max="32" value="0" aria-label="自力でできた問題数"></progress><p id="progress-text"></p><div id="review-links"></div><p id="storage-notice" class="notice" hidden>このブラウザでは記録を保存できません。この画面を開いている間は記録できます。</p><p class="muted">記録はこの端末・ブラウザ内だけに保存されます。他の教材の記録とは別です。端末間では同期せず、閲覧データを消すと記録も消えます。</p></section>
 </div></div></main><footer class="footer"><span>家族のまなび帳<br>読んで、動かして、考える。</span><a href="../index.html">数学の教材へ</a></footer></body></html>'''
-(R/'study/math/similarity/index.html').write_text(page)
+(R/'study/math/similarity/index.html').write_text(add_site_navigation(page, 'study/math/similarity/index.html'))
 # A4: generous handwriting space and one chapter per guide page.
 W,H=595.276,841.89
 class Book:
