@@ -26,6 +26,10 @@ function clean(g,context){assert(g.inside&&g.equal&&!g.overlaps.length&&!g.hits.
      const y=await svg.evaluate(e=>e.getBoundingClientRect().top-e.closest('article').getBoundingClientRect().top);if(y0!==null)assert(Math.abs(y-y0)<1);y0=y;
      clean(await inspect(svg),{width,id,i});
      if(lesson===10){
+      await expect(seq.locator('.example-context')).toContainText('与えられた長さ');await expect(seq.locator('.example-context')).toContainText('AX＝3 cm、DX＝6 cm、BX＝4 cm');
+      assert(await seq.locator('.example-context').evaluate(e=>e.getBoundingClientRect().bottom<e.parentElement.querySelector('figure').getBoundingClientRect().top));
+      if(i===5)await expect(seq.locator('.angle-story-title')).toHaveText('この例では、6÷3で2倍');
+      if(i===5)await seq.screenshot({path:`test-results/circle/chord-context-${width}.png`});
       const original=crossMath(await inspect(svg));await expect(svg.locator('[data-shared-arc]')).toHaveCount(i>=2&&i<=4?1:0);
       const compare=seq.locator('.chord-comparison');if(i<4)await expect(compare).toBeHidden();else{
        await expect(compare).toBeVisible();const view=compare.locator('svg'),g=await inspect(view);clean(g,{width,id,i,view:'comparison'});
@@ -37,7 +41,7 @@ function clean(g,context){assert(g.inside&&g.equal&&!g.overlaps.length&&!g.hits.
       if(i===6)await expect(seq.locator('.angle-story-formula')).toHaveText('AX：DX ＝ 3：6 ＝ 1：2BX：CX ＝ 4：? ＝ 1：2');
       if(i===7)await expect(seq.locator('.angle-story-formula')).toHaveText('CX ＝ 4 × 2 ＝ 8 cm');
      }else{
-      for(let v=40;v<=120;v+=10){await seq.locator('input').fill(String(v));const g=await inspect(svg);clean(g,{width,id,i,v});const A=g.edges[1].points[0],B=g.edges[1].points[1],O=[300,205],known=angle(O,A,B),answer=angle([180,45],A,B);assert(Math.abs(known+answer-90)<1e-8);assert(Math.abs(known-Number(await svg.getAttribute('data-known-angle')))<1e-8);assert(Math.abs(answer-Number(await svg.getAttribute('data-answer-angle')))<1e-8);if(i===4)await expect(seq.locator('.angle-story-formula')).toHaveText(`90° − ${v/2}° ＝ ${90-v/2}°`);}
+      for(let v=40;v<=120;v+=10){await seq.locator('input').fill(String(v));await expect(seq.locator('[data-given-angle]')).toContainText('∠OAB＝'+v/2+'°');const g=await inspect(svg);clean(g,{width,id,i,v});const A=g.edges[1].points[0],B=g.edges[1].points[1],O=[300,205],known=angle(O,A,B),answer=angle([180,45],A,B);assert(Math.abs(known+answer-90)<1e-8);assert(Math.abs(known-Number(await svg.getAttribute('data-known-angle')))<1e-8);assert(Math.abs(answer-Number(await svg.getAttribute('data-answer-angle')))<1e-8);if(i===4)await expect(seq.locator('.angle-story-formula')).toHaveText(`90° − ${v/2}° ＝ ${90-v/2}°`);}
       await expect(svg.locator('[data-radius]')).toHaveCount(i>=1?1:0);await expect(svg.locator('[data-right]')).toHaveCount(i>=2?1:0);await expect(svg.locator('[data-known]')).toHaveCount(i>=3?1:0);await expect(svg.locator('[data-answer]')).toHaveCount(i===4?1:0);
      }
      if(i<4)await expect(seq.locator('.angle-story-formula')).toBeHidden();await svg.screenshot({path:`test-results/circle/${id}-${width}-${i}.png`});assert(await p.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1));
@@ -46,7 +50,7 @@ function clean(g,context){assert(g.inside&&g.equal&&!g.overlaps.length&&!g.hits.
     await expect(seq.locator('.angle-story-count')).toHaveText(`${count} / ${count}`);await seq.locator('[data-zoom]').click();await expect(p.locator('dialog[open]')).toBeVisible();await p.keyboard.press('Escape');
     if(lesson===10){await seq.locator('[data-compare-zoom]').click();await expect(p.locator('dialog[open]')).toBeVisible();await p.keyboard.press('Escape');for(const n of [0,4,5]){await seq.locator(`[data-jump="${n}"]`).click();await expect(seq.locator('.angle-story-count')).toHaveText(`${n+1} / 8`);}}
     else{await seq.locator('input').focus();await p.keyboard.press('ArrowLeft');await expect(seq.locator('.angle-story-formula')).toHaveText('90° − 55° ＝ 35°');}
-    if(lesson===10){await seq.locator('[data-tail-back]').click();await expect(seq.locator('[data-tail-count]')).toHaveText('5 / 8');await seq.locator('[data-tail-next]').focus();await p.keyboard.press('Enter');await expect(seq.locator('.angle-story-count')).toHaveText('6 / 8');await expect(seq.locator('[data-tail-count]')).toHaveText('6 / 8');}
+    if(lesson===10){await expect(seq.locator('.example-context')).toContainText('求めるもの');await seq.locator('[data-tail-back]').click();await expect(seq.locator('[data-tail-count]')).toHaveText('5 / 8');await seq.locator('[data-tail-next]').focus();await p.keyboard.press('Enter');await expect(seq.locator('.angle-story-count')).toHaveText('6 / 8');await expect(seq.locator('[data-tail-count]')).toHaveText('6 / 8');}
     await seq.locator('summary').click();await expect(seq.locator('details ol')).toBeVisible();await seq.locator('[data-back]').click();await seq.locator('[data-reset]').click();await seq.locator('[data-back]').focus();await p.keyboard.press('Enter');await expect(seq.locator('.angle-story-count')).toHaveText(`1 / ${count}`);await expect(seq.locator('details')).not.toHaveAttribute('open','');
    }
   }

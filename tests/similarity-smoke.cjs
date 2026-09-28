@@ -4,6 +4,8 @@ const server=http.createServer((req,res)=>{let p=decodeURIComponent(req.url.spli
 (async()=>{await new Promise(r=>server.listen(0,'127.0.0.1',r));const base=`http://127.0.0.1:${server.address().port}/`,url=base+'study/math/similarity/index.html';const browser=await chromium.launch({headless:true,...(process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH?{executablePath:process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH}:{})});try{
  const context=await browser.newContext({viewport:{width:1440,height:1000}}),page=await context.newPage(),errors=[],external=[];page.on('pageerror',e=>errors.push(e.message));page.on('request',r=>{if(!r.url().startsWith(base))external.push(r.url());});await page.goto(base);await page.getByRole('link',{name:'数学の教材を選ぶ',exact:true}).click();await expect(page).toHaveURL(/study\/math\/index.html$/);await page.getByRole('link',{name:'相似を開く →',exact:true}).click();await expect(page.locator('h1')).toContainText('相似');await expect(page.locator('.lab.interactive:visible')).toHaveCount(4);
  await expect(page.locator('.concept-card')).toHaveCount(18);
+ await expect(page.locator('#match-conditions')).toContainText('△ABCの3/2倍');
+ assert(await page.locator('#match-conditions').evaluate(e=>e.getBoundingClientRect().bottom<document.getElementById('match-plot').getBoundingClientRect().top));
  await expect(page.locator('.board-card')).toHaveCount(4);
  await expect(page.locator('.board-transcript[open]')).toHaveCount(0);
  await page.locator('.board-transcript summary').first().click();
