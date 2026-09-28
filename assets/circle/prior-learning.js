@@ -9,14 +9,14 @@
  function angle(a,p,b,c,r=21){let s=Math.atan2(p[1]-a[1],a[0]-p[0])*180/Math.PI,t=Math.atan2(p[1]-b[1],b[0]-p[0])*180/Math.PI,d=(t-s+540)%360-180;if(d<0){s=t;d=-d;}return arc(p,r,s,d,c);}
  const part=(s,c)=>`<span class="circle-${c}">${s}</span>`;
  const configs=[
-  {id:'chord-story',lesson:10,titles:['交点Xを使う、2つの三角形','Xの向かい合う角は等しい','Aの角が見ている弧は？','Dの角も、同じ弧BCを見ている','同じ向きに並べると、対応が見える','AXからDXへ、長さは2倍','BXに対応するのは、CX','同じ2倍で、長さが求まる'],messages:[
+  {id:'chord-story',lesson:10,titles:['交点Xを使う、2つの三角形','Xの向かい合う角は等しい','Aの角が見ている弧は？','Dの角も、同じ弧BCを見ている','同じ向きに並べると、対応が見える','この例では、6÷3で2倍','BXに対応するのは、CX','求めた倍率で、CXを計算する'],messages:[
    'ACとBDの交点がXです。△AXBと△DXCが相似だと分かれば、長さの比が使えそう。等しい角を2組探そう。',
    'Xで交わる2本の直線に注目。茶色の∠AXBと∠DXCは対頂角なので等しくなります。',
    'AからXへ進む線を、その先のCまでたどります。もう1本はBへ。Aの角は青い弧BCを見ています。',
    'DからXへ進む線の先もB。もう1本はCへ。AとDは同じ弧BCに対する円周角なので、青い角も等しくなります。',
-   '茶色と青の2組の角が等しいので相似です。下は元の2つの三角形を同じ向きに並べ直した図。A↔D、X↔X、B↔Cの順に対応します。',
-   'ここから問20の長さを使います。青い辺AXは3 cm、対応するDXは6 cm。小さい三角形から大きい三角形へ、長さは6÷3＝2倍です。',
-   '次は茶色の辺。BXに対応するのはCXです。相似なら、こちらも同じ2倍。4 cmを何倍すればよいでしょう？',
+   '茶色と青の2組の角が等しいので相似です。下は元の2つの三角形を同じ向きに並べ直した図。A↔D、X↔X、B↔Cの順に対応します。何倍かは、長さの条件から求めます。',
+   '例題で与えられたAX＝3 cm、DX＝6 cmを使います。対応する辺の倍率は6÷3＝2。2倍は、この例の長さから求めた値です。',
+   '次は茶色の辺。BXに対応するのはCXです。相似なら、対応するどの辺も同じ倍率になります。この例で求めた2倍を、BX＝4 cmにも使おう。',
    'CX＝4×2＝8 cm。新しい公式を覚えなくても、円周角で相似を見つけ、対応する辺の比から求められました。'
   ],links:'紙へ：<a href="#q19">問19の証明</a>・<a href="#q20">問20の長さ</a> ／ <a href="../similarity/index.html">相似を振り返る</a>'},
   {id:'tangent-story',lesson:11,titles:['接線と弦の間に、どんな角がある？','接点Aへ、半径OAを足す','半径と接線で、90°が見つかる','分かっている角を、90°の中に置く','求める角は、90°の残り'],messages:[
@@ -33,6 +33,9 @@
   const cross=cfg.lesson===10;
   seq.innerHTML=`<div class="angle-story-controls"><button class="button" data-back>ひとつ前</button><span class="angle-story-count"></span><button class="button primary" data-next>次の手順</button><button class="button" data-reset>最初から</button></div>${cross?'<nav class="prior-chapters" aria-label="相似の説明を選ぶ"><button class="button" data-jump="0">等しい角を探す</button><button class="button" data-jump="4">対応を比べる</button><button class="button" data-jump="5">長さを求める</button></nav>':''}<h3 class="angle-story-title"></h3>${cross?'':'<label class="control">Bを円周上で動かす <input aria-label="Bの円周上の位置" type="range" min="40" max="120" step="10" value="80"></label>'}<figure><svg viewBox="0 0 550 400" role="img"></svg><button class="figure-open" data-zoom>図を大きく見る</button></figure><div aria-live="polite" aria-atomic="true"><p class="angle-story-before muted"></p><p class="angle-story-message"></p><p class="angle-story-formula"></p></div>${cross?'<section class="chord-comparison" hidden><h4>同じ2つの三角形を、同じ向きに</h4><p>回転・裏返しで向きをそろえました。辺の長さは変えていません。</p><figure><svg viewBox="0 0 550 270" role="img" aria-label="△AXBと△DXCを同じ向き、同じ縮尺で並べた図"></svg><button class="figure-open" data-compare-zoom>対応の図を大きく見る</button></figure></section><div class="prior-story-footer"><button class="button" data-tail-back>ひとつ前</button><span class="prior-footer-count" data-tail-count></span><button class="button primary" data-tail-next>次の手順</button></div>':''}<p class="angle-story-links">${cfg.links}</p><details><summary>元の解説をまとめて読む</summary></details>`;
   seq.querySelector('details').append(card.querySelector('ol').cloneNode(true));card.append(seq);card.classList.add('has-angle-story');
+  const context=document.createElement('div');context.className='example-context';context.id=cfg.id+'-conditions';
+  context.innerHTML=cross?'<strong>例題の条件 · 問19・20</strong><p>A・B・C・Dは同じ円周上。ACとBDの交点をXとします。</p><p><b>与えられた長さ</b>　AX＝3 cm、DX＝6 cm、BX＝4 cm</p><p><b>求めるもの</b>　CXの長さ</p>':'<strong>この例の条件 · 最初は問21と同じ</strong><p>直線lは、円Oの点Aでの接線です。</p><p data-given-angle></p><p><b>求めるもの</b>　接線lと弦ABの小さい方の角</p>';
+  seq.querySelector('.angle-story-title').before(context);
   let index=0;const svg=seq.querySelector('svg'),slider=seq.querySelector('input');
   function draw(){
    let g='',formula='',caption='';
@@ -48,8 +51,8 @@
     if(index>=5){g+=line(A,X,blue,3)+line(D,X,blue,3)+text([(A[0]+X[0])/2,A[1]+24],'3',blue)+text([(D[0]+X[0])/2-19,(D[1]+X[1])/2+4],'6',blue);}
     if(index>=6)g+=line(B,X,brown,3)+line(C,X,brown,3)+text([(B[0]+X[0])/2+18,(B[1]+X[1])/2+3],'4',brown)+text([(C[0]+X[0])/2,X[1]+22],index===7?'8':'?',brown);
     for(const [p,s]of [[A,'A'],[B,'B'],[C,'C'],[D,'D']]){const d=Math.atan2(O[1]-p[1],p[0]-O[0])*180/Math.PI,q=polar(O,153,d);g+=text([q[0],q[1]+6],s);}
-    g+=text([X[0]+24,X[1]+32],'X');
-    caption=['△AXBと△DXCに注目','対頂角：Xの角が等しい','A → C と A → B をたどる','AとDは、同じ青い弧BCを見る','2組の角が等しい → 相似','青い辺：AX 3 cm → DX 6 cm','茶色の辺：BX 4 cm → CX ?','CX ＝ 8 cm'][index];
+    g+=text([X[0]+24,X[1]+32],'X')+text([275,20],'例題の条件：AX＝3、DX＝6、BX＝4（cm）',ink,14);
+    caption=['△AXBと△DXCに注目','対頂角：Xの角が等しい','A → C と A → B をたどる','AとDは、同じ青い弧BCを見る','2組の角が等しい → 相似','この例：AX 3 cm → DX 6 cm','茶色の辺：BX 4 cm → CX ?','CX ＝ 8 cm'][index];
     if(index===4)formula='△AXB ∽ △DXC<br>A ↔ D ／ X ↔ X ／ B ↔ C';
     if(index===5)formula=part('DX ÷ AX ＝ 6 ÷ 3 ＝ 2','blue');
     if(index===6)formula=part('AX：DX ＝ 3：6 ＝ 1：2','blue')+'<br>'+part('BX：CX ＝ 4：? ＝ 1：2','brown');
@@ -62,11 +65,12 @@
      h+=angle(x,a,b,blue,20)+angle(a,x,b,brown,14);
      h+=text([a[0]-10,a[1]+24],names[0],blue)+text([x[0]+8,x[1]+24],names[1],brown)+text([b[0]+8,b[1]-12],names[2],green);
     }
-    if(index>=5){h+=text([(U[0]+V[0])/2,237],'3',blue)+text([(F[0]+G[0])/2,237],'6',blue)+line([198,145],[248,145],blue,1.5)+line([248,145],[241,140],blue,1.5)+line([248,145],[241,150],blue,1.5)+text([223,130],'2倍',blue,16);}
+    if(index>=5){h+=text([(U[0]+V[0])/2,237],'3',blue)+text([(F[0]+G[0])/2,237],'6',blue)+line([198,145],[248,145],blue,1.5)+line([248,145],[241,140],blue,1.5)+line([248,145],[241,150],blue,1.5)+text([223,130],'6÷3＝2倍',blue,14);}
     if(index>=6)h+=text([(V[0]+W[0])/2+18,(V[1]+W[1])/2+5],'4',brown)+text([(G[0]+H[0])/2+18,(G[1]+H[1])/2+5],index===7?'8':'?',brown);
     comparison.querySelector('svg').innerHTML=h;
    }else{
     const v=Number(slider.value),O=[300,205],A=[180,205],B=polar(O,120,v),theta=v/2;
+    context.querySelector('[data-given-angle]').textContent=`与えられた角：∠OAB＝${theta}°（Bを動かすと、この条件も変わります）`;
     g=`<circle cx="300" cy="205" r="120" fill="none" stroke="${gray}" stroke-width="1.4"/>`+line([180,45],[180,360],green,2.5,'data-tangent')+line(A,B,ink,2,'data-chord')+text([153,55],'l',green)+text([153,226],'A')+text([320,226],'O');
     const tag=polar(O,146,v);g+=text([tag[0],tag[1]+6],'B')+'<circle cx="300" cy="205" r="2.5" fill="#253b39"/>';
     if(index>=1)g+=line(A,O,brown,2,'data-radius stroke-dasharray="5 4"')+text([244,231],'半径',brown,16);

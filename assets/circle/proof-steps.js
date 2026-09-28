@@ -48,7 +48,8 @@
  let kind='single';const positions={single:0,inside:0,outside:0};
  function draw(){
   const s=data[kind],i=positions[kind],A=point(s.a),B=point(s.b),P=point(s.p),C=point(s.p+180),single=kind==='single',alpha=i===2||i===3,beta=i===4||i===5;
-  let g='<circle cx="275" cy="190" r="112" fill="none" stroke="#a5afa9" stroke-width="1.5"/>';
+  const example=single?'この例：Pの角を30°として考える':kind==='inside'?'この例：Pの角を22°と35°に分ける':'この例：大きい角80°、重なる角20°';
+  let g=text(275,20,example,gray,14)+'<circle cx="275" cy="190" r="112" fill="none" stroke="#a5afa9" stroke-width="1.5"/>';
   const triangle=(Q,c)=>`<polygon points="${P} ${O} ${Q}" fill="${c}" fill-opacity=".09" stroke="none"/>`;
   if(single&&i>=1&&i<=5)g+=triangle(B,blue);
   if(!single&&alpha)g+=triangle(A,blue);if(!single&&beta)g+=triangle(B,brown);
