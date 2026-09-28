@@ -46,6 +46,7 @@ function clean(g,context){assert(g.inside&&g.equal&&!g.overlaps.length&&!g.hits.
     await expect(seq.locator('.angle-story-count')).toHaveText(`${count} / ${count}`);await seq.locator('[data-zoom]').click();await expect(p.locator('dialog[open]')).toBeVisible();await p.keyboard.press('Escape');
     if(lesson===10){await seq.locator('[data-compare-zoom]').click();await expect(p.locator('dialog[open]')).toBeVisible();await p.keyboard.press('Escape');for(const n of [0,4,5]){await seq.locator(`[data-jump="${n}"]`).click();await expect(seq.locator('.angle-story-count')).toHaveText(`${n+1} / 8`);}}
     else{await seq.locator('input').focus();await p.keyboard.press('ArrowLeft');await expect(seq.locator('.angle-story-formula')).toHaveText('90° − 55° ＝ 35°');}
+    if(lesson===10){await seq.locator('[data-tail-back]').click();await expect(seq.locator('[data-tail-count]')).toHaveText('5 / 8');await seq.locator('[data-tail-next]').focus();await p.keyboard.press('Enter');await expect(seq.locator('.angle-story-count')).toHaveText('6 / 8');await expect(seq.locator('[data-tail-count]')).toHaveText('6 / 8');}
     await seq.locator('summary').click();await expect(seq.locator('details ol')).toBeVisible();await seq.locator('[data-back]').click();await seq.locator('[data-reset]').click();await seq.locator('[data-back]').focus();await p.keyboard.press('Enter');await expect(seq.locator('.angle-story-count')).toHaveText(`1 / ${count}`);await expect(seq.locator('details')).not.toHaveAttribute('open','');
    }
   }

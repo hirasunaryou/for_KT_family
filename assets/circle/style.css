@@ -28,3 +28,5 @@
 @media print{.angle-story{display:none!important}.has-angle-story>figure,.has-angle-story>ol,.has-angle-story>p:not(.eyebrow){display:block!important}}
 .prior-chapters{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:20px}.prior-chapters .button{font-size:14px;padding:9px 12px}.prior-chapters [aria-pressed=true]{background:var(--green);color:white}
 .chord-comparison{border-top:1px solid var(--line);padding-top:20px;margin-top:24px}.chord-comparison h4{font-size:17px;font-weight:600}.chord-comparison p{font-size:14px}.prior-story svg text{font-family:inherit}
+.prior-story-footer{display:flex;align-items:center;flex-wrap:wrap;gap:9px;margin:24px 0 16px}
+.prior-footer-count{font-size:13px;color:var(--muted);min-width:42px;text-align:center}
