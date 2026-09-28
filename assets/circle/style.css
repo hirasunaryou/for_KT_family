@@ -14,3 +14,15 @@
 .proof-formula{padding:16px;background:#f3f4ee;border-radius:8px;font-size:20px;line-height:2}
 .circle-blue{color:#3566a0}.circle-brown{color:#98502f}.circle-green{color:#285c50}
 @media(max-width:600px){.circle-modes{padding-inline:18px}.circle-modes .button{padding:9px 12px}.proof-story{padding-inline:12px}.proof-controls{gap:7px}.circle-focus{min-height:115px}.proof-formula{font-size:18px}}
+.has-angle-story>figure,.has-angle-story>ol,.has-angle-story>p:not(.eyebrow){display:none}
+.angle-story-controls{display:flex;align-items:center;flex-wrap:wrap;gap:9px;margin:20px 0}
+.angle-story-count{font-size:13px;color:var(--muted);min-width:42px;text-align:center}
+.angle-story-title{min-height:68px;margin-bottom:12px;font-size:19px;font-weight:600}
+.angle-story .control{max-width:430px;margin-bottom:16px}
+.angle-story figure{margin:16px 0}.angle-story figure svg{width:100%;max-width:620px}
+.angle-story .angle-story-before{font-size:13px;min-height:48px;border-left:2px solid var(--line);padding-left:12px}
+.angle-story .angle-story-message{min-height:120px;font-size:15px}
+.angle-story .angle-story-formula{padding:16px;background:#edf2e8;border-radius:8px;font-size:20px;line-height:2}
+.angle-story .angle-story-links,.angle-story details{font-size:14px;line-height:1.9}
+.angle-story details{border-top:1px solid var(--line);padding-top:16px}
+@media print{.angle-story{display:none!important}.has-angle-story>figure,.has-angle-story>ol,.has-angle-story>p:not(.eyebrow){display:block!important}}
