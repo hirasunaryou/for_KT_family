@@ -11,7 +11,7 @@ function shape(){const k=+$('shape-k').value,both=$('shape-mode').value==='both'
 input('shape-k',shape);input('shape-mode',shape);document.querySelectorAll('[data-shape]').forEach(b=>b.addEventListener('click',()=>{const [mode,k]=b.dataset.shape.split(',');$('shape-mode').value=mode;$('shape-k').value=k;shape();}));shape();
 const matchContext=document.createElement('div');matchContext.className='example-context';matchContext.id='match-conditions';matchContext.innerHTML='<strong>この例の設定</strong><p>△DEFの各辺を、△ABCの3/2倍にして描いています。向きと位置を変えた2つの三角形の対応を探そう。</p>';$('match-lab').querySelector('.lab-top').append(matchContext);
 let stage=0;function match(){const source=M.match(4),p=M.match(stage),colors=$('match-colors').checked;
- const notes=['まず対応を予想しよう。2つの三角形は重なり、向きも違います。','△DEFを右へ移動しました。辺の長さと角は変わりません。','△DEFを回しました。まだ左右が逆です。長さは変わりません。','△DEFを裏返しました。A↔D、B↔E、C↔Fの向きがそろいました。','この例では3/2倍を元に戻すので、1÷(3/2)＝2/3倍に縮めます。移動すると△ABCと重なります。相似で保たれるのは、対応する辺の比と角です。'];
+ const notes=['まず対応を予想しよう。2つの三角形は重なり、向きも違います。','△DEFを右へ移動しました。辺の長さと角は変わりません。','△DEFを回しました。まだ左右が逆です。長さは変わりません。','△DEFを裏返しました。A↔D、B↔E、C↔Fの向きがそろいました。','この例では3/2倍を元に戻すので、1÷(3/2)＝2/3倍に縮めます。移動すると△ABCと重なります。すべての辺を同じ倍率で縮めるので、角度は変わりません。'];
  $('match-plot').innerHTML=T(270,30,`手順 ${stage+1} / 5`)+(stage?poly(M.match(stage-1),'ghost'):'')+poly(source,'shape')+poly(p,'target')+dots(source,stage===4?['A/D','B/E','C/F']:'ABC',colors)+(stage===4?'':dots(p,'DEF',colors));
  $('match-result').innerHTML=`<strong>${['予想する','移動する','回転する','裏返す','倍率をそろえる'][stage]}</strong><p>${notes[stage].split('。').filter(Boolean).map(t=>`<span class="short-line">${t}。</span>`).join('')}</p>`;
  document.querySelectorAll('[data-match]').forEach(b=>b.setAttribute('aria-pressed',String(+b.dataset.match===stage)));
