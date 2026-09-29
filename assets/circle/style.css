@@ -30,3 +30,5 @@
 .chord-comparison{border-top:1px solid var(--line);padding-top:20px;margin-top:24px}.chord-comparison h4{font-size:17px;font-weight:600}.chord-comparison p{font-size:14px}.prior-story svg text{font-family:inherit}
 .prior-story-footer{display:flex;align-items:center;flex-wrap:wrap;gap:9px;margin:24px 0 16px}
 .prior-footer-count{font-size:13px;color:var(--muted);min-width:42px;text-align:center}
+.area-detour{margin:28px 0;padding:20px;border:1px solid var(--line);border-radius:8px;background:#faf8f1}.area-detour h4{font-size:17px;line-height:1.8;margin:0 0 12px}.area-detour p,.area-turn .area-turn-purpose{font-size:15px;line-height:1.9}.area-turn .muted,.area-detour .muted{font-size:13px}.area-turn{margin-bottom:20px}
+#area-bridge button[aria-disabled=true]{opacity:.45;cursor:default}

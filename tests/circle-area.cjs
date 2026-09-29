@@ -17,14 +17,14 @@ async function geometry(svg){return svg.evaluate(e=>{
  for(const width of [1440,768,390]){
   await page.setViewportSize({width,height:1100});await seq.locator('[data-reset]').click();
   for(let i=0;i<6;i++){
-   await expect(seq.locator('.angle-story-count')).toHaveText(`${i+1} / 6`);
+   await expect(seq.locator('.angle-story-count')).toHaveText(i<4?`${i+1} / 4`:`寄り道 ${i-3} / 2`);
    await expect(seq.locator('.example-context')).toContainText('AP＝6 cm、BP＝8 cm');
    const positions=await seq.evaluate(e=>[e.querySelector('.example-context').getBoundingClientRect().bottom,e.querySelector('svg').getBoundingClientRect().top]);assert(positions[0]<positions[1]);
    await expect(svg.locator('[data-right]')).toHaveCount(i>=1?1:0);
    await expect(svg.locator('[data-copy]')).toHaveCount(i>=4?1:0);
-   await expect(seq.locator('.angle-story-formula')).toBeVisible({visible:i===5});
-   for(const v of i>=3?Array.from({length:21},(_,n)=>n*5):[0]){
-    if(i>=3)await slider.fill(String(v));
+   await expect(seq.locator('.angle-story-formula')).toBeVisible({visible:i===3||i===5});
+   for(const v of i>=2?Array.from({length:21},(_,n)=>n*5):[0]){
+    if(i>=2)await slider.fill(String(v));
     const g=await geometry(svg);assert(g.inside&&g.equal&&!g.overlaps.length&&!g.hits.length,JSON.stringify({i,v,width,g}));
     const points=await svg.locator('[data-triangle]').evaluate(e=>[...e.points].map(p=>[p.x,p.y]));
     const [a,p,b]=points,ap=Math.hypot(a[0]-p[0],a[1]-p[1]),bp=Math.hypot(b[0]-p[0],b[1]-p[1]);
@@ -34,23 +34,31 @@ async function geometry(svg){return svg.evaluate(e=>{
     if(i>=4){const copy=await svg.locator('[data-copy]').evaluate(e=>[...e.points].map(p=>[p.x,p.y]));const q=copy[1];assert(Math.abs(Math.hypot(q[0]-a[0],q[1]-a[1])-240)<1e-4);assert(Math.abs(Math.hypot(q[0]-b[0],q[1]-b[1])-180)<1e-4);}
     if(v===100)assert(Math.abs(a[1]-p[1])<1e-4&&Math.abs(b[0]-p[0])<1e-4);
    }
-   if(i>=3)await slider.fill('0');
+   if(i>=2)await slider.fill('0');
    await svg.screenshot({path:`test-results/circle/area-${width}-${i}.png`});
-   if(i>=3){await seq.locator('[data-horizontal]').click();await svg.screenshot({path:`test-results/circle/area-horizontal-${width}-${i}.png`});await seq.locator('[data-original]').click();await expect(slider).toHaveValue('0');}
+   if(i>=2){await seq.locator('[data-horizontal]').click();await svg.screenshot({path:`test-results/circle/area-horizontal-${width}-${i}.png`});await seq.locator('[data-original]').click();await expect(slider).toHaveValue('0');}
    assert(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1));
-   await seq.locator('[data-next]').focus();await page.keyboard.press('Enter');
+   if(i===3){
+    await expect(seq.locator('.area-detour')).toBeVisible();await expect(seq.locator('.area-detour')).toContainText('あえて別の見方');
+    await expect(seq.locator('.angle-story-formula')).toContainText('6 × 8 ÷ 2');
+    await seq.locator('[data-next]').focus();await page.keyboard.press('Enter');await expect(seq.locator('.angle-story-count')).toHaveText('4 / 4');await expect(svg.locator('[data-copy]')).toHaveCount(0);
+    await seq.locator('.area-detour').screenshot({path:`test-results/circle/area-detour-${width}.png`});
+    if(width===1440)await seq.screenshot({path:'test-results/circle/area-main-complete.png'});
+    await seq.locator('[data-explore]').focus();await page.keyboard.press('Enter');await expect(seq.locator('.angle-story-title')).toBeFocused();
+   }else{await seq.locator('[data-next]').focus();await page.keyboard.press('Enter');}
   }
   await expect(seq.locator('.angle-story-formula')).toContainText('48 ÷ 2 ＝ 24 cm²');
   await seq.locator('[data-zoom]').click();await expect(page.locator('dialog[open]')).toContainText('AP＝6 cm');await page.keyboard.press('Escape');
-  await seq.locator('[data-jump="2"]').click();await expect(seq.locator('.angle-story-formula')).toBeHidden();await expect(svg.locator('[data-copy]')).toHaveCount(0);
-  await seq.locator('[data-jump="4"]').click();await slider.focus();await page.keyboard.press('ArrowRight');await expect(slider).toHaveValue('5');
-  await seq.locator('[data-back]').click();await expect(seq.locator('.angle-story-count')).toHaveText('4 / 6');
+  await slider.fill('55');await seq.locator('[data-return]').click();await expect(seq.locator('.angle-story-count')).toHaveText('4 / 4');await expect(slider).toHaveValue('55');await expect(svg.locator('[data-copy]')).toHaveCount(0);await expect(seq.locator('.angle-story-title')).toBeFocused();
+  await seq.locator('[data-jump="2"]').click();await expect(seq.locator('.angle-story-formula')).toBeHidden();await expect(seq.locator('.area-turn-purpose')).toContainText('見やすい向き');await expect(seq.locator('.area-turn-skip')).toBeVisible();
+  await slider.focus();await page.keyboard.press('ArrowRight');await expect(slider).toHaveValue('60');
+  await seq.locator('[data-jump="3"]').click();await expect(seq.locator('.angle-story-formula')).toBeVisible();await seq.locator('[data-explore]').click();await seq.locator('[data-back]').focus();await page.keyboard.press('Enter');await expect(seq.locator('.angle-story-count')).toHaveText('寄り道 1 / 2');
+  await seq.locator('[data-next]').click();await seq.locator('[data-back]').click();await expect(seq.locator('.angle-story-count')).toHaveText('寄り道 1 / 2');
   await seq.locator('summary').click();await expect(seq.locator('details ol')).toBeVisible();await seq.locator('[data-reset]').click();await expect(seq.locator('details')).not.toHaveAttribute('open','');await expect(slider).toHaveValue('0');
  }
  await seq.locator('a[href="#q22"]').click();await expect(page.locator('#q22')).toBeFocused();
  await page.emulateMedia({media:'print'});await expect(seq).toBeHidden();await expect(page.locator('#lesson-12 > figure')).toBeVisible();
  const nojs=await browser.newPage({javaScriptEnabled:false});await nojs.goto(url,{waitUntil:'domcontentloaded'});await expect(nojs.locator('#lesson-12 > figure')).toBeVisible();
- assert.deepEqual(errors,[]);console.log('PASS circle area: six stages, all rotation positions at three widths; fixed lengths/area/perpendicularity, congruent copy, labels, controls, zoom, print and no-JS');
+ assert.deepEqual(errors,[]);console.log('PASS circle area: four main stages + two optional stages, preserved return position, all rotation positions at three widths; fixed lengths/area/perpendicularity, congruent copy, labels, controls, zoom, print and no-JS');
  }finally{await browser.close();server.close();}
 })().catch(e=>{console.error(e);server.close();process.exitCode=1;});
-
