@@ -1,3 +1,42 @@
+/* Read an inscribed angle before using a formula: endpoints, two arcs, then exclude P. */
+(()=>{
+ 'use strict';
+ const card=document.getElementById('lesson-1');if(!card)return;
+ const blue='#3566a0',brown='#98502f',ink='#253b39',O=[275,210],R=105;
+ const pt=(d,r=R)=>[O[0]+r*Math.cos(d*Math.PI/180),O[1]-r*Math.sin(d*Math.PI/180)];
+ const text=(p,s,c=ink,size=17)=>`<text x="${p[0]}" y="${p[1]}" text-anchor="middle" fill="${c}" font-size="${size}">${s}</text>`;
+ const line=(a,b,c,w=2,extra='')=>`<line x1="${a[0]}" y1="${a[1]}" x2="${b[0]}" y2="${b[1]}" stroke="${c}" stroke-width="${w}" ${extra}/>`;
+ const arc=(start,span,c,dash='')=>`<path data-arc="${span===120?'short':'long'}" d="M ${pt(start)} A ${R} ${R} 0 ${span>180?1:0} 0 ${pt(start+span)}" fill="none" stroke="${c}" stroke-width="4" stroke-dasharray="${dash}"/>`;
+ const seq=document.createElement('div');seq.id='arc-reading-story';seq.className='angle-story interactive';
+ seq.innerHTML=`<p>まずは角度を計算せず、<strong>角が見ている弧</strong>を探そう。A・Bは固定し、円周上のPだけを移します。</p><div class="prior-chapters" aria-label="頂点Pの位置"><button class="button" data-side="top">Pを上側に置く</button><button class="button" data-side="bottom">Pを下側に置く</button></div><div class="angle-story-controls"><button class="button" data-back>ひとつ前</button><span class="angle-story-count"></span><button class="button primary" data-next>次の手順</button><button class="button" data-reset>最初から</button></div><h3 class="angle-story-title"></h3><figure><svg viewBox="0 0 550 450" role="img"></svg><button class="figure-open" data-zoom>図を大きく見る</button></figure><div class="arc-choices" hidden><p>Pを含まないのは、どちらの弧？</p><button class="button" data-choice="short">下を回る短い弧</button> <button class="button" data-choice="long">上を回る長い弧</button></div><div aria-live="polite" aria-atomic="true"><p class="angle-story-before muted"></p><p class="angle-story-message"></p></div><p class="angle-story-links">角度も比べたくなったら、<a href="#move-lab">Pを動かす体験へ</a>。紙では<a href="#q1">問1</a>で、弧と弦を確認しよう。</p><details><summary>弧と弦の違い・元の解説</summary><p>弧ABは円周に沿った部分。弦ABはAとBをまっすぐ結ぶ線分です。この体験では、円周に沿う2つの道を比べています。</p></details>`;
+ seq.querySelector('details').append(card.querySelector('ol').cloneNode(true));card.append(seq);card.classList.add('has-angle-story');
+ let side='top',index=0,choice=null;const svg=seq.querySelector('svg');
+ function draw(){
+  const top=side==='top',P=pt(top?90:270),A=pt(210),B=pt(330),correct=top?'short':'long';
+  const titles=['出発点は、角の頂点P','2本の線を、A・Bまでたどる','AからBへ、円周の道は2つある','Pを含まない方が、この角の弧'];
+  let g=text([275,23],'A・Bは固定。Pは円周上の頂点',ink,14)+`<circle cx="275" cy="210" r="105" fill="none" stroke="#a5afa9" stroke-width="1.5"/>`;
+  if(index===2||index===3&&top)g+=arc(210,120,blue);
+  if(index===2||index===3&&!top)g+=arc(330,240,brown,'7 4');
+  g+=line(P,A,index>=1?ink:'#a5afa9',index>=1?2.3:1.5,'data-pa')+line(P,B,index>=1?ink:'#a5afa9',index>=1?2.3:1.5,'data-pb');
+  const u=Math.atan2(A[1]-P[1],A[0]-P[0]),v=Math.atan2(B[1]-P[1],B[0]-P[0]),d=(v-u+3*Math.PI)%(2*Math.PI)-Math.PI,r=17,a=[P[0]+r*Math.cos(u),P[1]+r*Math.sin(u)],b=[P[0]+r*Math.cos(v),P[1]+r*Math.sin(v)];
+  g+=`<path d="M ${a} A ${r} ${r} 0 0 ${d>0?1:0} ${b}" stroke="${ink}" stroke-width="2" fill="none"/>`;
+  for(const [p,s]of [[A,'A'],[B,'B'],[P,'P']]){g+=`<circle cx="${p[0]}" cy="${p[1]}" r="${s==='P'||index>=1?4:2}" fill="${ink}"/>`;const label=s==='P'?pt(top?90:270,137):pt(s==='A'?210:330,135);g+=text([label[0],label[1]+6],s,ink,19);}
+  if(index>=2){if(index===2||!top)g+=text([275,53],'破線：上を回る長い弧AB',brown);if(index===2||top)g+=text([275,390],'実線：下を回る短い弧AB',blue);}
+  g+=text([275,431],index===3?(top?'Pは上側 → 下を回る弧を見る':'Pは下側 → 上を回る弧を見る'):index===2?'円周をたどる。Pを通らないのは？':index===1?'線が届く先は、どちらもA・B':'Pでできる角に注目',index===3?(top?blue:brown):ink);
+  svg.innerHTML=g;
+  let message=['Pが角の頂点です。ここから伸びる2本の線を、目でたどってみよう。','線が円周に届く先はAとB。この2点が、探す弧の両端になります。','下を回っても、上を回ってもAとBを結べます。角の頂点Pを途中で通らない道を選んでみよう。',top?'下を回る短い弧にはPがありません。次はPを下側に置き、同じように探してみよう。':'今度は上を回る長い弧にPがありません。「いつも短い方」ではなく「Pを含まない方」を選びます。'][index];
+  if(index===3&&choice)message=(choice===correct?'選んだ道にはPがありません。':'選んだ道は途中でPを通ります。もう一方の道に注目しよう。')+' '+message;
+  svg.setAttribute('aria-label',titles[index]+'。'+message);seq.querySelector('.angle-story-title').textContent=titles[index];seq.querySelector('.angle-story-count').textContent=`${index+1} / 4`;seq.querySelector('.angle-story-message').textContent=message;seq.querySelector('.angle-story-before').textContent=index?'ひとつ前：'+titles[index-1]:'';seq.querySelector('.arc-choices').hidden=index!==2;
+  for(const b of seq.querySelectorAll('[data-side]'))b.setAttribute('aria-pressed',String(b.dataset.side===side));
+  seq.querySelector('[data-back]').setAttribute('aria-disabled',String(index===0));seq.querySelector('[data-next]').setAttribute('aria-disabled',String(index===3));seq.querySelector('[data-next]').textContent=index===2?'弧を確かめる':'次の手順';
+ }
+ for(const b of seq.querySelectorAll('[data-side]'))b.onclick=()=>{side=b.dataset.side;index=0;choice=null;draw();};
+ for(const b of seq.querySelectorAll('[data-choice]'))b.onclick=()=>{choice=b.dataset.choice;index=3;draw();seq.querySelector('[data-back]').focus();};
+ seq.querySelector('[data-back]').onclick=()=>{if(index>0){index--;choice=null;draw();}};seq.querySelector('[data-next]').onclick=()=>{if(index<3){index++;choice=null;draw();}};
+ seq.querySelector('[data-reset]').onclick=()=>{side='top';index=0;choice=null;seq.querySelector('details').open=false;draw();};
+ seq.querySelector('[data-zoom]').onclick=()=>{const d=document.querySelector('.figure-dialog');d.querySelector('.large-figure').replaceChildren(svg.cloneNode(true));d.showModal();};draw();
+})();
+
 /* The diameter and cyclic quadrilateral both return to the arc being viewed. */
 (()=>{
  'use strict';
