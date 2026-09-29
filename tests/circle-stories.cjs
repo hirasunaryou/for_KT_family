@@ -33,7 +33,7 @@ async function inspect(plot){return plot.evaluate(svg=>{
    }
    await expect(page.locator('#proof-next')).toHaveAttribute('aria-disabled','true');await expect(page.locator('#proof-step')).toHaveText(`手順 ${count} / ${count}`);
    await page.locator('#proof-prev').click();await expect(plot.locator('[data-proof-arc]')).toHaveCount(0);
-   await page.locator('#proof-lab .figure-open').click();await expect(page.locator('dialog[open]')).toBeVisible();await page.keyboard.press('Escape');
+   await page.locator('#proof-lab .circle-lab-figure > .figure-open').click();await expect(page.locator('dialog[open]')).toBeVisible();await page.keyboard.press('Escape');
    await page.locator('#proof-reset').click();await expect(page.locator('#proof-formula')).toBeHidden();await expect(plot.locator('[data-angle]')).toHaveCount(0);
   }
  }

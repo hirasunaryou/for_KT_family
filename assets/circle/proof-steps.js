@@ -90,4 +90,31 @@
  $('#proof-prev').addEventListener('click',()=>{if(positions[kind]>0){positions[kind]--;draw();}});
  $('#proof-next').addEventListener('click',()=>{if(positions[kind]<data[kind].steps.length-1){positions[kind]++;draw();}});
  $('#proof-reset').addEventListener('click',()=>{positions[kind]=0;draw();});draw();
+
+ // A voluntary comparison, independent of the current proof and its saved step.
+ const detour=document.createElement('details');detour.id='auxiliary-detour';detour.className='auxiliary-detour interactive';
+ detour.innerHTML=`<summary>寄り道：補助線は、どうやって思いつく？</summary><div class="auxiliary-body"><p>円周角の理由は追えた。でも「中心へ線を引く」は、どう思いつく？<br>2本の候補を比べると、線の選び方が見えてきます。</p><div class="example-context"><strong>ここでは基本形の図で比べます</strong><p>P・O・Aは一直線。P・A・Bは円周上、Oは中心です。<br>まずは「等しい角を見つけたい」と考えてみよう。</p></div><div class="prior-chapters" aria-label="補助線を選ぶ"><button class="button" data-aux="none">線を足す前</button><button class="button" data-aux="radius">中心OとBを結ぶ</button><button class="button" data-aux="chord">AとBを結ぶ</button></div><figure><svg viewBox="0 0 550 400" role="img"></svg><button class="figure-open" data-aux-zoom>図を大きく見る</button></figure><div class="auxiliary-result" aria-live="polite" aria-atomic="true"><h4></h4><p></p></div><p class="auxiliary-take">補助線を考えるときは、「等しい辺がほしい」「直角がほしい」のように、使いたい性質から探してみよう。</p><button class="button" data-aux-close>寄り道を閉じる</button></div>`;
+ $('#proof-lab').append(detour);
+ const auxSvg=detour.querySelector('svg');let choice='none';
+ function drawAuxiliary(){
+  const P=point(90),A=point(270),B=point(330),radius=choice==='radius',chord=choice==='chord';
+  let g=text(275,23,'基本形：P・O・Aは一直線、Oは円の中心',ink,14)+`<circle cx="275" cy="190" r="112" fill="none" stroke="#a5afa9" stroke-width="1.5"/>`;
+  if(radius)g+=`<polygon data-aux-triangle points="${P} ${O} ${B}" fill="#e2ecf7"/>`;
+  if(chord)g+=`<polygon data-aux-triangle points="${P} ${A} ${B}" fill="#f4e4d7"/>`;
+  g+=line(P,A)+line(P,B);
+  if(radius)g+=line(P,O,blue,3)+line(O,B,blue,3)+equal(P,O,blue)+equal(O,B,blue)+mark(O,P,B,blue,24,false,'data-aux-angle="P"')+mark(P,B,O,blue,24,false,'data-aux-angle="B"');
+  if(chord){g+=line(A,B,brown,3);const n=Math.hypot(P[0]-B[0],P[1]-B[1]),m=Math.hypot(A[0]-B[0],A[1]-B[1]),u=[(P[0]-B[0])*13/n,(P[1]-B[1])*13/n],v=[(A[0]-B[0])*13/m,(A[1]-B[1])*13/m];g+=`<path data-aux-right d="M ${B[0]+u[0]} ${B[1]+u[1]} l ${v} l ${-u[0]} ${-u[1]}" fill="none" stroke="${brown}" stroke-width="2"/>`;}
+  g+=tag(90,'P')+tag(270,'A')+tag(330,'B')+text(254,177,'O',ink,17)+'<circle cx="275" cy="190" r="2.5" fill="#253b39"/>';
+  const notes={
+   none:['どんな性質が、見つかりそう？','上のボタンで線を1本足してみよう。中心OとBを結ぶ場合と、AとBを結ぶ場合。どんな三角形が見えてくる？','等しい角を見つけたい。どちらを結ぶ？'],
+   radius:['半径を2本にすると、等しい角が見つかる','OPとOBは同じ円の半径なので、長さが等しい。△OPBは二等辺三角形だから、PとBの底角も等しくなります。「円には等しい半径がある」と思い出すと、中心へ結ぶ理由が見えてきます。','同じ半径 → 等しい2辺 → 等しい底角'],
+   chord:['こちらの線では、直角が見つかった','PAは直径なので、円周角∠PBAは90°。ABを結ぶのも、面積や三平方の定理で役立つ選び方です。今回は等しい底角を使いたいので、中心OとBを結ぶ方がその目的につながります。','直径PAに対する円周角 → Bの角は90°']
+  };
+  const [title,message,caption]=notes[choice];g+=text(275,377,caption,radius?blue:chord?brown:ink,17);auxSvg.innerHTML=g;auxSvg.setAttribute('aria-label','基本形の寄り道。'+title+'。'+message);
+  detour.querySelector('h4').textContent=title;detour.querySelector('.auxiliary-result p').textContent=message;
+  for(const b of detour.querySelectorAll('[data-aux]'))b.setAttribute('aria-pressed',String(b.dataset.aux===choice));
+ }
+ for(const b of detour.querySelectorAll('[data-aux]'))b.onclick=()=>{choice=b.dataset.aux;drawAuxiliary();};
+ detour.querySelector('[data-aux-close]').onclick=()=>{detour.open=false;detour.querySelector('summary').focus();};
+ detour.querySelector('[data-aux-zoom]').onclick=()=>{const dialog=$('.figure-dialog');dialog.querySelector('.large-figure').replaceChildren(auxSvg.cloneNode(true));dialog.showModal();};drawAuxiliary();
 })();
