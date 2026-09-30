@@ -16,6 +16,9 @@
 @media(max-width:600px){.circle-modes{padding-inline:18px}.circle-modes .button{padding:9px 12px}.proof-story{padding-inline:12px}.proof-controls{gap:7px}.circle-focus{min-height:115px}.proof-formula{font-size:18px}}
 .has-angle-story>figure,.has-angle-story>ol,.has-angle-story>p:not(.eyebrow){display:none}
 .angle-story-controls{display:flex;align-items:center;flex-wrap:wrap;gap:9px;margin:20px 0}
+.angle-story button[aria-disabled="true"]{opacity:.5}
+.arc-choices{padding:16px;border:1px solid var(--line);border-radius:8px;margin-bottom:16px}
+.arc-choices p{margin-top:0}.arc-choices button{margin:4px 0}
 .angle-story-count{font-size:13px;color:var(--muted);min-width:42px;text-align:center}
 .angle-story-title{min-height:68px;margin-bottom:12px;font-size:19px;font-weight:600}
 .angle-story .control{max-width:430px;margin-bottom:16px}
