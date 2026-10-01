@@ -273,3 +273,71 @@ function focus(){if(/^#q([1-9]|1[0-9]|2[0-8])$/.test(location.hash))$(location.h
  for(const b of seq.querySelectorAll('[data-jump]'))b.onclick=()=>{index=Number(b.dataset.jump);draw();};seq.querySelector('[data-reset]').onclick=()=>{index=0;slider.value=150;seq.querySelector('details').open=false;draw();};
  seq.querySelector('[data-zoom]').onclick=()=>{const d=document.querySelector('.figure-dialog');d.querySelector('.large-figure').replaceChildren(svg.cloneNode(true));d.showModal();};draw();
 })();
+
+/* A cone's axial section connects the solid, the right triangle, and its height. */
+(()=>{
+ 'use strict';
+ const card=document.getElementById('lesson-14');if(!card)return;
+ const blue='#3566a0',brown='#98502f',ink='#253b39',gray='#87928b';
+ const seq=document.createElement('div');seq.id='cone-section-sequence';seq.className='height-sequence interactive';
+ seq.innerHTML=`<p class="sequence-intro"><strong>問25と同じ条件：</strong>底面の半径3 cm、母線5 cmの円すい。高さと体積を求めます。<br>母線は表面に沿った斜めの長さ。体積の式に使う「高さ」はどこでしょう？</p>
+ <div class="sequence-chapters"><button data-jump="0">断面を見つける</button><button data-jump="3">高さを求める</button><button data-jump="9">体積につなぐ</button></div>
+ <div class="sequence-controls"><button class="button" data-back>ひとつ前</button><span class="sequence-count"></span><button class="button primary" data-next>次の手順</button><button class="sequence-reset" data-reset>最初から</button></div>
+ <div class="sequence-explanation" aria-live="polite" aria-atomic="true"><h3></h3><p></p></div>
+ <label class="check" data-outline-control hidden><input type="checkbox" checked> 円すいの輪郭を残して見比べる</label>
+ <figure><svg viewBox="0 0 640 430" role="img"></svg><button class="figure-open" data-zoom>図を大きく見る</button></figure>
+ <p class="sequence-intro">立体は模式図です。取り出した断面は、縦横を同じ倍率で描いています。</p>
+ <div class="sequence-calculation" hidden><p class="sequence-previous"></p><p class="sequence-formula"></p><p class="sequence-intro" data-root-note hidden>√16そのものは4。±は方程式の2つの解を表します。高さなのでh＞0という条件で、正の解を選びます。</p></div>
+ <p>紙では<a href="#q25">問25</a>を自分の式で解こう。<br>「三平方を2回使う」立体も見る：<a href="#space-lab">箱の中の対角線</a>。</p>
+ <details class="height-summary"><summary>元の解説をまとめて読む</summary></details>`;
+ seq.querySelector('details').append(card.querySelector('ol').cloneNode(true));card.append(seq);card.classList.add('has-side-choice');
+ const part=(s,c)=>`<span class="sequence-${c}">${s}</span>`;
+ const h=s=>part(s,'height'),r=s=>part(s,'base');
+ const steps=[
+  ['斜めの5と、高さhは別の長さ','Vは頂点、Oは底面の中心。高さはVから底面へ垂直に下ろしたVOです。母線VA＝5を、そのまま高さに使えるでしょうか？','', '斜めの母線5と、垂直な高さhを見比べる'],
+  ['頂点と底面の中心を通って切る','軸VOを含む平面で切ると、左右対称の二等辺三角形が現れます。断面の下の辺は、底面の直径です。','', '色のついた三角形が、軸を通る断面'],
+  ['断面の半分に、直角三角形がある','右半分の△VOAに注目。VOは底面に垂直なので、∠VOA＝90°。横のOAは中心から円周までの半径3です。直径6ではありません。','', '横の辺OAは、直径の半分＝半径3'],
+  ['高さ・半径・母線を、式でつなぐ','直角をはさむ高さhと半径3。その向かいが母線5です。直角三角形が見つかったので、三平方の定理が使えます。',`${h('h²')} ＋ ${r('3²')} ＝ 5²`, '直角の向かいにある母線5が、斜辺'],
+  ['分かっている数を二乗する','3²は9、5²は25。まだ分からない高さのh²は、そのまま残します。',`${h('h²')} ＋ ${r('9')} ＝ 25`, '高さhの二乗を求めているところ'],
+  ['両辺から、同じ9を引く','左側をh²だけにするため、左右の両方から9を引きます。',`${h('h²')} ＋ 9 <span class="sequence-change">− 9</span> ＝ 25 <span class="sequence-change">− 9</span>`, '半径の二乗9を、両辺から引く'],
+  ['高さの二乗は16になる','左の9−9は0、右の25−9は16。16は高さそのものではなく、高さを二乗した値です。',`${h('h²')} ＝ 16`, 'h²＝16。高さh＝16ではない'],
+  ['方程式の解は、正と負の2つ','4²も(−4)²も16なので、方程式h²＝16の解は4と−4。ここから、問題に合う解を選びます。',`${h('h')} ＝ ±√16 ＝ ±4`, '4²も(−4)²も16。高さに使えるのは？'],
+  ['高さなので、正の解を選ぶ','高さは正の長さなのでh＞0。したがってh＝4 cmです。斜めの母線5より短いことも、図と照らして確認しよう。',`h ＞ 0 なので、${h('h ＝ 4 cm')}`, '垂直な高さは4 cm。母線5 cmとは別'],
+  ['体積に使うのは、求めた高さ4','円すいの体積は「底面積×高さ÷3」。底面は半径3の円なので、底面積はπ×3²です。母線5ではなく、青い高さ4を使います。',`体積 ＝ π × ${r('3²')} × ${h('4')} ÷ 3`, '円の底面積 × 垂直な高さ ÷ 3'],
+  ['高さを求めたことで、体積も分かる','3²＝9なので、π×9×4÷3＝12π。高さの単位はcm、体積の単位はcm³です。立体の中に平面の三角形を見つけたことが、入口でした。','体積 ＝ π × 9 × 4 ÷ 3 ＝ 12π cm³', '高さ4 cm → 円すいの体積12π cm³']
+ ];
+ let index=0;const svg=seq.querySelector('svg'),outline=seq.querySelector('input');
+ const text=(x,y,s,c=ink,size=20)=>`<text x="${x}" y="${y}" fill="${c}" text-anchor="middle" font-size="${size}">${s}</text>`;
+ function draw(){
+  const shell=index<2||outline.checked,volume=index>=9;
+  let g=text(320,24,'条件：半径3 cm・母線5 cm。高さと体積を求める',ink,16);
+  if(shell){
+   g+=`<g data-shell opacity="${index<2?1:'.35'}"><path d="M 170 285 L 320 85 L 470 285" fill="none" stroke="${gray}" stroke-width="1.7"/><path d="M 170 285 A 150 32 0 0 1 470 285" fill="none" stroke="${gray}" stroke-width="1.5" stroke-dasharray="5 4"/><path d="M 170 285 A 150 32 0 0 0 470 285" fill="none" stroke="${gray}" stroke-width="1.7"/></g>`;
+  }
+  if(index===1)g+='<polygon data-section points="170,285 320,85 470,285" fill="#edf2e7" stroke="#56714e" stroke-width="2"/>';
+  if(index>=2)g+=`<polygon data-half points="320,85 320,285 470,285" fill="${volume?'#f5f7fa':'#edf3f9'}" stroke="none"/>`;
+  if(volume)g+='<ellipse data-base cx="320" cy="285" rx="150" ry="32" fill="#edf2e7" fill-opacity=".8" stroke="#56714e" stroke-width="1.5"/>';
+  g+=`<line data-height x1="320" y1="85" x2="320" y2="285" stroke="${blue}" stroke-width="3" ${index<2?'stroke-dasharray="6 4"':''}/><line data-radius x1="320" y1="285" x2="470" y2="285" stroke="${brown}" stroke-width="${index>=2?3:2}"/><line data-generator x1="320" y1="85" x2="470" y2="285" stroke="${ink}" stroke-width="${index>=3?3:2}"/>`;
+  if(index>=2)g+='<path data-right d="M 320 271 H 334 V 285" stroke="#87928b" fill="none" stroke-width="1.6"/>';
+  g+=text(320,64,'V')+text(296,275,'O')+text(491,292,'A');
+  g+=text(279,216,index>=8?'高さ4':'高さh',blue,21)+text(435,176,'母線5',ink,21)+text(388,242,'半径3',brown,21);
+  if(index===1)g+=text(320,343,'下の辺全体は、直径6',ink,18);
+  g+=text(320,379,steps[index][3],index>=9?ink:blue,18);
+  if(index>=3)g+=text(320,410,seqText(steps[index][2]),ink,17);
+  svg.innerHTML=g;svg.setAttribute('aria-label',steps[index][0]+'。'+steps[index][1]);
+  seq.querySelector('h3').textContent=steps[index][0];seq.querySelector('.sequence-explanation p').textContent=steps[index][1];seq.querySelector('.sequence-count').textContent=`${index+1} / ${steps.length}`;
+  seq.querySelector('[data-outline-control]').hidden=index<2;
+  seq.querySelector('.sequence-calculation').hidden=index<3;seq.querySelector('.sequence-formula').innerHTML=steps[index][2];
+  const previous=seq.querySelector('.sequence-previous');previous.hidden=index<4||index===9;previous.innerHTML=index>=4?'ひとつ前：'+steps[index-1][2]:'';seq.querySelector('[data-root-note]').hidden=index<7||index>8;
+  seq.querySelector('[data-back]').setAttribute('aria-disabled',String(index===0));seq.querySelector('[data-next]').setAttribute('aria-disabled',String(index===steps.length-1));
+  for(const b of seq.querySelectorAll('[data-jump]')){if(Number(b.dataset.jump)===(index<3?0:index<9?3:9))b.setAttribute('aria-current','step');else b.removeAttribute('aria-current');}
+ }
+ function seqText(html){const e=document.createElement('span');e.innerHTML=html;return e.textContent;}
+ outline.onchange=draw;
+ seq.querySelector('[data-next]').onclick=()=>{if(index<steps.length-1){index++;draw();}};
+ seq.querySelector('[data-back]').onclick=()=>{if(index>0){index--;draw();}};
+ for(const b of seq.querySelectorAll('[data-jump]'))b.onclick=()=>{index=Number(b.dataset.jump);draw();};
+ seq.querySelector('[data-reset]').onclick=()=>{index=0;outline.checked=true;seq.querySelector('details').open=false;draw();};
+ seq.querySelector('[data-zoom]').onclick=()=>{const d=document.querySelector('.figure-dialog');d.querySelector('.large-figure').replaceChildren(svg.cloneNode(true));d.showModal();};
+ draw();
+})();
