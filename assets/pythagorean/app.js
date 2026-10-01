@@ -198,6 +198,40 @@ document.querySelectorAll('[data-grade]').forEach(b=>b.addEventListener('click',
 function focus(){if(/^#q([1-9]|1[0-9]|2[0-8])$/.test(location.hash))$(location.hash)?.focus();}window.addEventListener('hashchange',focus);document.documentElement.classList.add('js-ready');focus();
 })();
 
+/* Attach the square to the actual hypotenuse before returning from area to length. */
+(()=>{
+ 'use strict';
+ const card=document.getElementById('lesson-3');if(!card)return;
+ const blue='#3566a0',ink='#253b39',gray='#87928b';
+ const seq=document.createElement('div');seq.id='root-length-sequence';seq.className='height-sequence interactive';
+ seq.innerHTML=`<p class="sequence-intro"><strong>この例の条件：</strong>直角をはさむ2辺が2と3。斜辺の長さcを求めます。<br>斜辺に正方形を作ると、「c²」が何の面積か見えてきます。</p><div class="sequence-chapters"><button data-jump="0">図の意味を見る</button><button data-jump="2">式で求める</button><button data-jump="5">長さに戻す</button></div><div class="sequence-controls"><button class="button" data-back>ひとつ前</button><span class="sequence-count"></span><button class="button primary" data-next>次の手順</button><button class="sequence-reset" data-reset>最初から</button></div><div class="sequence-explanation" aria-live="polite" aria-atomic="true"><h3></h3><p></p></div><figure><svg viewBox="0 0 640 420" role="img"></svg><button class="figure-open" data-zoom>図を大きく見る</button></figure><div class="sequence-calculation" hidden><p class="sequence-previous"></p><p class="sequence-formula"></p><p class="sequence-intro" data-root-note hidden>√13そのものは正の数です。±は、方程式の正と負の解を両方書くために付けています。</p></div><p>なぜ面積を足せる？ <a href="#rearrange-lab">同じ4枚を並べ替えて確かめる</a>。<br><a href="../square-roots/index.html">平方根の意味を振り返る</a> · 紙では<a href="#q4">問4</a>・<a href="#q5">問5</a>。</p><details class="height-summary"><summary>元の解説をまとめて読む</summary></details>`;
+ seq.querySelector('details').append(card.querySelector('ol').cloneNode(true));card.append(seq);card.classList.add('has-side-choice');
+ const c=s=>`<span class="sequence-height">${s}</span>`;
+ const steps=[
+  ['求めたいのは、青い辺の長さ','直角の向かいの青い辺が斜辺です。その長さをcと置きました。まず、この辺に正方形を作ってみよう。',''],
+  ['斜辺を一辺にすると、面積はc²','青い辺cを、そのまま正方形の一辺にしました。縦も横もcだから面積はc×c＝c²。三角形の面積ではありません。',`${c('c')} × ${c('c')} ＝ ${c('c²')}`],
+  ['三平方で、この正方形の面積を求める','直角をはさむ辺は2と3。三平方の定理から、斜辺に作った正方形の面積c²は、2²と3²の和です。',`${c('c²')} ＝ 2² ＋ 3²`],
+  ['2と3を、それぞれ二乗する','2²は4、3²は9。長さ2と3をそのまま足すのではなく、二乗してから足します。',`${c('c²')} ＝ 4 ＋ 9`],
+  ['分かった13は、面積の方','4＋9＝13。青い正方形の面積が13と分かりました。求めたいのは、その一辺の長さcです。',`${c('c²')} ＝ ${c('13')}`],
+  ['方程式だけなら、正と負の解がある','二乗すると13になる数は、√13と−√13。c²＝13という方程式の解は2つあります。次に、長さという条件を確認します。',`${c('c')} ＝ ${c('±√13')}`],
+  ['長さなので、正の√13を選ぶ','c＞0なので、c＝√13。面積13の正方形の一辺の長さを、この記号で正確に表せます。小数に直さなくても答えになります。',`c ＞ 0 なので、${c('c ＝ √13')}`]
+ ];
+ let index=0;const svg=seq.querySelector('svg');
+ const text=(x,y,s,color=ink,size=20)=>`<text x="${x}" y="${y}" text-anchor="middle" fill="${color}" font-size="${size}">${s}</text>`;
+ function draw(){
+  let g=text(320,25,'条件：直角をはさむ辺は2と3。斜辺cを求める。',ink,16);
+  if(index>=1)g+='<polygon data-square points="335,280 200,190 290,55 425,145" fill="#edf3f9" stroke="#3566a0" stroke-width="1.6"/>'+text(312.5,150,'正方形の面積',blue,17)+text(312.5,184,index>=4?'13':'c²',blue,25);
+  g+='<line data-leg-a x1="200" y1="280" x2="200" y2="190" stroke="#253b39" stroke-width="2"/><line data-leg-b x1="200" y1="280" x2="335" y2="280" stroke="#253b39" stroke-width="2"/><line data-hypotenuse x1="200" y1="190" x2="335" y2="280" stroke="#3566a0" stroke-width="3"/><path data-right d="M 200 265 H 215 V 280" fill="none" stroke="#87928b" stroke-width="1.6"/>';
+  g+=text(175,240,'2')+text(267.5,309,'3')+text(252,264,index===6?'√13':'c',blue,22);
+  g+=text(320,378,index===0?'青い辺の長さをcと置く':index<4?'辺の長さはc。正方形の面積はc²。':index<6?'面積は13。辺の長さも13、ではない。':'面積13 → 一辺の長さ√13',blue,18);
+  svg.innerHTML=g;svg.setAttribute('aria-label',steps[index][0]+'。'+steps[index][1]);seq.querySelector('h3').textContent=steps[index][0];seq.querySelector('.sequence-explanation p').textContent=steps[index][1];seq.querySelector('.sequence-count').textContent=`${index+1} / 7`;
+  seq.querySelector('.sequence-calculation').hidden=index===0;seq.querySelector('.sequence-formula').innerHTML=steps[index][2];const previous=seq.querySelector('.sequence-previous');previous.hidden=index<2;previous.innerHTML=index>=2?'ひとつ前：'+steps[index-1][2]:'';seq.querySelector('[data-root-note]').hidden=index<5;
+  seq.querySelector('[data-back]').setAttribute('aria-disabled',String(index===0));seq.querySelector('[data-next]').setAttribute('aria-disabled',String(index===6));
+  for(const b of seq.querySelectorAll('[data-jump]')){if(Number(b.dataset.jump)===(index<2?0:index<5?2:5))b.setAttribute('aria-current','step');else b.removeAttribute('aria-current');}
+ }
+ seq.querySelector('[data-next]').onclick=()=>{if(index<6){index++;draw();}};seq.querySelector('[data-back]').onclick=()=>{if(index>0){index--;draw();}};for(const b of seq.querySelectorAll('[data-jump]'))b.onclick=()=>{index=Number(b.dataset.jump);draw();};seq.querySelector('[data-reset]').onclick=()=>{index=0;seq.querySelector('details').open=false;draw();};seq.querySelector('[data-zoom]').onclick=()=>{const d=document.querySelector('.figure-dialog');d.querySelector('.large-figure').replaceChildren(svg.cloneNode(true));d.showModal();};draw();
+})();
+
 /* Rotation changes the picture, not which side faces the right angle. */
 (()=>{
  'use strict';
