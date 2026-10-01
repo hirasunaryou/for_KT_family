@@ -63,3 +63,5 @@
 .height-sequence .ratio-result p{font-size:19px;margin:8px 0}
 .height-sequence .ratio-result .muted{font-size:14px}
 .ratio-reason{border-left:2px solid var(--green);padding-left:12px}
+
+.height-sequence .check[hidden]{display:none}
