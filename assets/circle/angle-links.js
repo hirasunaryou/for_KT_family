@@ -102,13 +102,13 @@
   const titles=['最初のPは、どの弧を見ている？','三角形の形は変わった。角度は？','同じ弧だから、同じ半分になる','反対側のQは、どの弧を見る？','弧が変わると、半分にする角も変わる'];
   let g=text([275,23],'設定：短い弧ABに対応する中心角は120°',ink,14)+`<circle cx="275" cy="205" r="105" fill="none" stroke="${gray}" stroke-width="1.5"/>`;
   if(index===1||index===2){if(p!==75)g+=`<g data-previous>${line(old,A,gray,1.3,'stroke-dasharray="4 4"')+line(old,B,gray,1.3,'stroke-dasharray="4 4"')}</g>`;g+=text([275,53],p===75?'今は、最初の位置と同じ':'薄い破線：最初の位置',ink,14);}
-  g+=arc(start,span,R,opposite?brown:blue,'data-seen-arc');
+  g+=line(A,B,gray,1.3,'data-fixed-chord')+arc(start,span,R,opposite?brown:blue,'data-seen-arc');
   if(opposite)g+=arc(210,120,R,'#ccd7e3','stroke-dasharray="4 4" data-old-arc');
   g+=line(P,A,opposite?'#afc2d8':blue,opposite?1.4:2.5,'data-pa')+line(P,B,opposite?'#afc2d8':blue,opposite?1.4:2.5,'data-pb');
   if(opposite)g+=line(Q,A,brown,2.5,'data-qa')+line(Q,B,brown,2.5,'data-qb')+mark(A,Q,B,brown);else g+=mark(A,P,B,blue);
   if(index>=2){
    g+=line(O,A,gray,1.4,'stroke-dasharray="5 4"')+line(O,B,gray,1.4,'stroke-dasharray="5 4"')+arc(start,span,30,opposite?brown:blue,'data-centre-arc');
-   const cuts=[[P,A],[P,B],[old,A],[old,B],[Q,A],[Q,B],[O,A],[O,B]];for(let i=0;i<72;i++)cuts.push([pt(i*5,30),pt((i+1)*5,30)]);
+   const cuts=[[A,B],[P,A],[P,B],[old,A],[old,B],[Q,A],[Q,B],[O,A],[O,B]];for(let i=0;i<72;i++)cuts.push([pt(i*5,30),pt((i+1)*5,30)]);
    const hits=(a,b,x,y)=>{let lo=0,hi=1;for(let k=0;k<2;k++){const min=(k?y:x)-(k?12:11),max=(k?y:x)+(k?12:11),d=b[k]-a[k];if(Math.abs(d)<1e-9){if(a[k]<min||a[k]>max)return false;}else{const s=(min-a[k])/d,t=(max-a[k])/d;lo=Math.max(lo,Math.min(s,t));hi=Math.min(hi,Math.max(s,t));if(lo>hi)return false;}}return true;};
    let label=null;for(const radius of [17,48,60]){for(let d=0;d<360;d+=15){const p=pt(d,radius);if(!cuts.some(([a,b])=>hits(a,b,p[0],p[1]))&&Math.hypot(p[0]-275,p[1]-205)>20){label=p;break;}}if(label)break;}
    g+=`<circle cx="275" cy="205" r="2.5" fill="${ink}"/>`+text([label[0],label[1]+6],'O',ink,17);
