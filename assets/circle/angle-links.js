@@ -37,6 +37,51 @@
  seq.querySelector('[data-zoom]').onclick=()=>{const d=document.querySelector('.figure-dialog');d.querySelector('.large-figure').replaceChildren(svg.cloneNode(true));d.showModal();};draw();
 })();
 
+/* Keep the intercepted arc fixed while changing the viewpoint from O to P. */
+(()=>{
+ 'use strict';
+ const card=document.getElementById('lesson-2');if(!card)return;
+ const blue='#3566a0',brown='#98502f',green='#285c50',gray='#a5afa9',ink='#253b39',O=[275,210],R=110;
+ const pt=(d,r=R)=>[275+r*Math.cos(d*Math.PI/180),210-r*Math.sin(d*Math.PI/180)];
+ const line=(a,b,c,w=2,attrs='')=>`<line x1="${a[0]}" y1="${a[1]}" x2="${b[0]}" y2="${b[1]}" stroke="${c}" stroke-width="${w}" ${attrs}/>`;
+ const text=(p,s,c=ink,size=17)=>`<text x="${p[0]}" y="${p[1]}" text-anchor="middle" fill="${c}" font-size="${size}">${s}</text>`;
+ const wedge=(a,p,b,r,c,fill,attrs='')=>{const u=Math.atan2(a[1]-p[1],a[0]-p[0]),v=Math.atan2(b[1]-p[1],b[0]-p[0]),d=(v-u+3*Math.PI)%(2*Math.PI)-Math.PI,q=[p[0]+r*Math.cos(u),p[1]+r*Math.sin(u)],z=[p[0]+r*Math.cos(v),p[1]+r*Math.sin(v)];return `<path ${attrs} d="M ${p} L ${q} A ${r} ${r} 0 0 ${d>0?1:0} ${z} Z" stroke="${c}" stroke-width="1.8" fill="${fill}"/>`;};
+ const seq=document.createElement('div');seq.id='half-angle-story';seq.className='angle-story interactive';
+ seq.innerHTML=`<div class="example-context"><strong>この体験の設定</strong><p>Oは円の中心、Pは円周上の頂点です。<br>A・Bの位置を変えて、中心角を<span data-setting>120</span>°にします。Pの角は何度になる？</p></div><label class="control">中心角の設定：<output>120°</output><input type="range" min="40" max="160" step="10" value="120" aria-label="中心角の設定"></label><div class="angle-story-controls"><button class="button" data-back>ひとつ前</button><span class="angle-story-count"></span><button class="button primary" data-next>中心から見る</button><button class="button" data-reset>最初から</button></div><h3 class="angle-story-title"></h3><figure><svg viewBox="0 0 550 470" role="img"></svg><button class="figure-open" data-zoom>図を大きく見る</button></figure><div aria-live="polite" aria-atomic="true"><p class="angle-story-before muted"></p><p class="angle-story-message"></p><p class="angle-story-formula" hidden></p></div><p class="angle-story-links">なぜ半分になる？ <a href="#proof-lab">半径を引いて、理由をたどる</a>。<br>Pの位置も変えてみるなら<a href="#move-lab">動く体験へ</a>。紙では<a href="#q2">問2</a>〜<a href="#q4">問4</a>。</p><details><summary>元の解説をまとめて読む</summary></details>`;
+ seq.querySelector('details').append(card.querySelector('ol').cloneNode(true));card.append(seq);card.classList.add('has-angle-story');
+ let index=0;const slider=seq.querySelector('input'),svg=seq.querySelector('svg');
+ function draw(){
+  const central=Number(slider.value),a=270-central/2,b=270+central/2,A=pt(a),B=pt(b),P=pt(90),inscribed=central/2;
+  const titles=['先に、同じ弧ABをそろえる','中心Oから、A・Bへ結ぶ','円周上Pからも、同じA・Bへ','同じ弧なら、Pの角はOの角の半分'];
+  // Find one clear centre-label position using every stage's lines, so it stays put.
+  const hits=(u,v,x,y)=>{let lo=0,hi=1;for(let k=0;k<2;k++){const min=(k?y:x)-(k?12:11),max=(k?y:x)+(k?12:11),d=v[k]-u[k];if(Math.abs(d)<1e-9){if(u[k]<min||u[k]>max)return false;}else{const s=(min-u[k])/d,t=(max-u[k])/d;lo=Math.max(lo,Math.min(s,t));hi=Math.min(hi,Math.max(s,t));if(lo>hi)return false;}}return true;};
+  const cuts=[[P,A],[P,B],[O,A],[O,B]];for(let i=0;i<32;i++)cuts.push([pt(a+central*i/32,30),pt(a+central*(i+1)/32,30)]);
+  let tag=null;for(const radius of [24,42,53]){for(let d=0;d<360;d+=15){const p=pt(d,radius);if(!cuts.some(([u,v])=>hits(u,v,p[0],p[1]))){tag=p;break;}}if(tag)break;}
+  let g=text([275,23],`設定：中心角 ${central}° ／ Pは円周上`,ink,14)+`<circle cx="275" cy="210" r="110" fill="none" stroke="${gray}" stroke-width="1.5"/><path data-shared-arc d="M ${A} A 110 110 0 0 0 ${B}" fill="none" stroke="${green}" stroke-width="5"/>`;
+  g+=line(P,A,index>=2?blue:gray,index>=2?2.5:1.4,'data-pa')+line(P,B,index>=2?blue:gray,index>=2?2.5:1.4,'data-pb');
+  if(index>=1)g+=line(O,A,brown,2,'data-oa stroke-dasharray="5 3"')+line(O,B,brown,2,'data-ob stroke-dasharray="5 3"')+wedge(A,O,B,30,brown,'#f4e4d7','data-central');
+  if(index>=2)g+=wedge(A,P,B,22,blue,'#e2ecf7','data-inscribed');
+  g+=`<circle cx="275" cy="210" r="2.5" fill="${brown}"/>`+text([tag[0],tag[1]+6],'O',brown,18)+text([275,76],'P',blue,19);
+  for(const [d,s]of [[a,'A'],[b,'B']]){const p=pt(d,138);g+=text([p[0],p[1]+6],s)+`<circle cx="${pt(d)[0]}" cy="${pt(d)[1]}" r="3" fill="${green}"/>`;}
+  g+=text([275,375],'どちらも、この緑の弧ABを見る',green,16);
+  if(index>=1)g+=text([275,408],`Oの中心角：${central}°`,brown,19);
+  if(index>=2)g+=text([275,441],`Pの円周角：${index===3?inscribed+'°':'？'}`,blue,19);
+  svg.innerHTML=g;svg.dataset.central=String(central);svg.dataset.inscribed=String(inscribed);
+  const messages=[
+   'Pを含まない、下側の弧ABを緑で示しました。この弧を変えずに、見る場所をOとPで比べます。',
+   `茶色の破線は半径OA・OB。中心Oにできる角が「中心角」です。この例では${central}°に設定しました。`,
+   '青い2本はPA・PB。円周上Pにできる角が「円周角」です。線の先はさっきと同じA・B。Pの角は何度になるか、予想してみよう。',
+   `同じ弧に対する円周角は中心角の半分。${central}÷2＝${inscribed}°です。設定を変えても、この関係で求められます。なぜ半分になるかは、下の「理由をたどる」で確かめよう。`
+  ];
+  seq.querySelector('[data-setting]').textContent=central;seq.querySelector('output').textContent=central+'°';slider.setAttribute('aria-valuetext',central+'度');
+  seq.querySelector('.angle-story-title').textContent=titles[index];seq.querySelector('.angle-story-count').textContent=`${index+1} / 4`;seq.querySelector('.angle-story-before').textContent=index?'ひとつ前：'+titles[index-1]:'';seq.querySelector('.angle-story-message').textContent=messages[index];
+  const f=seq.querySelector('.angle-story-formula');f.hidden=index!==3;f.innerHTML=`<span class="circle-brown">中心角 ${central}°</span> ÷ 2<br>＝ <span class="circle-blue">円周角 ${inscribed}°</span><br><small>逆に求めるなら、<span class="circle-blue">${inscribed}°</span> × 2 ＝ <span class="circle-brown">${central}°</span></small>`;
+  svg.setAttribute('aria-label',titles[index]+'。'+messages[index]);seq.querySelector('[data-back]').setAttribute('aria-disabled',String(index===0));seq.querySelector('[data-next]').setAttribute('aria-disabled',String(index===3));seq.querySelector('[data-next]').textContent=['中心から見る','円周上から見る','角度を確かめる','角度を確かめる'][index];
+ }
+ slider.oninput=()=>{index=0;draw();};seq.querySelector('[data-back]').onclick=()=>{if(index>0){index--;draw();}};seq.querySelector('[data-next]').onclick=()=>{if(index<3){index++;draw();}};
+ seq.querySelector('[data-reset]').onclick=()=>{index=0;slider.value=120;seq.querySelector('details').open=false;draw();};seq.querySelector('[data-zoom]').onclick=()=>{const d=document.querySelector('.figure-dialog');d.querySelector('.large-figure').replaceChildren(svg.cloneNode(true));d.showModal();};draw();
+})();
+
 /* The diameter and cyclic quadrilateral both return to the arc being viewed. */
 (()=>{
  'use strict';
