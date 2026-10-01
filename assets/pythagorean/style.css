@@ -8,6 +8,8 @@
 
 /* The paper explanation stays complete; the Web reveals its reasoning one step at a time. */
 .has-height-sequence .height-static{display:none}
+.has-side-choice>figure,.has-side-choice>ol,.has-side-choice>.take{display:none}
+@media print{.has-side-choice>figure,.has-side-choice>ol,.has-side-choice>.take{display:block!important}}
 .height-sequence[hidden],.sequence-calculation[hidden],.sequence-previous[hidden]{display:none}
 .height-sequence .sequence-intro{font-size:14px;color:var(--muted);margin-top:22px}
 .sequence-controls{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:16px 0 22px}
