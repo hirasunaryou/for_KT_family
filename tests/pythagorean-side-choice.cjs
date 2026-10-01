@@ -15,30 +15,33 @@ async function geometry(svg){return svg.evaluate(e=>{
  const seq=page.locator('#side-choice-sequence'),svg=seq.locator('svg'),slider=seq.locator('input');
  for(const width of [1440,768,390]){
   await page.setViewportSize({width,height:1100});await seq.locator('[data-reset]').click();await expect(page.locator('#lesson-4 > figure')).toBeHidden();
-  for(let i=0;i<7;i++){
-   await expect(seq.locator('.sequence-count')).toHaveText(`${i+1} / 7`);await expect(seq.locator('.sequence-calculation')).toBeVisible({visible:i>=2});
+  for(let i=0;i<8;i++){
+   await expect(seq.locator('.sequence-count')).toHaveText(`${i+1} / 8`);await expect(seq.locator('.sequence-calculation')).toBeVisible({visible:i>=2});
    const g=await geometry(svg);assert(g.inside&&g.equal&&!g.overlaps.length&&!g.hits.length,JSON.stringify({width,i,g}));
-   if(i>=2)await expect(seq.locator('.sequence-formula')).toContainText(['x² ＋ 3² ＝ 5²','x² ＋ 9 ＝ 25','x² ＋ 9 − 9 ＝ 25 − 9','x² ＝ 16','x ＝ √16 ＝ 4'][i-2]);
+   if(i>=2)await expect(seq.locator('.sequence-formula')).toContainText(['x² ＋ 3² ＝ 5²','x² ＋ 9 ＝ 25','x² ＋ 9 − 9 ＝ 25 − 9','x² ＝ 16','x ＝ ±√16 ＝ ±4','x ＞ 0 なので、x ＝ 4'][i-2]);
    if(i>=3)await expect(seq.locator('.sequence-previous')).toContainText('ひとつ前');
-   await expect(svg.locator('text').filter({hasText:/^4$/})).toHaveCount(i===6?1:0);
+   await expect(svg.locator('text').filter({hasText:/^4$/})).toHaveCount(i===7?1:0);
+   await expect(seq.locator('[data-root-note]')).toBeVisible({visible:i>=6});
+   if(i===6){await expect(svg.locator('text').filter({hasText:/^x$/})).toHaveCount(1);await expect(seq.locator('.sequence-explanation')).toContainText('4²も(−4)²も16');}
+   if(i===7){await expect(seq.locator('.sequence-previous')).toContainText('±4');await expect(seq.locator('.sequence-explanation')).toContainText('長さには使えません');}
    await svg.screenshot({path:`test-results/pythagorean/side-choice-${width}-${i}.png`});
    await seq.locator('[data-next]').focus();await page.keyboard.press('Enter');
   }
   for(const solved of [false,true]){
-   await seq.locator('[data-jump="0"]').click();await seq.locator('[data-next]').click();if(solved)for(let i=1;i<6;i++)await seq.locator('[data-next]').click();
+   await seq.locator('[data-jump="0"]').click();await seq.locator('[data-next]').click();if(solved)for(let i=1;i<7;i++)await seq.locator('[data-next]').click();
    for(let rotation=0;rotation<=360;rotation+=15){
     await slider.fill(String(rotation));const g=await geometry(svg);assert(g.inside&&g.equal&&!g.overlaps.length&&!g.hits.length,JSON.stringify({width,solved,rotation,g}));
     const [ab,ac,bc]=g.edges,len=([a,b])=>Math.hypot(a[0]-b[0],a[1]-b[1]);assert(Math.abs(len(ab)-180)<1e-4);assert(Math.abs(len(ac)-135)<1e-4);assert(Math.abs(len(bc)-225)<1e-4);
-    const u=ab[1].map((v,i)=>v-ab[0][i]),v=ac[1].map((v,i)=>v-ac[0][i]);assert(Math.abs(u[0]*v[0]+u[1]*v[1])<.02);await expect(seq.locator('.sequence-count')).toHaveText(solved?'7 / 7':'2 / 7');
+    const u=ab[1].map((v,i)=>v-ab[0][i]),v=ac[1].map((v,i)=>v-ac[0][i]);assert(Math.abs(u[0]*v[0]+u[1]*v[1])<.02);await expect(seq.locator('.sequence-count')).toHaveText(solved?'8 / 8':'2 / 8');
    }
   }
   await seq.locator('[data-back]').click();await expect(svg.locator('text').filter({hasText:/^x$/})).toHaveCount(1);await seq.locator('[data-zoom]').click();await expect(page.locator('dialog[open]')).toContainText('条件');await page.keyboard.press('Escape');
-  await slider.focus();await page.keyboard.press('ArrowLeft');await expect(slider).toHaveValue('345');await seq.locator('[data-jump="2"]').click();await expect(seq.locator('.sequence-count')).toHaveText('3 / 7');await expect(slider).toHaveValue('345');
+  await slider.focus();await page.keyboard.press('ArrowLeft');await expect(slider).toHaveValue('345');await seq.locator('[data-jump="2"]').click();await expect(seq.locator('.sequence-count')).toHaveText('3 / 8');await expect(slider).toHaveValue('345');
   await seq.locator('[data-reset]').click();await expect(slider).toHaveValue('150');assert(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1));
  }
  for(const href of ['#q6','#q7','#rearrange-lab']){await seq.locator(`a[href="${href}"]`).click();await expect(page.locator(href)).toBeInViewport();}
  await page.emulateMedia({media:'print'});await expect(seq).toBeHidden();await expect(page.locator('#lesson-4 > figure')).toBeVisible();await expect(page.locator('#lesson-4 > ol')).toBeVisible();
  const nojs=await browser.newPage({javaScriptEnabled:false,ignoreHTTPSErrors:true});await nojs.goto(url,{waitUntil:'domcontentloaded'});await expect(nojs.locator('#lesson-4 > figure')).toBeVisible();assert.deepEqual(errors,[]);
- console.log('PASS side choice: seven algebra steps, 25 rotations × two reveal states × three widths, independent lengths/right angle, labels, previous equations, navigation, zoom, links, print and no-JS');
+ console.log('PASS side choice: eight algebra steps with both roots then positive-length selection, 25 rotations × two reveal states × three widths, independent lengths/right angle, labels, previous equations, navigation, zoom, links, print and no-JS');
  }finally{await browser.close();server.close();}
 })().catch(e=>{console.error(e);server.close();process.exitCode=1;});

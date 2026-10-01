@@ -214,7 +214,8 @@ function focus(){if(/^#q([1-9]|1[0-9]|2[0-8])$/.test(location.hash))$(location.h
   ['分かっている数の二乗を計算する','3²は9、5²は25。x²はまだ分からないので、そのまま残します。',`${x} ＋ 9 ＝ ${part('25',brown)}`],
   ['両辺から、同じ9を引く','左の＋9をなくすために、両辺から9を引きます。右だけ、左だけを変えないのが方程式の約束です。',`${x} ＋ 9 <span class="sequence-change">− 9</span> ＝ ${part('25',brown)} <span class="sequence-change">− 9</span>`],
   ['左はx²だけ。右は16になる','9−9は0、25−9は16。引き算になったのは、最初の二乗の和の式を変形したからです。',`${x} ＝ ${part('16',blue)}`],
-  ['二乗から、長さに戻す','xは長さなので、正の平方根を選びます。x＝4。斜辺5より短いことも、見直しの手がかりになります。',`${part('x',blue)} ＝ √16 ＝ ${part('4',blue)}`]
+  ['方程式の解は、正と負の2つ','4²も(−4)²も16。方程式x²＝16だけを見ると、解は4と−4の2つあります。次に、もとの問題の条件を確認します。',`${part('x',blue)} ＝ ±√16 ＝ ${part('±4',blue)}`],
+  ['長さの条件で、正の解を選ぶ','このxは辺の長さなので、x＞0。−4は方程式を満たしても、長さには使えません。だからx＝4。斜辺5より短いことも確認できます。',`x ＞ 0 なので、${part('x ＝ 4',blue)}`]
  ];
  let index=0;const slider=seq.querySelector('input'),svg=seq.querySelector('svg');
  const text=(p,s,c=ink,size=20)=>`<text x="${p[0]}" y="${p[1]}" fill="${c}" text-anchor="middle" font-size="${size}">${s}</text>`;
@@ -224,12 +225,13 @@ function focus(){if(/^#q([1-9]|1[0-9]|2[0-8])$/.test(location.hash))$(location.h
   const edge=(a,b,c,attr)=>`<line ${attr} x1="${a[0]}" y1="${a[1]}" x2="${b[0]}" y2="${b[1]}" stroke="${c}" stroke-width="${index>=1&&attr==='data-hypotenuse'?4:2.4}"/>`;
   let g=text([320,25],'条件：直角をはさむ辺がxと3、向かいの辺が5',ink,16)+edge(A,B,blue,'data-unknown')+edge(A,C,ink,'data-leg')+edge(B,C,index>=1?brown:gray,'data-hypotenuse');
   const r=[[-45,-45],[-45,-30],[-60,-30]].map(cv);g+=`<path data-right d="M ${r[0]} L ${r[1]} L ${r[2]}" stroke="${ink}" stroke-width="${index===1?3:1.7}" fill="none"/>`;
-  const labels=[[[30,-78],index===6?'4':'x',blue],[[-95,22.5],'3',ink],[[51.6,51.3],'5',index>=1?brown:gray]];
+  const labels=[[[30,-78],index===7?'4':'x',blue],[[-95,22.5],'3',ink],[[51.6,51.3],'5',index>=1?brown:gray]];
   for(const [p,s,c]of labels){const q=cv(p);g+=text([q[0],q[1]+7],s,c,23);}
-  g+=text([320,426],index===0?'先に直角。その向かいが斜辺。':index===6?'求めた4は、斜辺5より短い。':'回しても、茶色の5が斜辺。',index>=1?brown:ink,18);
+  g+=text([320,426],index===0?'先に直角。その向かいが斜辺。':index===6?'4²＝16、(−4)²＝16。長さに合うのは？':index===7?'長さなのでx＞0。辺には4を使う。':'回しても、茶色の5が斜辺。',index>=1?brown:ink,18);
   svg.innerHTML=g;svg.setAttribute('aria-label',steps[index][0]+'。'+steps[index][1]);seq.querySelector('output').textContent=slider.value+'°';slider.setAttribute('aria-valuetext',slider.value+'度');
   seq.querySelector('h3').textContent=steps[index][0];seq.querySelector('.sequence-explanation p').textContent=steps[index][1];seq.querySelector('.sequence-count').textContent=`${index+1} / ${steps.length}`;
   seq.querySelector('.sequence-calculation').hidden=index<2;seq.querySelector('.sequence-formula').innerHTML=steps[index][2];const previous=seq.querySelector('.sequence-previous');previous.hidden=index<3;previous.innerHTML=index>=3?'ひとつ前：'+steps[index-1][2]:'';
+  let note=seq.querySelector('[data-root-note]');if(!note){note=document.createElement('p');note.dataset.rootNote='';note.className='sequence-intro';note.textContent='√16そのものは4です。±は、方程式の解である4と−4の両方を書くために付けています。';seq.querySelector('.sequence-calculation').append(note);}note.hidden=index<6;
   seq.querySelector('[data-back]').setAttribute('aria-disabled',String(index===0));seq.querySelector('[data-next]').setAttribute('aria-disabled',String(index===steps.length-1));
   for(const b of seq.querySelectorAll('[data-jump]')){const active=Number(b.dataset.jump)===(index<2?0:index===2?2:3);if(active)b.setAttribute('aria-current','step');else b.removeAttribute('aria-current');}
  }
