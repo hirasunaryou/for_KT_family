@@ -21,7 +21,7 @@ async function checkBounds(svg){return svg.evaluate(e=>{const b=e.getBBox(),m=e.
   for(const width of [1440,768,390]){
    await page.setViewportSize({width,height:1100});
    for(const c of cases){
-    const seq=page.locator(c.id);await expect(seq).toBeVisible();await seq.locator('[data-reset]').click();
+    const seq=page.locator(c.id);await expect(seq).toBeVisible();await seq.locator('[data-jump="0"]').click();
     const card=seq.locator('xpath=ancestor::article[1]');await expect(card.locator('.height-static')).toBeHidden();
     for(let i=0;i<c.steps;i++){
      await expect(seq.locator('.sequence-count')).toHaveText((i+1)+' / '+c.steps);
