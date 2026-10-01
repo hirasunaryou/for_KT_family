@@ -110,7 +110,7 @@
    g+=line(O,A,gray,1.4,'stroke-dasharray="5 4"')+line(O,B,gray,1.4,'stroke-dasharray="5 4"')+arc(start,span,30,opposite?brown:blue,'data-centre-arc');
    const cuts=[[A,B],[P,A],[P,B],[old,A],[old,B],[Q,A],[Q,B],[O,A],[O,B]];for(let i=0;i<72;i++)cuts.push([pt(i*5,30),pt((i+1)*5,30)]);
    const hits=(a,b,x,y)=>{let lo=0,hi=1;for(let k=0;k<2;k++){const min=(k?y:x)-(k?12:11),max=(k?y:x)+(k?12:11),d=b[k]-a[k];if(Math.abs(d)<1e-9){if(a[k]<min||a[k]>max)return false;}else{const s=(min-a[k])/d,t=(max-a[k])/d;lo=Math.max(lo,Math.min(s,t));hi=Math.min(hi,Math.max(s,t));if(lo>hi)return false;}}return true;};
-   let label=null;for(const radius of [17,48,60]){for(let d=0;d<360;d+=15){const p=pt(d,radius);if(!cuts.some(([a,b])=>hits(a,b,p[0],p[1]))&&Math.hypot(p[0]-275,p[1]-205)>20){label=p;break;}}if(label)break;}
+   let label=null;for(const radius of [14,48,60,75,140]){for(let d=0;d<360;d+=15){if(radius===14&&d%180!==0)continue;const p=pt(d,radius);if(!cuts.some(([a,b])=>hits(a,b,p[0],p[1]))){label=p;break;}}if(label)break;}
    g+=`<circle cx="275" cy="205" r="2.5" fill="${ink}"/>`+text([label[0],label[1]+6],'O',ink,17);
   }
   for(const [d,s,c]of [[210,'A',ink],[330,'B',ink],[p,'P',blue],...(opposite?[[270,'Q',brown]]:[])]){const v=pt(d,135);g+=text([v[0],v[1]+6],s,c,19);}

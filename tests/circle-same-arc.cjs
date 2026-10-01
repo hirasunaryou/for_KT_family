@@ -6,7 +6,7 @@ async function geometry(svg){return svg.evaluate(e=>{
  const labels=[...e.querySelectorAll('text')].map(t=>({s:t.textContent,...Object.fromEntries(['x','y','width','height'].map(k=>[k,t.getBBox()[k]]))})),overlaps=[],hits=new Set();
  for(let i=0;i<labels.length;i++)for(let j=i+1;j<labels.length;j++){const a=labels[i],b=labels[j];if(a.x<b.x+b.width&&a.x+a.width>b.x&&a.y<b.y+b.height&&a.y+a.height>b.y)overlaps.push([a.s,b.s]);}
  for(const l of e.querySelectorAll('line,path,circle'))for(let i=0;i<=120;i++){const p=l.getPointAtLength(l.getTotalLength()*i/120);for(const t of labels)if(p.x>t.x-1&&p.x<t.x+t.width+1&&p.y>t.y-1&&p.y<t.y+t.height+1)hits.add(t.s);}
- const b=e.getBBox(),m=e.getScreenCTM(),edges=[...e.querySelectorAll('line')].slice(0,4).map(l=>[[l.x1.baseVal.value,l.y1.baseVal.value],[l.x2.baseVal.value,l.y2.baseVal.value]]);return {edges,overlaps,hits:[...hits],inside:b.x>=0&&b.y>=0&&b.x+b.width<=550&&b.y+b.height<=470,equal:Math.abs(m.a-m.d)<1e-8};
+ const b=e.getBBox(),m=e.getScreenCTM(),edges=[...e.querySelectorAll('line')].slice(0,4).map(l=>[[l.x1.baseVal.value,l.y1.baseVal.value],[l.x2.baseVal.value,l.y2.baseVal.value]]);return {labels,edges,overlaps,hits:[...hits],inside:b.x>=0&&b.y>=0&&b.x+b.width<=550&&b.y+b.height<=470,equal:Math.abs(m.a-m.d)<1e-8};
 });}
 
 const angle=(a,p,b)=>Math.atan2(Math.abs((a[0]-p[0])*(b[1]-p[1])-(a[1]-p[1])*(b[0]-p[0])),(a[0]-p[0])*(b[0]-p[0])+(a[1]-p[1])*(b[1]-p[1]))*180/Math.PI;
@@ -22,7 +22,7 @@ const angle=(a,p,b)=>Math.atan2(Math.abs((a[0]-p[0])*(b[1]-p[1])-(a[1]-p[1])*(b[
    for(let i=1;i<=4;i++){
     const g=await geometry(svg);assert(g.inside&&g.equal&&!g.overlaps.length&&!g.hits.length,JSON.stringify({width,v,i,g}));
     const pts=await svg.evaluate(e=>{const pair=s=>{const l=e.querySelector(s);return l?[[l.x1.baseVal.value,l.y1.baseVal.value],[l.x2.baseVal.value,l.y2.baseVal.value]]:null;};return {pa:pair('[data-pa]'),pb:pair('[data-pb]'),qa:pair('[data-qa]'),qb:pair('[data-qb]'),span:e.querySelector('[data-seen-arc]').getTotalLength()/105*180/Math.PI,central:e.querySelector('[data-centre-arc]')?.getTotalLength()/30*180/Math.PI};});
-    assert(Math.abs(angle(pts.pa[1],pts.pa[0],pts.pb[1])-60)<1e-4);assert(Math.abs(pts.span-(i>=3?240:120))<.2);if(i>=2)assert(Math.abs(pts.central-(i>=3?240:120))<.2);
+    assert(Math.abs(angle(pts.pa[1],pts.pa[0],pts.pb[1])-60)<1e-4);assert(Math.abs(pts.span-(i>=3?240:120))<.2);if(i>=2)assert(Math.abs(pts.central-(i>=3?240:120))<.2,JSON.stringify({width,v,i,pts,errors}));
     if(i>=3)assert(Math.abs(angle(pts.qa[1],pts.qa[0],pts.qb[1])-120)<1e-4);
     for(const p of [pts.pa[0],pts.pa[1],pts.pb[1]])assert(Math.abs(Math.hypot(p[0]-275,p[1]-205)-105)<1e-4);
     await expect(svg.locator('[data-previous]')).toHaveCount(i<=2&&v!==75?1:0);await expect(seq.locator('.angle-story-formula')).toBeVisible({visible:i===4});
