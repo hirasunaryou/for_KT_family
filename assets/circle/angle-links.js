@@ -82,6 +82,59 @@
  seq.querySelector('[data-reset]').onclick=()=>{index=0;slider.value=120;seq.querySelector('details').open=false;draw();};seq.querySelector('[data-zoom]').onclick=()=>{const d=document.querySelector('.figure-dialog');d.querySelector('.large-figure').replaceChildren(svg.cloneNode(true));d.showModal();};draw();
 })();
 
+/* A changed triangle can still intercept the same arc; crossing AB changes the arc. */
+(()=>{
+ 'use strict';
+ const card=document.getElementById('lesson-3');if(!card)return;
+ const blue='#3566a0',brown='#98502f',gray='#a5afa9',ink='#253b39',O=[275,205],R=105;
+ const pt=(d,r=R)=>[275+r*Math.cos(d*Math.PI/180),205-r*Math.sin(d*Math.PI/180)];
+ const A=pt(210),B=pt(330),Q=pt(270),old=pt(75);
+ const line=(a,b,c,w=2,extra='')=>`<line x1="${a[0]}" y1="${a[1]}" x2="${b[0]}" y2="${b[1]}" stroke="${c}" stroke-width="${w}" ${extra}/>`;
+ const text=(p,s,c=ink,size=17)=>`<text x="${p[0]}" y="${p[1]}" text-anchor="middle" fill="${c}" font-size="${size}">${s}</text>`;
+ const arc=(start,span,r,c,extra='')=>`<path d="M ${pt(start,r)} A ${r} ${r} 0 ${span>180?1:0} 0 ${pt(start+span,r)}" fill="none" stroke="${c}" stroke-width="${r===R?4:2}" ${extra}/>`;
+ const mark=(a,p,b,c)=>{const u=Math.atan2(a[1]-p[1],a[0]-p[0]),v=Math.atan2(b[1]-p[1],b[0]-p[0]),d=(v-u+3*Math.PI)%(2*Math.PI)-Math.PI,r=20,s=[p[0]+r*Math.cos(u),p[1]+r*Math.sin(u)],z=[p[0]+r*Math.cos(v),p[1]+r*Math.sin(v)];return `<path d="M ${p} L ${s} A ${r} ${r} 0 0 ${d>0?1:0} ${z} Z" fill="${c===blue?'#e2ecf7':'#f4e4d7'}" stroke="${c}" stroke-width="1.8"/>`;};
+ const seq=document.createElement('div');seq.id='same-arc-story';seq.className='angle-story interactive';
+ seq.innerHTML=`<div class="example-context"><strong>この体験の設定</strong><p>A・Bと円は固定。短い弧ABに対応する中心角を120°とします。<br>まず同じ側でPを動かし、次に反対側のQと比べます。</p></div><div class="prior-chapters" aria-label="見直すところ"><button class="button" data-jump="0">同じ側で比べる</button><button class="button" data-jump="3">反対側を比べる</button></div><div class="angle-story-controls"><button class="button" data-back>ひとつ前</button><span class="angle-story-count"></span><button class="button primary" data-next>同じ側で動かす</button><button class="button" data-reset>最初から</button></div><h3 class="angle-story-title"></h3><div data-position hidden><label class="control">同じ側でのPの位置：<output></output><input type="range" min="35" max="145" step="5" value="135" aria-label="同じ側でのPの位置"></label></div><figure><svg viewBox="0 0 550 470" role="img"></svg><button class="figure-open" data-zoom>図を大きく見る</button></figure><div aria-live="polite" aria-atomic="true"><p class="angle-story-before muted"></p><p class="angle-story-message"></p><p class="angle-story-formula" hidden></p></div><p class="angle-story-links">半分になる理由は<a href="#proof-lab">半径を引いてたどる</a>。<br>両側で自由に動かすなら<a href="#move-lab">体験1へ</a>。紙では<a href="#q5">問5</a>〜<a href="#q8">問8</a>。</p><details><summary>元の解説をまとめて読む</summary></details>`;
+ seq.querySelector('details').append(card.querySelector('ol').cloneNode(true));card.append(seq);card.classList.add('has-angle-story');
+ let index=0;const svg=seq.querySelector('svg'),slider=seq.querySelector('input');
+ function draw(){
+  const opposite=index>=3,p=index===0?75:Number(slider.value),P=pt(p),span=opposite?240:120,start=opposite?330:210;
+  const titles=['最初のPは、どの弧を見ている？','三角形の形は変わった。角度は？','同じ弧だから、同じ半分になる','反対側のQは、どの弧を見る？','弧が変わると、半分にする角も変わる'];
+  let g=text([275,23],'設定：短い弧ABに対応する中心角は120°',ink,14)+`<circle cx="275" cy="205" r="105" fill="none" stroke="${gray}" stroke-width="1.5"/>`;
+  if(index===1||index===2){if(p!==75)g+=`<g data-previous>${line(old,A,gray,1.3,'stroke-dasharray="4 4"')+line(old,B,gray,1.3,'stroke-dasharray="4 4"')}</g>`;g+=text([275,53],p===75?'今は、最初の位置と同じ':'薄い破線：最初の位置',ink,14);}
+  g+=line(A,B,gray,1.3,'data-fixed-chord')+arc(start,span,R,opposite?brown:blue,'data-seen-arc');
+  if(opposite)g+=arc(210,120,R,'#ccd7e3','stroke-dasharray="4 4" data-old-arc');
+  g+=line(P,A,opposite?'#afc2d8':blue,opposite?1.4:2.5,'data-pa')+line(P,B,opposite?'#afc2d8':blue,opposite?1.4:2.5,'data-pb');
+  if(opposite)g+=line(Q,A,brown,2.5,'data-qa')+line(Q,B,brown,2.5,'data-qb')+mark(A,Q,B,brown);else g+=mark(A,P,B,blue);
+  if(index>=2){
+   g+=line(O,A,gray,1.4,'stroke-dasharray="5 4"')+line(O,B,gray,1.4,'stroke-dasharray="5 4"')+arc(start,span,30,opposite?brown:blue,'data-centre-arc');
+   const cuts=[[A,B],[P,A],[P,B],[old,A],[old,B],[Q,A],[Q,B],[O,A],[O,B]];for(let i=0;i<72;i++)cuts.push([pt(i*5,30),pt((i+1)*5,30)]);
+   const hits=(a,b,x,y)=>{let lo=0,hi=1;for(let k=0;k<2;k++){const min=(k?y:x)-(k?12:11),max=(k?y:x)+(k?12:11),d=b[k]-a[k];if(Math.abs(d)<1e-9){if(a[k]<min||a[k]>max)return false;}else{const s=(min-a[k])/d,t=(max-a[k])/d;lo=Math.max(lo,Math.min(s,t));hi=Math.min(hi,Math.max(s,t));if(lo>hi)return false;}}return true;};
+   let label=null;for(const radius of [14,48,60,75,140]){for(let d=0;d<360;d+=15){if(radius===14&&d%180!==0)continue;const p=pt(d,radius);if(!cuts.some(([a,b])=>hits(a,b,p[0],p[1]))){label=p;break;}}if(label)break;}
+   g+=`<circle cx="275" cy="205" r="2.5" fill="${ink}"/>`+text([label[0],label[1]+6],'O',ink,17);
+  }
+  for(const [d,s,c]of [[210,'A',ink],[330,'B',ink],[p,'P',blue],...(opposite?[[270,'Q',brown]]:[])]){const v=pt(d,135);g+=text([v[0],v[1]+6],s,c,19);}
+  const caption=opposite?'Qを含まないのは、上を回る長い弧':index>=1?'Pを動かしても、下の短い弧は同じ':'Pを含まない、下の短い弧AB';g+=text([275,378],caption,opposite?brown:blue,17);
+  if(index===2)g+=text([275,415],'Pの円周角：120° ÷ 2 ＝ 60°',blue,19);
+  if(opposite){g+=text([275,410],'対応する中心角：360° − 120° ＝ 240°',brown,16)+text([275,443],index===3?'Qの円周角：？':'Qの円周角：240° ÷ 2 ＝ 120°',brown,19);}
+  svg.innerHTML=g;svg.dataset.span=String(span);
+  const messages=[
+   'PからA・Bへ線をたどると、Pを含まない短い弧ABが見つかります。次にPを動かすと、角度も変わると思う？',
+   'スライダーでPを動かそう。線の長さや三角形の形は変わります。でも、青い弧ABは変わりましたか？ 角度も変わるか、予想してから次へ。',
+   'どの位置でも、Pが見ているのは同じ短い弧AB。対応する中心角が120°のままなので、その半分の円周角も60°のままです。',
+   'Qは弦ABの反対側。短い弧にはQがあるので、見るのは残りの長い弧です。中心角も、茶色の大きい方を使います。Qの角は何度になりそう？',
+   '長い弧に対応する中心角240°の半分で、Qの角は120°。「同じ弦AB」だけでは同じ角と言えません。「同じ弧を見ているか」まで確かめよう。'
+  ];
+  seq.querySelector('.angle-story-title').textContent=titles[index];seq.querySelector('.angle-story-count').textContent=`${index+1} / 5`;seq.querySelector('.angle-story-message').textContent=messages[index];seq.querySelector('.angle-story-before').textContent=index?'ひとつ前：'+titles[index-1]:'';
+  const f=seq.querySelector('.angle-story-formula');f.hidden=index!==4;f.innerHTML='<span class="circle-blue">P：短い弧 → 120° ÷ 2 ＝ 60°</span><br><span class="circle-brown">Q：長い弧 → 240° ÷ 2 ＝ 120°</span>';
+  seq.querySelector('[data-position]').hidden=index!==1&&index!==2;const pos=Math.round((Number(slider.value)-35)/110*100);seq.querySelector('output').textContent=pos+' / 100';slider.setAttribute('aria-valuetext','位置 '+pos+' / 100');
+  svg.setAttribute('aria-label',titles[index]+'。'+messages[index]);seq.querySelector('[data-back]').setAttribute('aria-disabled',String(index===0));seq.querySelector('[data-next]').setAttribute('aria-disabled',String(index===4));seq.querySelector('[data-next]').textContent=['同じ側で動かす','理由と角度を確かめる','反対側と比べる','Qの角度を確かめる','Qの角度を確かめる'][index];
+  for(const b of seq.querySelectorAll('[data-jump]'))b.setAttribute('aria-pressed',String(Number(b.dataset.jump)===(opposite?3:0)));
+ }
+ slider.oninput=()=>{index=1;draw();};seq.querySelector('[data-next]').onclick=()=>{if(index<4){index++;draw();}};seq.querySelector('[data-back]').onclick=()=>{if(index>0){index--;draw();}};
+ for(const b of seq.querySelectorAll('[data-jump]'))b.onclick=()=>{index=Number(b.dataset.jump);draw();};seq.querySelector('[data-reset]').onclick=()=>{index=0;slider.value=135;seq.querySelector('details').open=false;draw();};seq.querySelector('[data-zoom]').onclick=()=>{const d=document.querySelector('.figure-dialog');d.querySelector('.large-figure').replaceChildren(svg.cloneNode(true));d.showModal();};draw();
+})();
+
 /* The diameter and cyclic quadrilateral both return to the arc being viewed. */
 (()=>{
  'use strict';
