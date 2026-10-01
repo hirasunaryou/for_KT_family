@@ -37,7 +37,7 @@ async function checkBounds(svg){return svg.evaluate(e=>{const b=e.getBBox(),m=e.
   }
   const sim=page.locator('#similar-proof-sequence');await sim.locator('[data-jump="6"]').click();await expect(sim.locator('.sequence-count')).toHaveText('7 / 10');await sim.locator('[data-jump="8"]').click();await expect(sim.locator('.sequence-count')).toHaveText('9 / 10');
   const net=page.locator('#surface-net-sequence');await net.locator('[data-jump="6"]').click();await expect(net).toContainText('√41 cm');
-  for(const href of ['#q22','#q26','#q27','#q28']){const link=page.locator('a[href="'+href+'"]').filter({visible:true}).first();await expect(link).toHaveCount(1);}
+  for(const href of ['#q22','#q26','#q27','#q28']){const link=page.locator('a[href="'+href+'"]:visible').first();await expect(link).toHaveCount(1);}
   await page.emulateMedia({media:'print'});
   for(const c of cases){await expect(page.locator(c.id)).toBeHidden();await expect(page.locator(c.id).locator('xpath=ancestor::article[1]').locator('.height-static')).toBeVisible();}
   const nojs=await browser.newPage({javaScriptEnabled:false});await nojs.goto(url,{waitUntil:'domcontentloaded'});
