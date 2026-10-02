@@ -65,3 +65,21 @@
 .ratio-reason{border-left:2px solid var(--green);padding-left:12px}
 
 .height-sequence .check[hidden]{display:none}
+
+
+/* Surface-route lesson: preserve face identity from the solid to the net. */
+.surface-question{margin:20px 0 10px;padding:18px 20px;border:1px solid var(--line);border-left:4px solid var(--blue);border-radius:10px;background:#f8faf7}
+.surface-question h3{font-size:19px;line-height:1.65;margin:4px 0 8px}.surface-question p{margin:4px 0;font-size:14px}
+.surface-3d-lab{margin:30px 0 20px;padding:20px;border:1px solid var(--line);border-radius:12px;background:#fbfcfa}
+.surface-3d-copy h3{font-size:18px;line-height:1.65;margin:5px 0}.surface-3d-copy p{font-size:14px}
+.surface-3d-controls{display:flex;flex-wrap:wrap;gap:8px;margin:16px 0}
+.surface-3d-controls .button{min-height:42px}.surface-3d-controls [aria-pressed=true]{background:var(--green);color:white;border-color:var(--green)}
+.surface-3d-stage{border:1px solid var(--line);border-radius:10px;background:white;touch-action:none;overflow:hidden}
+.surface-3d-stage svg{display:block;width:100%;height:auto;cursor:grab;touch-action:none;user-select:none}
+.surface-3d-stage svg:active{cursor:grabbing}.surface-3d-stage svg:focus-visible{outline:3px solid #3566a055;outline-offset:-3px}
+.surface-3d-status{min-height:48px;margin:12px 0 6px;padding:10px 12px;background:#f1f4ee;border-radius:8px;font-size:14px}
+.surface-face-key{display:flex;flex-wrap:wrap;gap:14px 20px;font-size:13px;color:var(--muted)}
+.surface-face-key span{display:inline-flex;align-items:center;gap:7px}.face-key{display:inline-block;width:20px;height:14px;border:1px solid #77857e;border-radius:3px}
+.face-front{background:#dfeaf6}.face-side{background:#f6e4d6}.face-top{background:#e4efe1}
+@media(max-width:480px){.surface-question,.surface-3d-lab{padding:14px}.surface-3d-controls .button{font-size:13px;padding-inline:10px}}
+@media print{.surface-3d-lab{display:none!important}}
