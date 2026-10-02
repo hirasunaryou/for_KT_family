@@ -11,8 +11,8 @@ async function checkBounds(svg){return svg.evaluate(e=>{const b=e.getBBox(),m=e.
    {id:'#similar-proof-sequence',steps:10,checks:[
     [2,'△ACHと△ABC'],[4,'b:c=p:b'],[5,'b²=cp'],[6,'△BCHと△BAC'],[7,'a²=cq'],[8,'a²+b²=c(p+q)'],[9,'a²+b²=c²']
    ]},
-   {id:'#surface-net-sequence',steps:7,checks:[
-    [0,'表面だけ'],[2,'5²+4²=41'],[3,'7²+2²=53'],[4,'6²+3²=45'],[5,'41<45<53'],[6,'√41 cm']
+   {id:'#surface-net-sequence',steps:11,checks:[
+    [0,'何を求める問題'],[1,'空間対角線'],[2,'3D'],[3,'表面'],[4,'展開図'],[5,'41'],[6,'53'],[7,'45'],[8,'二乗'],[9,'41＜45＜53'],[10,'√41 cm']
    ]},
    {id:'#connection-sequence',steps:6,checks:[
     [0,'平方根'],[1,'円'],[2,'相似'],[3,'座標'],[4,'二次方程式'],[5,'条件を読む']
@@ -36,7 +36,7 @@ async function checkBounds(svg){return svg.evaluate(e=>{const b=e.getBBox(),m=e.
    }
   }
   const sim=page.locator('#similar-proof-sequence');await sim.locator('[data-jump="6"]').click();await expect(sim.locator('.sequence-count')).toHaveText('7 / 10');await sim.locator('[data-jump="8"]').click();await expect(sim.locator('.sequence-count')).toHaveText('9 / 10');
-  const net=page.locator('#surface-net-sequence');await net.locator('[data-jump="6"]').click();await expect(net).toContainText('√41 cm');
+  const net=page.locator('#surface-net-sequence');await net.locator('[data-jump="9"]').click();await expect(net).toContainText('41＜45＜53');
   for(const href of ['#q22','#q26','#q27','#q28']){const link=page.locator('a[href="'+href+'"]:visible').first();await expect(link).toHaveCount(1);}
   await page.emulateMedia({media:'print'});
   for(const c of cases){await expect(page.locator(c.id)).toBeHidden();await expect(page.locator(c.id).locator('xpath=ancestor::article[1]').locator('.height-static')).toBeVisible();}
