@@ -1,15 +1,47 @@
-<div id="surface-net-sequence" class="height-sequence" hidden>
- <p class="sequence-intro">箱の表面だけを進む道は、面を開くと平面の直線になります。3つの開き方を順番に比べます。</p>
+<div id="surface-net-sequence" class="height-sequence surface-lesson" hidden>
+ <section class="surface-question" aria-labelledby="surface-question-title">
+  <p class="eyebrow">まず、この問いをつかむ</p>
+  <h3 id="surface-question-title">3 cm × 4 cm × 2 cm の直方体。向かい合う頂点 A から G まで、<strong>箱の表面だけ</strong>を通って進むとき、最短の道はどれ？</h3>
+  <p>箱の中を突き抜ける直線は通れません。表面を通る道だけを比べます。</p>
+ </section>
  <nav class="sequence-chapters" aria-label="表面経路のまとまり">
-  <button type="button" data-jump="0">1 条件</button><button type="button" data-jump="2">2 3つの展開</button><button type="button" data-jump="6">3 最短を選ぶ</button>
+  <button type="button" data-jump="0">1 問いと条件</button>
+  <button type="button" data-jump="2">2 立体で見る</button>
+  <button type="button" data-jump="5">3 面を開く</button>
+  <button type="button" data-jump="9">4 最短を選ぶ</button>
  </nav>
  <div class="sequence-controls" role="group" aria-label="表面経路の説明手順">
   <button type="button" data-back class="button">ひとつ前</button><span class="sequence-count"></span>
   <button type="button" data-next class="button primary">次の手順</button><button type="button" data-reset class="sequence-reset">最初から</button>
  </div>
  <div class="sequence-explanation" aria-live="polite" aria-atomic="true"><h3 data-title tabindex="-1"></h3><p data-message></p></div>
- <figure><svg data-plot viewBox="0 0 640 470" role="img" aria-label="直方体の表面を開いて3つの経路を比べる"></svg></figure>
+ <figure><svg data-plot viewBox="0 0 640 470" role="img" aria-label="直方体の表面経路と展開図を比べる"></svg></figure>
  <div class="sequence-calculation" data-calculation hidden><p class="sequence-previous" data-previous></p><p class="sequence-formula" data-formula></p></div>
+
+ <aside id="surface-3d-lab" class="surface-3d-lab interactive" aria-labelledby="surface-3d-title">
+  <div class="surface-3d-copy">
+   <p class="eyebrow">3Dで確かめる</p>
+   <h3 id="surface-3d-title">箱を回して、「中を通る線」と「表面を通る道」を見分けよう</h3>
+   <p>ドラッグまたはスワイプで回転できます。面の色は、この下の展開図でも同じです。</p>
+  </div>
+  <div class="surface-3d-controls">
+   <button type="button" class="button" data-path="inside" aria-pressed="true">中を通る直線</button>
+   <button type="button" class="button" data-path="route1" aria-pressed="false">表面候補①</button>
+   <button type="button" class="button" data-path="route2" aria-pressed="false">表面候補②</button>
+   <button type="button" class="button" data-path="route3" aria-pressed="false">表面候補③</button>
+   <button type="button" class="sequence-reset" data-view-reset>向きを戻す</button>
+  </div>
+  <div class="surface-3d-stage">
+   <svg id="surface-3d-plot" viewBox="0 0 640 470" role="img" tabindex="0" aria-label="回転できる3×4×2の直方体。AからGへの経路を表示"></svg>
+  </div>
+  <p id="surface-3d-status" class="surface-3d-status" aria-live="polite"></p>
+  <div class="surface-face-key" aria-label="面の色の対応">
+   <span><i class="face-key face-front"></i>3×4 の面</span>
+   <span><i class="face-key face-side"></i>2×4 の面</span>
+   <span><i class="face-key face-top"></i>3×2 の面</span>
+  </div>
+ </aside>
+
  <div class="actions"><button type="button" data-zoom class="button">図を大きく見る</button><a class="button" href="#space-lab">箱の中の対角線と比べる</a><a class="button" href="#q26">紙の問26へ</a></div>
  <details class="height-summary"><summary>3つの計算をまとめて読む</summary></details>
 </div>

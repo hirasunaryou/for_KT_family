@@ -53,31 +53,59 @@ function drawSim(i){
 }
 setup('similar-proof-sequence',simSteps,drawSim,'ol');
 
-/* Lesson 15: surface nets */
+/* Lesson 15: surface routes and nets */
 const netSteps=[
- {title:'条件は「表面だけを進む」',message:'3×4×2 cmの直方体で、向かい合う頂点を結びます。箱の中を突き抜ける空間対角線は使えません。'},
- {title:'面を開けば、表面の道が直線になる',message:'通る2つの面を平らに開くと、折れ曲がっていた表面の最短経路を1本の直線として測れます。'},
- {title:'開き方①：5と4の長方形',message:'3と2が横につながって5。もう一方が4なので、経路²=5²+4²=41。',formula:`①　5² ＋ 4² ＝ ${span('41','side')}`},
- {title:'開き方②：7と2の長方形',message:'3と4が横につながって7。もう一方が2なので、経路²=7²+2²=53。',previous:'①　5²＋4²＝41',formula:`②　7² ＋ 2² ＝ ${span('53','height')}`},
- {title:'開き方③：6と3の長方形',message:'4と2が横につながって6。もう一方が3なので、経路²=6²+3²=45。',previous:'②　7²＋2²＝53',formula:`③　6² ＋ 3² ＝ ${span('45','base')}`},
- {title:'平方根を取る前に、二乗で比べられる',message:'長さはすべて正なので、二乗が小さい経路ほど短い。41<45<53です。',previous:'候補の二乗：41、53、45',formula:`${span('41','side')} ＜ ${span('45','base')} ＜ ${span('53','height')}`},
- {title:'この3つでは、①が最短',message:'①は√41 cm、③は√45=3√5 cm、②は√53 cm。箱の中の対角線とは別の問題です。',previous:'41＜45＜53',formula:`最短 ＝ ${span('√41 cm','side')}`}
+ {title:'何を求める問題？',message:'AからGまで、箱の表面だけを通る最短の道を求めます。「表面だけ」がこの問題の一番大事な条件です。'},
+ {title:'まっすぐ結ぶと短そう。でも通れない',message:'AとGを空間の直線で結ぶと箱の内部を通ります。これは空間対角線で、今回の「表面だけ」という条件には合いません。'},
+ {title:'立体を回して、中を通ることを確かめる',message:'点線は箱の内部を通っています。下の3D体験では、自分で回して奥行きを確かめられます。'},
+ {title:'では、表面を通る道は？',message:'表面では面と面の境目で道が折れて見えます。でも、その2面を平らに開けば1本の直線として比べられます。'},
+ {title:'面の色を覚えておこう',message:'青・橙・緑の面は、立体でも展開図でも同じ面です。開いても「どの面だったか」を色で追えます。'},
+ {title:'候補①：3×4面と2×4面を開く',message:'青い3×4面と橙の2×4面を横につなぐと、横は3+2=5、縦は4。対角線の二乗は41です。',formula:`①　(3＋2)² ＋ 4² ＝ 5²＋4² ＝ ${span('41','side')}`},
+ {title:'候補②：3×2面と3×4面を開く',message:'緑の3×2面と青い3×4面をつなぐと、横は4+3=7、縦は2。対角線の二乗は53です。',previous:'①　5²＋4²＝41',formula:`②　(4＋3)² ＋ 2² ＝ 7²＋2² ＝ ${span('53','height')}`},
+ {title:'候補③：2×4面と3×2面を開く',message:'橙の2×4面と緑の3×2面をつなぐと、横は4+2=6、縦は3。対角線の二乗は45です。',previous:'②　7²＋2²＝53',formula:`③　(4＋2)² ＋ 3² ＝ 6²＋3² ＝ ${span('45','base')}`},
+ {title:'3つを同じ基準で比べる',message:'候補は√41、√53、√45。どれも正の長さなので、平方根を計算しなくても二乗41・53・45を比べれば順番が分かります。',previous:'候補：√41、√53、√45',formula:`41、53、45 を比べる`},
+ {title:'41＜45＜53',message:'一番小さいのは41。したがって候補①が最短です。',previous:'41、53、45',formula:`${span('41','side')} ＜ ${span('45','base')} ＜ ${span('53','height')}`},
+ {title:'答えは√41 cm',message:'最短経路は候補①の√41 cm。大事なのは、立体の中の直線ではなく「通れる表面」を開いて比べたことです。',previous:'41＜45＜53',formula:`最短 ＝ ${span('√41 cm','side')}`}
 ];
-function netRect(x,y,w,h,label,a,b,active,answer){
- let g=poly([pt(x,y),pt(x+w,y),pt(x+w,y+h),pt(x,y+h)],active?ink:light,active?'#fff':'#fafafa',active?2:1.3);
- g+=line(pt(x,y+h),pt(x+w,y),active?ink:light,active?2.5:1.2);
+function netRect(x,y,w,h,label,a,b,active,answer,split,colors){
+ let g=poly([pt(x,y),pt(x+w,y),pt(x+w,y+h),pt(x,y+h)],active?ink:light,'#fff',active?2:1.3);
+ if(split&&colors){
+   const sw=w*split;
+   g+=`<rect x="${x}" y="${y}" width="${sw}" height="${h}" fill="${colors[0]}" opacity=".72"/>`;
+   g+=`<rect x="${x+sw}" y="${y}" width="${w-sw}" height="${h}" fill="${colors[1]}" opacity=".72"/>`;
+   g+=line(pt(x+sw,y),pt(x+sw,y+h),gray,1.2,'5 4');
+   g+=poly([pt(x,y),pt(x+w,y),pt(x+w,y+h),pt(x,y+h)],active?ink:light,'none',active?2:1.3);
+ }
+ g+=line(pt(x,y+h),pt(x+w,y),active?ink:light,active?2.7:1.2);
  g+=txt(x+w/2,y-18,label,active?ink:gray,20)+txt(x+w/2,y-2,String(a),active?blue:gray,17)+txt(x+w+20,y+h/2,String(b),active?brown:gray,17);
  if(answer)g+=txt(x+w/2,y+h+34,answer,active?ink:gray,20);return g;
 }
+function boxStatic(showInside=true,showSurface=false){
+ const A=pt(170,315),B=pt(365,315),C=pt(445,255),D=pt(250,255),E=pt(170,145),F=pt(365,145),G=pt(445,85),H=pt(250,85);
+ let g=poly([A,B,F,E],ink,'#dfeaf6',1.7)+poly([B,C,G,F],ink,'#f6e4d6',1.7)+poly([E,F,G,H],ink,'#e4efe1',1.7);
+ for(const [u,v] of [[A,D],[D,C],[D,H],[H,G],[C,G]])g+=line(u,v,gray,1.2,'5 4');
+ g+=txt(A.x-18,A.y+18,'A',ink,20)+txt(G.x+18,G.y-8,'G',ink,20);
+ if(showInside)g+=line(A,G,blue,3,'7 5')+txt(316,210,'箱の中',blue,18);
+ if(showSurface)g+=line(A,B,brown,3.5)+line(B,G,brown,3.5)+txt(386,238,'表面',brown,18);
+ g+=txt(267,347,'3',blue,17)+txt(389,303,'2',brown,17)+txt(145,235,'4',ink,17);
+ return g;
+}
 function drawNet(i){
- let g=txt(320,32,'3 cm × 4 cm × 2 cm の直方体',ink,18);
- if(i===0){g+=poly([pt(205,135),pt(405,135),pt(455,95),pt(255,95)],gray,'#fff')+poly([pt(205,135),pt(405,135),pt(405,285),pt(205,285)],gray,'#edf3f9')+poly([pt(405,135),pt(455,95),pt(455,245),pt(405,285)],gray,'#f7eee6')+line(pt(205,285),pt(455,95),blue,2.5,'6 4')+txt(320,345,'青い破線は箱の中。今回は通れない。',blue,19);return g;}
- if(i===1){g+=netRect(175,135,250,160,'面を開く',5,4,true,'表面の道 → 平面の直線')+txt(320,370,'折り目を開いても、表面上の道の長さは変わらない',gray,18);return g;}
- g+=netRect(35,135,155,124,'①',5,4,i===2||i>=5,i>=2?'√41':'?');
- g+=netRect(242,135,196,56,'②',7,2,i===3||i>=5,i>=3?'√53':'?');
- g+=netRect(482,135,132,66,'③',6,3,i===4||i>=5,i>=4?'3√5':'?');
- if(i>=5)g+=txt(320,340,'二乗で比較：41 ＜ 45 ＜ 53',i===6?blue:ink,22);
- if(i===6)g+=txt(320,390,'最短は ① √41 cm',blue,24);
+ let g=txt(320,28,'問い：A → G を「表面だけ」で進む最短経路は？',ink,18);
+ if(i===0)return g+boxStatic(false,false)+txt(320,405,'まず「どこを通ってよいか」を確認する',gray,18);
+ if(i===1)return g+boxStatic(true,false)+txt(320,405,'空間対角線は短そうでも、箱の内部なので条件外',blue,18);
+ if(i===2)return g+boxStatic(true,false)+txt(320,405,'下の3Dで回して、点線の奥行きを確かめよう',blue,18);
+ if(i===3)return g+boxStatic(false,true)+txt(320,405,'表面の道は面の境目で折れて見える',brown,18);
+ if(i===4)return g+boxStatic(false,true)+txt(320,420,'青 3×4　橙 2×4　緑 3×2　→ 展開しても同じ色',ink,17);
+ if(i===5)return g+netRect(170,120,300,180,'候補①',5,4,true,'√41',3/5,['#dfeaf6','#f6e4d6'])+txt(320,390,'青3 + 橙2 = 5',ink,19);
+ if(i===6)return g+netRect(145,145,350,100,'候補②',7,2,true,'√53',4/7,['#dfeaf6','#e4efe1'])+txt(320,360,'青4 + 緑3 = 7',ink,19);
+ if(i===7)return g+netRect(170,145,300,150,'候補③',6,3,true,'3√5',4/6,['#f6e4d6','#e4efe1'])+txt(320,390,'橙4 + 緑2 = 6',ink,19);
+ g+=netRect(35,115,155,124,'①',5,4,true,'√41',3/5,['#dfeaf6','#f6e4d6']);
+ g+=netRect(242,115,196,56,'②',7,2,true,'√53',4/7,['#dfeaf6','#e4efe1']);
+ g+=netRect(482,115,132,66,'③',6,3,true,'3√5',4/6,['#f6e4d6','#e4efe1']);
+ g+=txt(320,330,'二乗：① 41　② 53　③ 45',i>=9?blue:ink,21);
+ if(i>=9)g+=txt(320,375,'41 ＜ 45 ＜ 53',blue,23);
+ if(i===10)g+=txt(320,420,'最短は ① √41 cm',blue,25);
  return g;
 }
 setup('surface-net-sequence',netSteps,drawNet,'ol');
