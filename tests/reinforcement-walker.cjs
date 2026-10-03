@@ -91,14 +91,29 @@ function checkMovementPrinciples(){
   let scene=make();
   let result=Engine.step(scene.engine,scene.bot,actionIndex('left-short-arms-center'),scene.runtime);
   assert(!result.stumbled&&scene.bot.x>0,'a short correct first step creates propulsion');
+  assert.strictEqual(result.motion.kind,'push','a successful step exposes the propulsion phase');
+  assert(result.motion.pushAdded>0,'a successful step exposes the forward momentum it added');
+  assert(result.motion.speedAfter>result.motion.speedBefore,'a successful first step increases forward momentum');
   assert.strictEqual(scene.bot.nextFoot,1,'a successful left step changes the next foot to right');
   assert.strictEqual(scene.bot.recovery,2,'a short step needs two brace actions before the next foot');
   assert(result.dx>0,'step result exposes the distance used by the explanation');
+  const retainedPushMotion=Object.assign({},result.motion);
+  Engine.step(scene.engine,scene.bot,actionIndex('brace-arms-center'),scene.runtime);
+  assert.deepStrictEqual(result.motion,retainedPushMotion,'a later step does not rewrite an earlier result motion');
 
   scene=make();
   result=Engine.step(scene.engine,scene.bot,actionIndex('left-long-arms-center'),scene.runtime);
   assert(result.stumbled,'a long stride from rest stumbles');
   assert.strictEqual(result.stumbleReason,'long-rest','the UI can explain why the long first stride failed');
+
+  scene=make();
+  Engine.step(scene.engine,scene.bot,actionIndex('left-short-arms-center'),scene.runtime);
+  const beforeBraceSpeed=scene.bot.vx;
+  result=Engine.step(scene.engine,scene.bot,actionIndex('brace-arms-center'),scene.runtime);
+  assert.strictEqual(result.motion.kind,'coast','bracing exposes the coasting and recovery phase');
+  closeTo(result.motion.pushAdded,0,'bracing does not add forward propulsion');
+  assert(result.motion.speedAfter<beforeBraceSpeed&&result.motion.dx>0,'bracing coasts forward while momentum decays');
+  assert.strictEqual(scene.bot.recovery,1,'bracing advances foot recovery once');
 
   scene=make();
   Engine.step(scene.engine,scene.bot,actionIndex('left-short-arms-center'),scene.runtime);
@@ -211,6 +226,13 @@ async function checkPageAndUi(){
   assert.strictEqual(staticDoc.querySelectorAll('#discoveries [data-discovery-status]').length,5,'each discovery exposes found or not-found text');
   assert(staticDoc.getElementById('movementTheory'),'movement principles sit beside the manual controls');
   assert(staticDoc.getElementById('actionInsight'),'each manual action has a dynamic explanation');
+  assert(staticDoc.getElementById('motionCause'),'foot-ground causality has a focused dynamic explanation');
+  assert.strictEqual(staticDoc.querySelectorAll('.learning-entrances a').length,2,'two learning-style entry points share one page');
+  assert(staticDoc.querySelector('[data-start-manual]'),'the discovery entry can restore manual mode after AI activity');
+  assert(html.indexOf('id="manualControls"')<html.indexOf('id="movementTheory"'),'the first manual controls appear before the detailed body explanation');
+  assert(staticDoc.getElementById('replayToolbar').hidden,'replay controls stay out of the way before AI learning');
+  assert(!staticDoc.querySelector('.reward-tuning').open,'fine reward sliders start behind an optional detail');
+  assert.strictEqual(staticDoc.querySelector('[data-metric="distance"]').getAttribute('aria-pressed'),'true','the first graph focuses on intuitive distance');
   assert(staticDoc.getElementById('qStory'),'one Q-table update has a focused explanation');
   assert(staticDoc.getElementById('parameterFocus'),'one parameter at a time has a focused explanation');
   assert(/成功確率ではありません/.test(staticDoc.getElementById('qStory').textContent),'Q value is explicitly distinguished from a probability');
@@ -228,6 +250,9 @@ async function checkPageAndUi(){
   window.eval(appJs);
   const doc=window.document;
   const debug=window.__walkerDebug;
+
+  assert(doc.querySelector('[data-leg="left-short"]').classList.contains('is-next'),'the safe short first step is recommended');
+  assert(!doc.querySelector('[data-leg="left-long"]').classList.contains('is-next'),'a guaranteed long-stride stumble is not marked as next');
 
   assert(/完走.*\+/.test(doc.getElementById('rewardFormula').textContent),'displayed reward formula includes the finish bonus');
   const beforeArmTime=debug.bot.time;
@@ -248,10 +273,18 @@ async function checkPageAndUi(){
   assert.strictEqual(debug.bot.time,beforeArmTime+1,'the compound leg-and-arm action advances exactly one time step');
   assert(debug.bot.x>beforeArmX,'the first valid compound step advances the walker');
   assert.strictEqual(doc.getElementById('actionInsight').dataset.outcome,'push','a successful step is labelled as propulsion');
+  assert.strictEqual(doc.getElementById('motionCause').dataset.phase,'push','the causality panel highlights ground propulsion after a valid step');
+  assert(Number(doc.getElementById('motionPushValue').textContent)>0,'the causality panel shows added forward momentum');
+  assert(/地面.*右|右向き/.test(doc.getElementById('motionCauseText').textContent),'the causality panel connects the ground reaction to forward motion');
   assert.strictEqual(doc.getElementById('nextFootStatus').textContent,'右足','the body readout changes to the next foot');
   assert(/あと 2 回/.test(doc.getElementById('recoveryStatus').textContent),'the body readout exposes short-step recovery');
+  doc.querySelector('[data-leg="brace"]').click();
+  assert.strictEqual(uiStepCalls,2,'bracing uses the shared physics exactly once');
+  assert.strictEqual(doc.getElementById('motionCause').dataset.phase,'coast','the causality panel distinguishes coasting from propulsion');
+  closeTo(Number(doc.getElementById('motionPushValue').textContent),0,'bracing visibly adds no forward momentum');
+  assert(/新しい推進を足さず|新しい前向きの勢いを足しません/.test(doc.getElementById('motionCause').textContent),'bracing is distinguished from adding propulsion');
   doc.querySelector('[data-leg="right-short"]').click();
-  assert.strictEqual(uiStepCalls,2,'a premature second foot still advances physics exactly once');
+  assert.strictEqual(uiStepCalls,3,'a premature second foot still advances physics exactly once');
   assert.strictEqual(doc.getElementById('actionInsight').dataset.outcome,'stumble','a premature foot is labelled as a stumble');
   assert.strictEqual(doc.getElementById('actionInsight').dataset.reason,'recovering','the dynamic explanation exposes recovery as the cause');
   debug.startManual();
@@ -265,6 +298,7 @@ async function checkPageAndUi(){
   assert(train50,'fast training button can be operated');
   train50.click();
   assert.strictEqual(doc.activeElement,doc.getElementById('stopTraining'),'keyboard focus moves to the stop control during training');
+  assert(doc.getElementById('replayToolbar').hidden,'replay controls stay hidden while their clicks would be ignored during training');
   assert(doc.getElementById('resetLearning').disabled,'reset is disabled while asynchronous training is active');
   assert(doc.getElementById('rewardForward').disabled,'reward sliders are disabled while asynchronous training is active');
   assert(doc.querySelector('[data-reward-preset]').disabled,'reward presets are disabled while asynchronous training is active');
@@ -285,6 +319,7 @@ async function checkPageAndUi(){
     await new Promise(resolve=>setTimeout(resolve,4));
   }
   assert(!trainingProgress||trainingProgress.hidden,'training returns control to the learner after the batch');
+  assert(!doc.getElementById('replayToolbar').hidden,'learning reveals the before-and-after replay controls');
   assert(!/まだ学習前/.test(doc.getElementById('chartA11y').textContent),'training updates the chart text equivalent');
 
   if(debug&&debug.engine){
@@ -302,6 +337,19 @@ async function checkPageAndUi(){
     closeTo(Number(doc.getElementById('qStoryNew').dataset.value),update.value,'Q story new value matches the engine');
     assert(!/まだ更新/.test(doc.getElementById('equationNumbers').textContent),'numeric formula appears after learning');
   }
+  train50.click();
+  assert(doc.getElementById('replayToolbar').hidden,'starting an additional batch hides the old replay controls while they cannot be used');
+  for(let i=0;i<250&&displayedEpisodes()!==100;i++){
+    await new Promise(resolve=>setTimeout(resolve,4));
+  }
+  assert.strictEqual(displayedEpisodes(),100,'an additional learning batch completes');
+  for(let i=0;i<100&&trainingProgress&&!trainingProgress.hidden;i++){
+    await new Promise(resolve=>setTimeout(resolve,4));
+  }
+  assert(!doc.getElementById('replayToolbar').hidden,'replay controls return after additional learning finishes');
+  doc.querySelector('[data-start-manual]').click();
+  assert(!doc.getElementById('manualControls').hidden,'the discovery entrance restores visible manual controls after learning');
+  assert(/手動/.test(doc.getElementById('modeBadge').textContent),'the discovery entrance restores manual mode rather than only changing the hash');
   const contributionIds=['rewardContributionForward','rewardContributionBalance','rewardContributionEnergy','rewardContributionFall'];
   const contributions=contributionIds.map(id=>doc.getElementById(id)).filter(Boolean);
   if(contributions.length){

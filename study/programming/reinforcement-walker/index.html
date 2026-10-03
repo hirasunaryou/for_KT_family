@@ -8,7 +8,7 @@
   <link rel="icon" href="../../../assets/icon.svg">
   <link rel="stylesheet" href="../../../assets/family/style.css">
   <link rel="stylesheet" href="../../../assets/family/navigation.css">
-  <link rel="stylesheet" href="../../../assets/reinforcement-walker/style.css?v=20261003-2">
+  <link rel="stylesheet" href="../../../assets/reinforcement-walker/style.css?v=20261003-3">
 </head>
 <body class="has-site-navigation walker-page">
   <a class="skip" href="#main">ゲームへスキップ</a>
@@ -25,10 +25,16 @@
       <div class="mode-badge" id="modeBadge">手動チャレンジ</div>
     </header>
 
+    <nav class="learning-entrances" aria-label="おすすめの始め方">
+      <div><p class="panel-step">好きな入口から</p><strong>どちらから始めても、あとで行き来できます</strong></div>
+      <a href="#manualControls" data-start-manual><span>じっくり発見する</span><b>自分の手で一歩ずつ</b><small>一歩 → 踏ん張る → 次の足。失敗の理由まで観察する</small></a>
+      <a href="#trainingControls"><span>5分で要点をつかむ</span><b>AIの変化を先に見る</b><small>50回学習 → 学習前と比較 → AIテスト</small></a>
+    </nav>
+
     <section class="game-shell" aria-label="ころころウォーカーの実験">
       <div class="stage-column" id="gameStage" tabindex="0" aria-label="ゲーム画面。手動中はA、S、Dで足、J、K、Lで腕を操作できます">
         <canvas id="world" width="900" height="430" aria-label="でこぼこ道を右へ進む棒人間。腕と足の動きでバランスが変わります"></canvas>
-        <div class="replay-toolbar" aria-label="学習リプレイ">
+        <div class="replay-toolbar" id="replayToolbar" aria-label="学習リプレイ" hidden>
           <div><span class="toolbar-label">学習の早送り</span><small>保存した失敗や発見をもう一度見る</small></div>
           <div class="replay-buttons" id="replayButtons"><button type="button" data-replay="untrained" aria-pressed="true">学習前</button></div>
           <button class="replay-stop" id="stopReplay" type="button" hidden>再生を止める</button>
@@ -42,6 +48,26 @@
           <div><span>AIの最高</span><strong id="aiBest">0.0 m</strong></div>
         </div>
         <p class="coach" id="coach">短い一歩から始めよう。傾いた方向と反対へ腕を振ると、立て直しやすくなります。</p>
+        <div class="manual-controls" id="manualControls">
+          <fieldset class="control-bank">
+            <legend>足：一歩を選ぶ</legend>
+            <div class="leg-controls">
+              <button type="button" data-leg="left-short"><kbd>A</kbd><span>左足・小さく</span></button>
+              <button type="button" data-leg="left-long"><kbd>Shift+A</kbd><span>左足・大きく</span></button>
+              <button type="button" data-leg="brace"><kbd>S</kbd><span>踏ん張って整える</span></button>
+              <button type="button" data-leg="right-short"><kbd>D</kbd><span>右足・小さく</span></button>
+              <button type="button" data-leg="right-long"><kbd>Shift+D</kbd><span>右足・大きく</span></button>
+            </div>
+          </fieldset>
+          <fieldset class="control-bank">
+            <legend>腕：次の一歩で振る方向を選ぶ</legend>
+            <div class="arm-controls">
+              <button type="button" data-arm="arms-left"><kbd>J</kbd><span>腕を左へ ←</span></button>
+              <button type="button" data-arm="arms-center"><kbd>K</kbd><span>まんなか</span></button>
+              <button type="button" data-arm="arms-right"><kbd>L</kbd><span>腕を右へ →</span></button>
+            </div>
+          </fieldset>
+        </div>
         <section class="movement-theory" id="movementTheory" aria-labelledby="movementTheoryTitle">
           <div class="movement-heading"><div><p class="panel-step">一歩ずつ観察</p><h2 id="movementTheoryTitle">いまの体はどうなっている？</h2></div><span>このゲーム内の簡略モデル</span></div>
           <div class="body-readout" aria-label="棒人間の現在の状態">
@@ -56,42 +82,38 @@
             <p id="actionWhy">足は左右交互。一歩の直後は「踏ん張る」で次の足を出す準備をします。</p>
             <small id="actionNext">観察 → 予想 → 一歩 → 結果、の順で比べよう。</small>
           </div>
+          <section class="motion-cause" id="motionCause" data-phase="ready" aria-labelledby="motionCauseTitle">
+            <div class="motion-cause-heading"><div><p class="panel-step">足と地面の理屈</p><h3 id="motionCauseTitle">なぜ一歩で右へ進む？</h3></div><span>ゲーム内の勢い</span></div>
+            <div class="motion-flow" aria-label="一歩で前へ進み、踏ん張り中は勢いが残る流れ">
+              <div data-motion-stage="push"><span>一歩の中</span><b>足で地面を左へ押す</b><i aria-hidden="true">地面へ ←</i></div>
+              <span class="motion-arrow" aria-hidden="true">→</span>
+              <div data-motion-stage="reaction"><span>押し返し</span><b>地面が体を右へ押す</b><i aria-hidden="true">→ 体へ</i></div>
+              <span class="motion-arrow" aria-hidden="true">→</span>
+              <div data-motion-stage="coast"><span>踏ん張り中</span><b>勢いで進み、次の足を準備</b><i aria-hidden="true">新しく足す勢い 0</i></div>
+            </div>
+            <dl class="motion-numbers">
+              <div><dt>今回足した勢い</dt><dd id="motionPushValue">+0.000</dd></div>
+              <div><dt>前向きの勢い</dt><dd id="motionSpeedValue">0.000 → 0.000</dd></div>
+              <div><dt>この操作で進んだ距離</dt><dd id="motionDistanceValue">+0.00 m</dd></div>
+            </dl>
+            <p id="motionCauseText">このゲームの「一歩」は、足を出して接地するだけでなく、地面を後ろへ押すところまでを1操作にまとめています。</p>
+          </section>
           <details class="movement-rules">
-            <summary>歩ける理屈を4つで見る</summary>
+            <summary>なぜ一歩と「踏ん張る」で前へ進むの？</summary>
             <ol>
-              <li><b>足は交互</b><span>左・右は使う足の名前。どちらの足でも右へ進み、出した足の側へ体が回ります。</span></li>
-              <li><b>一歩のあとに休む</b><span>短い一歩は2回、長い一歩は3回「踏ん張る」と、反対の足を出せます。</span></li>
-              <li><b>大股は条件つき</b><span>よく進む一方、停止中・大きく傾いた体・急な坂ではつまずきます。</span></li>
+              <li><b>一歩＝接地＋押す</b><span>足を出して接地し、地面を後ろへ押すまでをまとめています。地面から前向きに押し返され、勢いが増えます。</span></li>
+              <li><b>踏ん張り＝惰性＋準備</b><span>新しい推進は足しません。前の一歩の勢いは少し減りますが、その間も進みながら次の足を出す準備を1回進めます。</span></li>
+              <li><b>足は交互・大股は条件つき</b><span>左・右は使う足の名前。大股は、停止中・大きく傾いた体・急な坂ではつまずきます。</span></li>
               <li><b>腕は回転の舵</b><span>傾きと反対へ振ると戻しやすくなります。腕だけでは前進しません。</span></li>
             </ol>
-            <p>本物の人の歩行を厳密に再現したものではなく、傾き・速さ・足の順番を観察しやすくしたゲームのルールです。</p>
+            <p>本物の歩行では、重心移動・関節・足裏の接地が連続して起きます。ここでは「置く＋押す」と「次の足の準備」に分け、傾き・勢い・足の順番を観察しやすくした簡略モデルです。</p>
           </details>
         </section>
-        <div class="manual-controls" id="manualControls">
-          <fieldset class="control-bank">
-            <legend>足：一歩を選ぶ</legend>
-            <div class="leg-controls">
-              <button type="button" data-leg="left-short"><kbd>A</kbd><span>左足・小さく</span></button>
-              <button type="button" data-leg="left-long"><kbd>Shift+A</kbd><span>左足・大きく</span></button>
-              <button type="button" data-leg="brace"><kbd>S</kbd><span>踏ん張る</span></button>
-              <button type="button" data-leg="right-short"><kbd>D</kbd><span>右足・小さく</span></button>
-              <button type="button" data-leg="right-long"><kbd>Shift+D</kbd><span>右足・大きく</span></button>
-            </div>
-          </fieldset>
-          <fieldset class="control-bank">
-            <legend>腕：次の一歩で振る方向を選ぶ</legend>
-            <div class="arm-controls">
-              <button type="button" data-arm="arms-left"><kbd>J</kbd><span>腕を左へ ←</span></button>
-              <button type="button" data-arm="arms-center"><kbd>K</kbd><span>まんなか</span></button>
-              <button type="button" data-arm="arms-right"><kbd>L</kbd><span>腕を右へ →</span></button>
-            </div>
-          </fieldset>
-        </div>
       </div>
 
       <aside class="control-panel" aria-label="学習の操作">
-        <section><p class="panel-step">1 · まず人間が体験</p><h2>同じ体で苦戦する</h2><p>AIと同じ棒人間、同じ地面、同じ15通りの動き。どこが難しいかを体で確かめよう。</p><button class="wide-button" id="manualStart" type="button">手動で最初から</button></section>
-        <section>
+        <section><p class="panel-step">1 · まず人間が体験</p><h2>同じ体で苦戦する</h2><p>AIと同じ棒人間、同じ地面、同じ15通りの動き。どこが難しいかを体で確かめよう。</p><button class="wide-button" id="manualStart" type="button">手動チャレンジをやり直す</button></section>
+        <section id="trainingControls">
           <p class="panel-step">2 · AIに試行させる</p><h2>失敗を何回重ねる？</h2><p>回数は今の続きに追加されます。500回ではまだ不器用。工夫が育つ途中も観察しよう。</p>
           <div class="train-buttons"><button type="button" data-train="50">さらに50回</button><button type="button" data-train="500">さらに500回</button><button type="button" data-train="2000">さらに2,000回</button><button type="button" data-train="5000">さらに5,000回</button></div>
           <p class="local-compute-note">学習計算は、この端末のブラウザ内で実行します。GitHub Pagesは画面のファイルを配るだけです。</p>
@@ -115,11 +137,16 @@
       </article>
       <article class="learning-card chart-card">
         <div class="card-heading"><div><p class="panel-step">全試行の記録</p><h2>はちゃめちゃから歩行へ</h2></div><span id="chartSummary">学習前</span></div>
-        <div class="metric-buttons" id="metricButtons" aria-label="グラフに表示する記録"><button type="button" data-metric="reward" aria-pressed="true">報酬</button><button type="button" data-metric="distance" aria-pressed="false">距離</button><button type="button" data-metric="alternation" aria-pressed="false">足の交互率</button></div>
+        <div class="metric-buttons" id="metricButtons" aria-label="グラフに表示する記録"><button type="button" data-metric="distance" aria-pressed="true">距離</button><button type="button" data-metric="reward" aria-pressed="false">報酬</button><button type="button" data-metric="alternation" aria-pressed="false">足の交互率</button></div>
         <canvas id="rewardChart" width="640" height="290" aria-label="試行ごとの記録。細い線は各試行、太い線は移動平均です" aria-describedby="chartA11y"></canvas>
         <p class="visually-hidden" id="chartA11y">まだ学習前です。</p>
         <p>細い線は毎回の結果、太い線は最近の平均。急な大成功だけでなく、安定して伸びているかを見よう。</p>
       </article>
+    </section>
+
+    <section class="idea-strip" aria-labelledby="ideaTitle">
+      <div><p class="panel-step">いま体験したこと</p><h2 id="ideaTitle">正解を教えず、結果を返す</h2></div>
+      <ol><li><b>状態を見る</b><span>傾き、勢い、腕、足、坂</span></li><li><b>行動する</b><span>足5通り × 腕3通り</span></li><li><b>報酬を受け取る</b><span>何をほめるかは人が設計</span></li><li><b>Q値を直す</b><span>失敗も次の予想に残る</span></li></ol>
     </section>
 
     <section class="reward-lab" aria-labelledby="rewardTitle">
@@ -127,14 +154,18 @@
       <div class="reward-layout">
         <div>
           <div class="reward-presets" aria-label="報酬のおすすめ設定"><button type="button" data-reward-preset="balanced" aria-pressed="true">バランス型</button><button type="button" data-reward-preset="speed" aria-pressed="false">前進だいじ</button><button type="button" data-reward-preset="survival" aria-pressed="false">転ばない</button><button type="button" data-reward-preset="efficient" aria-pressed="false">省エネ</button></div>
-          <div class="reward-grid">
-            <label for="rewardForward">前へ進む <output id="rewardForwardValue">11.000</output><input id="rewardForward" type="range" min="0" max="20" step="0.5" value="11"><small>1 mのプラス。完走時はこの値の0.7倍を追加</small></label>
-            <label for="rewardBalance">直立を保つ <output id="rewardBalanceValue">0.025</output><input id="rewardBalance" type="range" min="0" max="0.08" step="0.005" value="0.025"><small>各瞬間、まっすぐ立てた分のプラス</small></label>
-            <label for="rewardEnergy">力を使う <output id="rewardEnergyValue">0.045</output><input id="rewardEnergy" type="range" min="0" max="0.12" step="0.005" value="0.045"><small>大股や腕の切り返しへのマイナス</small></label>
-            <label for="rewardFall">転ぶ <output id="rewardFallValue">18.000</output><input id="rewardFall" type="range" min="0" max="35" step="1" value="18"><small>転倒した瞬間のマイナス</small></label>
-          </div>
-          <p class="reward-formula" id="rewardFormula">報酬 = 11 × 前進 + 0.025 × 直立 − 0.045 × 力 − 18 × 転倒（完走時 +7.7）</p>
-          <p class="reset-note">報酬を変えると、別の教え方を比べられるようQテーブルと学習記録を0に戻します。</p>
+          <p class="reward-preset-guide">まずは「何を大切にする先生か」を一つ選ぶ。違いを細かく作りたいときだけ、下の数字を開こう。</p>
+          <details class="reward-tuning">
+            <summary>4つの数字を細かく調整する</summary>
+            <div class="reward-grid">
+              <label for="rewardForward">前へ進む <output id="rewardForwardValue">11.000</output><input id="rewardForward" type="range" min="0" max="20" step="0.5" value="11"><small>1 mのプラス。完走時はこの値の0.7倍を追加</small></label>
+              <label for="rewardBalance">直立を保つ <output id="rewardBalanceValue">0.025</output><input id="rewardBalance" type="range" min="0" max="0.08" step="0.005" value="0.025"><small>各瞬間、まっすぐ立てた分のプラス</small></label>
+              <label for="rewardEnergy">力を使う <output id="rewardEnergyValue">0.045</output><input id="rewardEnergy" type="range" min="0" max="0.12" step="0.005" value="0.045"><small>大股や腕の切り返しへのマイナス</small></label>
+              <label for="rewardFall">転ぶ <output id="rewardFallValue">18.000</output><input id="rewardFall" type="range" min="0" max="35" step="1" value="18"><small>転倒した瞬間のマイナス</small></label>
+            </div>
+            <p class="reward-formula" id="rewardFormula">報酬 = 11 × 前進 + 0.025 × 直立 − 0.045 × 力 − 18 × 転倒（完走時 +7.7）</p>
+            <p class="reset-note">報酬を変えると、別の教え方を比べられるようQテーブルと学習記録を0に戻します。</p>
+          </details>
         </div>
         <aside class="reward-contributions" aria-label="直前の1試行でもらった報酬の内訳">
           <h3>直前の試行の内訳</h3>
@@ -217,15 +248,11 @@
       </section>
     </details>
 
-    <section class="idea-strip" aria-labelledby="ideaTitle">
-      <div><p class="panel-step">強化学習の正体</p><h2 id="ideaTitle">正解を教えず、結果を返す</h2></div>
-      <ol><li><b>状態を見る</b><span>傾き、速さ、腕、足、坂</span></li><li><b>行動する</b><span>足5通り × 腕3通り</span></li><li><b>報酬を受け取る</b><span>何をほめるかは人が設計</span></li><li><b>Q値を直す</b><span>失敗も次の予想に残る</span></li></ol>
-    </section>
     <noscript><p class="notice">このゲームにはJavaScriptが必要です。強化学習は「状態を見る→行動する→報酬を受け取る→次の選択を改善する」を繰り返します。</p></noscript>
   </main>
 
   <footer class="footer"><span>家族のまなび帳<br>読んで、動かして、考える。</span><span><a href="../../../index.html">ホーム</a> · <a href="../index.html">プログラミング</a></span></footer>
-  <script src="../../../assets/reinforcement-walker/engine.js?v=20261003-2"></script>
-  <script src="../../../assets/reinforcement-walker/app.js?v=20261003-2"></script>
+  <script src="../../../assets/reinforcement-walker/engine.js?v=20261003-3"></script>
+  <script src="../../../assets/reinforcement-walker/app.js?v=20261003-3"></script>
 </body>
 </html>
