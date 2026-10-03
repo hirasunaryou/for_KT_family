@@ -364,6 +364,7 @@
 .transfer-label {
   fill: #135d77;
   font-size: 12px;
+  text-anchor: end;
 }
 
 .speed-label {

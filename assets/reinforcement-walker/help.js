@@ -140,7 +140,7 @@
     setTextPoint('helpReactionLabel',activeFoot.x+28,activeFoot.y-37);
     const transfer=$('helpTransferPath');
     if(transfer)transfer.setAttribute('points',`${activeFoot.x.toFixed(1)},${(activeFoot.y-5).toFixed(1)} ${activeKnee.x.toFixed(1)},${activeKnee.y.toFixed(1)} ${activeHip.x.toFixed(1)},${activeHip.y.toFixed(1)}`);
-    setTextPoint('helpTransferLabel',168,267);
+    setTextPoint('helpTransferLabel',275,267);
     const speedRatio=frame.speed&&motion.step.speedAfter?Math.max(.42,Math.min(1,frame.speed/motion.step.speedAfter)):1;
     const speedStart=pose.x+46;
     setLine('helpSpeedLine',speedStart,137,speedStart+203*speedRatio,137);
