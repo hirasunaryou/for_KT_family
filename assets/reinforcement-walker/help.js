@@ -30,7 +30,8 @@
     armsLeft:{x:330,lean:10,left:'0,-62 -15,-30 -23,0',right:'0,-62 15,-30 23,0',leftArm:'0,-108 -40,-90 -67,-75',rightArm:'0,-108 5,-78 -18,-55',active:'none'},
     armsRight:{x:330,lean:17,left:'0,-62 -15,-30 -23,0',right:'0,-62 15,-30 23,0',leftArm:'0,-108 -5,-78 18,-55',rightArm:'0,-108 40,-90 67,-75',active:'none'},
     long:{x:330,lean:0,left:'0,-62 38,-31 88,0',right:'0,-62 -10,-30 -22,0',leftArm:'0,-108 -30,-82 -49,-53',rightArm:'0,-108 29,-88 48,-68',active:'left'},
-    fail:{x:330,lean:23,left:'0,-62 39,-27 92,0',right:'0,-62 -7,-28 -16,0',leftArm:'0,-108 -34,-75 -54,-45',rightArm:'0,-108 36,-92 57,-78',active:'left'}
+    fail:{x:330,lean:23,left:'0,-62 39,-27 92,0',right:'0,-62 -7,-28 -16,0',leftArm:'0,-108 -34,-75 -54,-45',rightArm:'0,-108 36,-92 57,-78',active:'left'},
+    failRight:{x:330,lean:23,left:'0,-62 -7,-28 -16,0',right:'0,-62 39,-27 92,0',leftArm:'0,-108 -36,-92 -57,-78',rightArm:'0,-108 34,-75 54,-45',active:'right'}
   };
 
   const topics={
@@ -70,7 +71,7 @@
       kicker:'失敗を読む',title:'なぜ、つまずいた？',lead:'「失敗した」で終わらず、状態と選んだ行動のどこが合わなかったかを分けます。',
       frames:[
         {pose:'fail',question:'左足の次に、また左足を出したら？',title:'足の順番が違う',text:'このゲームは左右交互が約束です。次が右足の状態で左足を選ぶと、地面をうまく押せません。',look:'赤くなった「足の順番」と失敗の×印',metric:'今回足す速度 +0.000',takeaway:'状態の「次の足」を見る。',caution:'左右交互は教材として決めたゲーム規則です。',caption:'同じ足を続けて選び、つまずいた場面です。',scene:'同じ足を続けて出して姿勢を崩した棒人間。足の順番が強調されている。',failure:'wrong-foot',layers:['failure']},
-        {pose:'fail',question:'足の順番が合っていても、すぐ出したら？',title:'まだ準備中',text:'短い一歩の後は2回、大股の後は3回待つ約束です。準備が残る状態では反対足でも失敗します。',look:'赤くなった「次の足の準備」',metric:'準備 1 ／ 今回足す速度 +0.000',takeaway:'足の順番と準備OKの両方が必要。',caution:'これは実際の秒数ではなく、ゲーム内の待ち拍です。',caption:'反対足でも、準備が終わる前なので失敗します。',scene:'準備不足で足を出し、姿勢を崩した棒人間。準備条件が強調されている。',failure:'recovering',layers:['failure']},
+        {pose:'failRight',question:'足の順番が合っていても、すぐ出したら？',title:'まだ準備中',text:'短い一歩の後は2回、大股の後は3回待つ約束です。準備が残る状態では反対足でも失敗します。',look:'色のついた右足と、赤くなった「次の足の準備」',metric:'準備 1 ／ 今回足す速度 +0.000',takeaway:'足の順番と準備OKの両方が必要。',caution:'これは実際の秒数ではなく、ゲーム内の待ち拍です。',caption:'左足の次に右足を出したが、準備が終わる前なので失敗した場面です。',scene:'左足の次に右足を出したが、準備不足で姿勢を崩した棒人間。右足と準備条件が強調されている。',failure:'recovering',layers:['failure']},
         {pose:'long',question:'最初から大股なら、速く進める？',title:'停止中の大股は失敗',text:'大股は成功時の推進が大きい代わりに、足側への回転と力の消費が増え、次の足まで3拍待ちます。止まった状態では失敗するゲーム規則です。',look:'赤くなった「大股の条件」と伸ばした足',metric:'推進 大 ／ 消費 大 ／ 準備 3拍',takeaway:'大きい行動には、大きい利益と負担がある。',caution:'まず小さな一歩で速度を作る。大きな傾きや急な坂でも大股は失敗します。',caption:'止まった状態から大股を選び、うまく押せない場面です。',scene:'停止中に大股を選んだ棒人間。大股の条件が強調されている。',failure:'long',layers:['contact','failure']},
         {pose:'fail',question:'条件が合っていても、毎回同じ結果になる？',title:'でこぼこでは、滑ることもある',text:'地面をでこぼこにすると、同じ行動でも小さな確率で滑ります。AIは一度の成功だけでなく、繰り返した結果から学びます。',look:'赤くなった「でこぼこの滑り」と接地点',metric:'今回足す速度 +0.000',takeaway:'同じ行動でも結果が揺れる環境がある。',caution:'HELPの主な歩行例は、理屈を見やすくするため滑りなしの固定条件です。',caption:'足順と準備は合っていても、でこぼこで滑った場面です。',scene:'接地点で滑り、姿勢を崩した棒人間。滑り条件が強調されている。',failure:'slip',layers:['contact','failure']},
         {pose:'fail',question:'つまずきと転倒は、同じ？',title:'つまずいた後も、まだ立っている場合がある',text:'つまずきは一歩の失敗。転倒は体の傾きがゲーム内の限界を越えた判定です。失敗後も惰性で少し進むことがあります。',look:'赤くなった「つまずき／転倒」と速度矢印',metric:'新しい推進 0 ／ 残った速度あり',takeaway:'進んだ距離だけで、一歩の成功を決めない。',caution:'転倒の限界も、学びやすくするために決めたゲーム規則です。',caption:'つまずき後、残った速度で進みながら大きく傾いています。',scene:'つまずいた後に傾き、残った速度で少し進む棒人間。転倒との区別が強調されている。',failure:'fall',speed:motion.step.speedAfter*.5,layers:['speed','failure']}
@@ -165,6 +166,7 @@
     setHidden('helpRotationArrow',!layers.has('rotation'));
     setHidden('helpRecovery',!layers.has('recovery'));
     setHidden('helpFailureMark',!layers.has('failure'));
+    setHidden('helpFailureSequence',frame.failure!=='recovering');
   }
 
   function renderDots(frames){

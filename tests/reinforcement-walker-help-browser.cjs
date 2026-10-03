@@ -97,9 +97,38 @@ const server=http.createServer((request,response)=>{
       assert.notEqual(leftRotation,rightRotation,'opposite arm choices display opposite rotation arrows');
       await page.locator('[data-help-topic="mistakes"]').click();
       await expect(page.locator('#helpTopicTitle')).toContainText('つまずいた');
+      await page.locator('[data-help-step="1"]').click();
+      await expect(page.locator('#helpRightLeg')).toHaveClass(/help-active-limb/);
+      await expect(page.locator('#helpLeftLeg')).not.toHaveClass(/help-active-limb/);
+      await expect(page.locator('#helpFailureSequence')).toBeVisible();
+      await expect(page.locator('#helpFailureSequence')).toHaveText('左足 ✓ → 右足（準備1）×');
       assert(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1),`stepped help overflows at ${width}px`);
       await page.close();
     }
+
+    const printPage=await context.newPage();
+    await printPage.goto(helpUrl);
+    await printPage.emulateMedia({media:'print'});
+    await expect(printPage.locator('.help-print-guide')).toBeVisible();
+    await expect(printPage.locator('.help-lab')).toBeHidden();
+    assert.equal(await printPage.locator('[data-print-frame]').count(),22,'printing includes the complete 22-frame walkthrough');
+    await printPage.pdf({path:'test-results/walker-help-print.pdf',format:'A4',printBackground:true});
+    await printPage.close();
+
+    const noJsContext=await browser.newContext({javaScriptEnabled:false,reducedMotion:'reduce'});
+    await noJsContext.route('**/*',route=>route.request().url().startsWith(base)?route.continue():route.abort());
+    const noJsPage=await noJsContext.newPage();
+    await noJsPage.goto(helpUrl);
+    await expect(noJsPage.locator('.help-print-guide')).toBeVisible();
+    await expect(noJsPage.locator('.help-lab')).toBeHidden();
+    await expect(noJsPage.locator('.help-interactive-intro')).toBeHidden();
+    await expect(noJsPage.locator('.help-static-intro')).toBeVisible();
+    await expect(noJsPage.locator('#helpGuideStart')).toBeVisible();
+    assert.equal(await noJsPage.locator('[data-print-frame]').count(),22,'JavaScript-free readers receive all 22 frames');
+    assert.equal(await noJsPage.locator('#closeHelp').evaluate(element=>element.tagName),'A','the prominent return control is a working link without JavaScript');
+    await noJsPage.locator('#closeHelp').click();
+    await expect(noJsPage).toHaveURL(/reinforcement-walker\/index\.html#manualControls$/);
+    await noJsContext.close();
 
     const game=await context.newPage();
     game.on('pageerror',error=>errors.push(error.message));

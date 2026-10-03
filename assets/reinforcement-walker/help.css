@@ -19,8 +19,15 @@
   line-height: 1.7;
 }
 
+.help-static-intro {
+  display: none;
+}
+
 .help-close-button {
+  display: inline-flex;
   flex: none;
+  align-items: center;
+  justify-content: center;
   min-height: 46px;
   padding: 10px 16px;
   border: 1px solid var(--walker-navy);
@@ -30,6 +37,7 @@
   font: inherit;
   font-size: 13px;
   font-weight: 800;
+  text-decoration: none;
   cursor: pointer;
 }
 
@@ -382,6 +390,14 @@
   fill: #9c3e31;
 }
 
+.failure-sequence {
+  fill: #7d342b;
+  font-family: system-ui, -apple-system, "Yu Gothic", sans-serif;
+  font-size: 12px;
+  font-weight: 900;
+  text-anchor: middle;
+}
+
 .failure-panel {
   fill: rgba(255, 255, 255, .92);
   stroke: #c9d7d3;
@@ -620,6 +636,10 @@
   border: 1px solid var(--walker-line);
   border-radius: 16px;
   background: #fff;
+}
+
+.help-print-guide {
+  display: none;
 }
 
 .motion-dictionary {
@@ -884,13 +904,75 @@
 
 @media print {
   .help-topic-nav,
+  .help-lab,
   .help-controls,
   .help-keyboard-note,
   .help-close-button {
     display: none;
   }
 
-  .help-lab,
+  .help-interactive-intro {
+    display: none;
+  }
+
+  .help-static-intro {
+    display: inline;
+  }
+
+  .help-print-guide {
+    display: block;
+    margin: 0 0 18px;
+    color: #111;
+  }
+
+  .help-print-guide > header {
+    margin-bottom: 12px;
+    padding-bottom: 8px;
+    border-bottom: 2px solid #333;
+  }
+
+  .help-print-guide h2,
+  .help-print-guide h3,
+  .help-print-guide p {
+    margin-top: 0;
+  }
+
+  .help-print-guide h2 {
+    margin-bottom: 5px;
+    font-size: 18pt;
+  }
+
+  .help-print-guide > header p:last-child {
+    margin-bottom: 0;
+    font-size: 10.5pt;
+  }
+
+  .help-print-topic {
+    margin: 0 0 14px;
+    break-inside: avoid;
+  }
+
+  .help-print-topic h3 {
+    margin-bottom: 6px;
+    padding: 5px 8px;
+    border-left: 4px solid #333;
+    background: #eee;
+    font-size: 13pt;
+    break-after: avoid;
+  }
+
+  .help-print-topic ol {
+    margin: 0;
+    padding-left: 24px;
+  }
+
+  .help-print-topic li {
+    margin: 0 0 5px;
+    font-size: 10pt;
+    line-height: 1.5;
+    break-inside: avoid;
+  }
+
   .help-reference,
   .help-accuracy,
   .help-try-card {

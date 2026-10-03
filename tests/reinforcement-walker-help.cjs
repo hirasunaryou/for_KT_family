@@ -27,6 +27,8 @@ function checkStaticPage(){
   const doc=dom.window.document;
   assert.equal(doc.querySelectorAll('[data-help-topic]').length,4,'help divides walking into four focused topics');
   assert.equal(doc.querySelectorAll('.site-return-nav a').length,3,'help has persistent exits to the site, list, and game');
+  assert.equal(doc.querySelector('.skip').getAttribute('href'),'#helpGuideStart','the skip link always targets visible explanatory content');
+  assert.equal(doc.querySelectorAll('a.help-close-button[href="index.html#manualControls"]').length,2,'prominent game-return controls remain real links without JavaScript');
   assert(doc.querySelector('#gaitScene[role="img"]'),'the side-view scene is exposed as an image');
   assert(doc.getElementById('gaitSceneTitle')&&doc.getElementById('gaitSceneDesc'),'the changing scene has a title and description');
   assert.equal(doc.querySelector('.help-explanation').getAttribute('aria-live'),'polite','one changing explanation is announced without flooding');
@@ -34,12 +36,14 @@ function checkStaticPage(){
   assert(/簡略モデル/.test(doc.querySelector('.help-model-note').textContent),'the game model is distinguished before the walkthrough');
   assert(/画面右が前/.test(doc.querySelector('.help-model-note').textContent),'screen direction is explicit before left and right feet appear');
   assert(/物理学の運動量|速度と運動量は別/.test(doc.querySelector('.help-accuracy').textContent),'game momentum wording is distinguished from formal physics');
-  assert(/JavaScriptなし/.test(doc.querySelector('noscript').textContent),'a complete no-JavaScript summary remains readable');
+  assert.equal(doc.querySelectorAll('.help-print-topic').length,4,'the static guide includes every topic');
+  assert.equal(doc.querySelectorAll('[data-print-frame]').length,22,'print and no-JavaScript readers receive all 22 frames');
+  assert(Array.from(doc.querySelectorAll('noscript')).some(element=>/全22コマ/.test(element.textContent)),'JavaScript-free readers are directed to the complete static guide');
   assert(gameHtml.indexOf('help.html#push')>=0&&gameHtml.indexOf('help.html#push')<gameHtml.indexOf('id="world"'),'the game links to help before the canvas');
   assert(/target="_blank" rel="opener"/.test(gameHtml),'help opens separately so an in-memory learning session is preserved');
   assert(gameHtml.includes('id="motionHelpLink"'),'the live result has a contextual help entrance');
   assert(programming.includes('reinforcement-walker/help.html#push'),'the programming index offers the guide as a separate entrance');
-  assert(helpHtml.includes('engine.js?v=20261004-1')&&helpHtml.includes('help.js?v=20261004-1'),'help loads versioned local assets in dependency order');
+  assert(helpHtml.includes('engine.js?v=20261004-1')&&helpHtml.includes('help.js?v=20261004-3'),'help loads versioned local assets in dependency order');
   dom.window.close();
 }
 
@@ -95,6 +99,11 @@ function checkStepper(){
   assert.equal(doc.getElementById('helpStepCount').textContent,'1 / 5','each topic owns its own frame count');
   doc.querySelector('[data-help-topic="mistakes"]').click();
   assert(/つまず/.test(doc.getElementById('helpTopicTitle').textContent),'failure reasons have a dedicated entry');
+  doc.querySelector('[data-help-step="1"]').click();
+  assert(doc.getElementById('helpRightLeg').classList.contains('help-active-limb'),'the recovering failure highlights the attempted right foot');
+  assert(!doc.getElementById('helpLeftLeg').classList.contains('help-active-limb'),'the previous left foot is not shown as the attempted foot');
+  assert(/右足/.test(doc.getElementById('gaitSceneDesc').textContent),'the accessible scene description names the attempted right foot');
+  assert(!doc.getElementById('helpFailureSequence').hasAttribute('hidden'),'the recovery mistake shows the correct foot order and unfinished wait in the scene');
   assert(debug.motion.step.pushAdded>0,'the guide takes the successful push value from the real engine');
   assert.equal(debug.motion.brace1.pushAdded,0,'the guide takes zero brace propulsion from the real engine');
   assert(debug.motion.brace1.speedAfter<debug.motion.brace1.speedBefore,'the guide reflects real coasting slowdown');

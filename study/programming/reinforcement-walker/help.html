@@ -9,10 +9,11 @@
   <link rel="stylesheet" href="../../../assets/family/style.css">
   <link rel="stylesheet" href="../../../assets/family/navigation.css">
   <link rel="stylesheet" href="../../../assets/reinforcement-walker/style.css?v=20261004-1">
-  <link rel="stylesheet" href="../../../assets/reinforcement-walker/help.css?v=20261004-1">
+  <link rel="stylesheet" href="../../../assets/reinforcement-walker/help.css?v=20261004-3">
+  <noscript><style>.help-topic-nav,.help-lab,.help-interactive-intro{display:none}.help-print-guide{display:block}.help-static-intro{display:inline}</style></noscript>
 </head>
 <body class="has-site-navigation walker-page walker-help-page">
-  <a class="skip" href="#helpLab">一コマ解説へスキップ</a>
+  <a class="skip" href="#helpGuideStart">歩き方解説へスキップ</a>
   <nav class="site-return-nav" aria-label="サイト内の移動">
     <a class="site-home-link" href="../../../index.html">サイトのトップ</a>
     <a href="../index.html">教材一覧</a>
@@ -29,12 +30,12 @@
       <div>
         <p class="eyebrow">WALKING GUIDE / 1 FRAME AT A TIME</p>
         <h1>棒人間は、どうして前へ進む？</h1>
-        <p>一度に読む必要はありません。「次の一コマ」を押し、図に新しく現れたものだけを追ってください。</p>
+        <p><span class="help-interactive-intro">一度に読む必要はありません。「次の一コマ」を押し、図に新しく現れたものだけを追ってください。</span><span class="help-static-intro">下の22コマ一覧を、上から順に一つずつ追ってください。</span></p>
       </div>
-      <button class="help-close-button" id="closeHelp" type="button">HELPを閉じてゲームへ戻る</button>
+      <a class="help-close-button" id="closeHelp" href="index.html#manualControls">HELPを閉じてゲームへ戻る</a>
     </header>
 
-    <aside class="help-model-note" aria-label="この解説の前提">
+    <aside class="help-model-note" id="helpGuideStart" tabindex="-1" aria-label="この解説の前提">
       <strong>最初の約束</strong>
       <p><b>画面右が前、画面左が後ろ。</b>「左足・右足」は足の名前です。このゲームは、本物の歩行をそのまま再現せず、足を出す・接地する・押す動きを短い操作へまとめた簡略モデルです。</p>
     </aside>
@@ -133,6 +134,7 @@
               <g data-failure-reason="fall" class="failure-row"><circle cx="437" cy="186" r="6"/><text x="450" y="191">つまずき／転倒</text></g>
               <path d="M548 216 L602 270 M602 216 L548 270" class="failure-mark"/>
               <text x="516" y="300" class="failure-label">うまく押せない</text>
+              <text id="helpFailureSequence" x="516" y="327" class="failure-sequence" hidden>左足 ✓ → 右足（準備1）×</text>
             </g>
           </svg>
           <figcaption id="helpSceneCaption">問いを立て、次のコマで足裏に注目します。</figcaption>
@@ -160,6 +162,56 @@
       <p class="help-keyboard-note">キーボードの ← → でも一コマずつ移動できます。自動では進みません。</p>
     </section>
 
+    <section class="help-print-guide" aria-labelledby="printGuideTitle">
+      <header>
+        <p class="panel-step">全コマを紙でたどる</p>
+        <h2 id="printGuideTitle">歩き方HELP：22コマ一覧</h2>
+        <p>画面右が前、画面左が後ろです。左足・右足は足の名前で、進む向きとは別です。</p>
+      </header>
+      <article class="help-print-topic">
+        <h3>1．一歩で、なぜ右へ進む？</h3>
+        <ol>
+          <li data-print-frame><b>向きをそろえる：</b>前は画面右、後ろは画面左。まだ前向き速度は0です。</li>
+          <li data-print-frame><b>足を出して接地する：</b>左足が地面に触れただけでは、まだ前向き速度は増えません。</li>
+          <li data-print-frame><b>地面を後ろへ押す：</b>足裏が進行方向と反対の画面左へ地面を押します。</li>
+          <li data-print-frame><b>地面が足を前へ押す：</b>地面から足が受けた右向きの力が、脚を通って体へ伝わります。</li>
+          <li data-print-frame><b>前向き速度が増える：</b>足で速度を足し、同じ操作中の抵抗と坂の分を引いた速度で進みます。</li>
+          <li data-print-frame><b>残った速度で移動する：</b>押し終わっても速度が残るため、体は少し右へ進みます。</li>
+        </ol>
+      </article>
+      <article class="help-print-topic">
+        <h3>2．「踏ん張る」は、なぜ少し進む？</h3>
+        <ol>
+          <li data-print-frame><b>一歩の直後：</b>前向き速度はある一方、次の右足はまだ「準備 あと2」です。</li>
+          <li data-print-frame><b>1回目の踏ん張り：</b>新しい推進は0。前の一歩で残った速度により惰性で進みます。</li>
+          <li data-print-frame><b>準備が2から1へ：</b>惰性で進む一拍の間に、次の足の準備が1段階進みます。</li>
+          <li data-print-frame><b>2回目の踏ん張り：</b>準備はOKになりますが、抵抗により速度はさらに少し減ります。</li>
+          <li data-print-frame><b>反対の右足を出す：</b>左・短 → 待つ → 待つ → 右・短が最小の歩行周期です。</li>
+          <li data-print-frame><b>止まっているとき：</b>踏ん張りだけでは新しい速度を足さないため、前へ進みません。</li>
+        </ol>
+      </article>
+      <article class="help-print-topic">
+        <h3>3．腕は、何を変える？</h3>
+        <ol>
+          <li data-print-frame><b>腕の向きを選ぶ：</b>これは次の操作の予約で、選んだだけでは時間も体も動きません。</li>
+          <li data-print-frame><b>傾きと回転を見る：</b>傾きは今の姿勢、回転はこれから姿勢が変わる向きです。</li>
+          <li data-print-frame><b>反対へ腕を振る：</b>右回りが強いときの左振りは、左向きの回転を足して立て直す候補です。</li>
+          <li data-print-frame><b>同じ向きへ腕を振る：</b>右回りに右振りを重ねると、さらに姿勢を崩す場合があります。</li>
+          <li data-print-frame><b>腕と前進を分ける：</b>腕は回転を変えます。前向き速度には足で地面を押す一歩が必要です。</li>
+        </ol>
+      </article>
+      <article class="help-print-topic">
+        <h3>4．なぜ、つまずいた？</h3>
+        <ol>
+          <li data-print-frame><b>足の順番：</b>左足の次にまた左足を選ぶと、左右交互のゲーム規則に合いません。</li>
+          <li data-print-frame><b>次の足の準備：</b>左足の次が右足でも、待ち拍が残っていれば準備不足です。</li>
+          <li data-print-frame><b>大股の条件：</b>大股は利益も負担も大きく、停止中・大きな傾き・急な坂では失敗します。</li>
+          <li data-print-frame><b>でこぼこの滑り：</b>条件が同じでも結果が揺れるため、AIは繰り返した結果から学びます。</li>
+          <li data-print-frame><b>つまずきと転倒：</b>一歩の失敗と、傾きが限界を越えた転倒は別の判定です。</li>
+        </ol>
+      </article>
+    </section>
+
     <section class="help-reference" aria-labelledby="motionDictionaryTitle">
       <div class="section-heading"><div><p class="panel-step">あとから見返す</p><h2 id="motionDictionaryTitle">動きの意味を、短く整理</h2></div><p>詳しい理由は上の4テーマで一コマずつ確認できます。</p></div>
       <div class="motion-dictionary">
@@ -185,14 +237,14 @@
 
     <section class="help-try-card">
       <div><p class="panel-step">ゲームで確かめる</p><h2>左の小さな一歩 → 踏ん張る2回 → 右の小さな一歩</h2><p>まず足だけで試し、次に傾きと反対の腕を選んで違いを比べよう。</p></div>
-      <button class="help-close-button" type="button" data-close-help>ゲームへ戻って試す</button>
+      <a class="help-close-button" href="index.html#manualControls" data-close-help>ゲームへ戻って試す</a>
     </section>
 
-    <noscript><section class="notice"><h2>JavaScriptなしで読むまとめ</h2><ol><li>画面右が前。左足・右足は足の名前。</li><li>一歩は、足を出す・接地する・地面を後ろへ押す、をまとめた操作。</li><li>地面から前向きに押し返され、このゲームの前向き速度が増える。</li><li>踏ん張りは推進0。残った速度で進み、次の足の準備を1段階進める。</li><li>腕は前進速度でなく体の回転を変える。</li></ol></section></noscript>
+    <noscript><p class="notice">JavaScriptなしでは、全22コマを上の一覧で順に読めます。</p></noscript>
   </main>
 
   <footer class="footer"><span>家族のまなび帳<br>読んで、動かして、考える。</span><span><a href="index.html">ころころウォーカー</a> · <a href="../index.html">プログラミング</a></span></footer>
   <script src="../../../assets/reinforcement-walker/engine.js?v=20261004-1"></script>
-  <script src="../../../assets/reinforcement-walker/help.js?v=20261004-1"></script>
+  <script src="../../../assets/reinforcement-walker/help.js?v=20261004-3"></script>
 </body>
 </html>
