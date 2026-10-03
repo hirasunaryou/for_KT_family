@@ -8,11 +8,11 @@
   <link rel="icon" href="../../../assets/icon.svg">
   <link rel="stylesheet" href="../../../assets/family/style.css">
   <link rel="stylesheet" href="../../../assets/family/navigation.css">
-  <link rel="stylesheet" href="../../../assets/reinforcement-walker/style.css?v=20261003-3">
+  <link rel="stylesheet" href="../../../assets/reinforcement-walker/style.css?v=20261004-1">
 </head>
 <body class="has-site-navigation walker-page">
   <a class="skip" href="#main">ゲームへスキップ</a>
-  <nav class="site-return-nav" aria-label="サイト内の移動"><a class="site-home-link" href="../../../index.html">サイトのトップ</a></nav>
+  <nav class="site-return-nav" aria-label="サイト内の移動"><a class="site-home-link" href="../../../index.html">サイトのトップ</a><a href="../index.html">教材一覧</a><a href="help.html" target="_blank" rel="opener">歩き方HELP</a></nav>
   <header class="masthead">
     <a class="brand" href="../../../index.html"><span class="brand-icon">f.</span>家族のまなび帳</a>
     <nav aria-label="家族サイト"><a href="../index.html">プログラミング</a><a href="../../../questions/index.html">日々の疑問</a></nav>
@@ -26,7 +26,8 @@
     </header>
 
     <nav class="learning-entrances" aria-label="おすすめの始め方">
-      <div><p class="panel-step">好きな入口から</p><strong>どちらから始めても、あとで行き来できます</strong></div>
+      <div><p class="panel-step">好きな入口から</p><strong>分からない動きは、HELPで一コマずつ確認できます</strong></div>
+      <a class="recommended-entrance" href="help.html#push" target="_blank" rel="opener"><span>最初におすすめ · 約5分</span><b>歩き方を一コマずつ見る</b><small>足と地面の力 → 踏ん張り → 腕 → 失敗</small></a>
       <a href="#manualControls" data-start-manual><span>じっくり発見する</span><b>自分の手で一歩ずつ</b><small>一歩 → 踏ん張る → 次の足。失敗の理由まで観察する</small></a>
       <a href="#trainingControls"><span>5分で要点をつかむ</span><b>AIの変化を先に見る</b><small>50回学習 → 学習前と比較 → AIテスト</small></a>
     </nav>
@@ -54,13 +55,13 @@
             <div class="leg-controls">
               <button type="button" data-leg="left-short"><kbd>A</kbd><span>左足・小さく</span></button>
               <button type="button" data-leg="left-long"><kbd>Shift+A</kbd><span>左足・大きく</span></button>
-              <button type="button" data-leg="brace"><kbd>S</kbd><span>踏ん張って整える</span></button>
+              <button type="button" data-leg="brace"><kbd>S</kbd><span>踏ん張る・1拍待つ</span></button>
               <button type="button" data-leg="right-short"><kbd>D</kbd><span>右足・小さく</span></button>
               <button type="button" data-leg="right-long"><kbd>Shift+D</kbd><span>右足・大きく</span></button>
             </div>
           </fieldset>
           <fieldset class="control-bank">
-            <legend>腕：次の一歩で振る方向を選ぶ</legend>
+            <legend>腕：次の操作で振る方向を選ぶ</legend>
             <div class="arm-controls">
               <button type="button" data-arm="arms-left"><kbd>J</kbd><span>腕を左へ ←</span></button>
               <button type="button" data-arm="arms-center"><kbd>K</kbd><span>まんなか</span></button>
@@ -83,30 +84,31 @@
             <small id="actionNext">観察 → 予想 → 一歩 → 結果、の順で比べよう。</small>
           </div>
           <section class="motion-cause" id="motionCause" data-phase="ready" aria-labelledby="motionCauseTitle">
-            <div class="motion-cause-heading"><div><p class="panel-step">足と地面の理屈</p><h3 id="motionCauseTitle">なぜ一歩で右へ進む？</h3></div><span>ゲーム内の勢い</span></div>
-            <div class="motion-flow" aria-label="一歩で前へ進み、踏ん張り中は勢いが残る流れ">
-              <div data-motion-stage="push"><span>一歩の中</span><b>足で地面を左へ押す</b><i aria-hidden="true">地面へ ←</i></div>
+            <div class="motion-cause-heading"><div><p class="panel-step">直前の結果</p><h3 id="motionCauseTitle">なぜ一歩で右へ進む？</h3></div><span>ゲーム内の前向き速度</span></div>
+            <div class="motion-flow" aria-label="一歩で前向き速度が増え、踏ん張り中は速度が残る流れ">
+              <div data-motion-stage="push"><span>一歩の中</span><b>地面を後ろへ押す</b><i aria-hidden="true">後ろ（画面左）←</i></div>
               <span class="motion-arrow" aria-hidden="true">→</span>
-              <div data-motion-stage="reaction"><span>押し返し</span><b>地面が体を右へ押す</b><i aria-hidden="true">→ 体へ</i></div>
+              <div data-motion-stage="reaction"><span>押し返し</span><b>地面が足を前へ押す</b><i aria-hidden="true">足から体へ →</i></div>
               <span class="motion-arrow" aria-hidden="true">→</span>
-              <div data-motion-stage="coast"><span>踏ん張り中</span><b>勢いで進み、次の足を準備</b><i aria-hidden="true">新しく足す勢い 0</i></div>
+              <div data-motion-stage="coast"><span>踏ん張り中</span><b>惰性で進み、次の足を準備</b><i aria-hidden="true">新しく足す速度 0</i></div>
             </div>
             <dl class="motion-numbers">
-              <div><dt>今回足した勢い</dt><dd id="motionPushValue">+0.000</dd></div>
-              <div><dt>前向きの勢い</dt><dd id="motionSpeedValue">0.000 → 0.000</dd></div>
+              <div><dt>今回増えた速度</dt><dd id="motionPushValue">+0.000</dd></div>
+              <div><dt>前向き速度</dt><dd id="motionSpeedValue">0.000 → 0.000</dd></div>
               <div><dt>この操作で進んだ距離</dt><dd id="motionDistanceValue">+0.00 m</dd></div>
             </dl>
             <p id="motionCauseText">このゲームの「一歩」は、足を出して接地するだけでなく、地面を後ろへ押すところまでを1操作にまとめています。</p>
+            <a class="motion-help-link" id="motionHelpLink" href="help.html#push" target="_blank" rel="opener">この場面を、大きな図で一コマずつ見る →</a>
           </section>
           <details class="movement-rules">
             <summary>なぜ一歩と「踏ん張る」で前へ進むの？</summary>
             <ol>
-              <li><b>一歩＝接地＋押す</b><span>足を出して接地し、地面を後ろへ押すまでをまとめています。地面から前向きに押し返され、勢いが増えます。</span></li>
-              <li><b>踏ん張り＝惰性＋準備</b><span>新しい推進は足しません。前の一歩の勢いは少し減りますが、その間も進みながら次の足を出す準備を1回進めます。</span></li>
+              <li><b>一歩＝接地＋押す</b><span>足を出して接地し、地面を後ろへ押すまでをまとめています。地面が足を前へ押し、その力が体へ伝わって前向き速度が増えます。</span></li>
+              <li><b>踏ん張り＝惰性＋準備</b><span>新しい推進は足しません。前向き速度は少し減りますが、その間も進みながら次の足を出す準備を1回進めます。</span></li>
               <li><b>足は交互・大股は条件つき</b><span>左・右は使う足の名前。大股は、停止中・大きく傾いた体・急な坂ではつまずきます。</span></li>
               <li><b>腕は回転の舵</b><span>傾きと反対へ振ると戻しやすくなります。腕だけでは前進しません。</span></li>
             </ol>
-            <p>本物の歩行では、重心移動・関節・足裏の接地が連続して起きます。ここでは「置く＋押す」と「次の足の準備」に分け、傾き・勢い・足の順番を観察しやすくした簡略モデルです。</p>
+            <p>本物の歩行では、重心移動・関節・足裏の接地が連続して起きます。ここでは「置く＋押す」と「次の足の準備」に分け、傾き・前向き速度・足の順番を観察しやすくした簡略モデルです。</p>
           </details>
         </section>
       </div>
@@ -252,7 +254,7 @@
   </main>
 
   <footer class="footer"><span>家族のまなび帳<br>読んで、動かして、考える。</span><span><a href="../../../index.html">ホーム</a> · <a href="../index.html">プログラミング</a></span></footer>
-  <script src="../../../assets/reinforcement-walker/engine.js?v=20261003-3"></script>
-  <script src="../../../assets/reinforcement-walker/app.js?v=20261003-3"></script>
+  <script src="../../../assets/reinforcement-walker/engine.js?v=20261004-1"></script>
+  <script src="../../../assets/reinforcement-walker/app.js?v=20261004-1"></script>
 </body>
 </html>

@@ -1,0 +1,198 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="ころころウォーカーの足・地面・腕・踏ん張りを、一コマずつ動かして理解する歩き方HELP。">
+  <title>歩き方HELP | ころころウォーカー</title>
+  <link rel="icon" href="../../../assets/icon.svg">
+  <link rel="stylesheet" href="../../../assets/family/style.css">
+  <link rel="stylesheet" href="../../../assets/family/navigation.css">
+  <link rel="stylesheet" href="../../../assets/reinforcement-walker/style.css?v=20261004-1">
+  <link rel="stylesheet" href="../../../assets/reinforcement-walker/help.css?v=20261004-1">
+</head>
+<body class="has-site-navigation walker-page walker-help-page">
+  <a class="skip" href="#helpLab">一コマ解説へスキップ</a>
+  <nav class="site-return-nav" aria-label="サイト内の移動">
+    <a class="site-home-link" href="../../../index.html">サイトのトップ</a>
+    <a href="../index.html">教材一覧</a>
+    <a href="index.html" data-close-help>ゲームへ戻る</a>
+  </nav>
+  <header class="masthead">
+    <a class="brand" href="../../../index.html"><span class="brand-icon">f.</span>家族のまなび帳</a>
+    <nav aria-label="家族サイト"><a href="../index.html">プログラミング</a><a href="../../../questions/index.html">日々の疑問</a></nav>
+  </header>
+
+  <main class="walker-wrap walker-help-wrap" id="main">
+    <div class="crumbs"><a href="../../../index.html">ホーム</a> / <a href="../index.html">プログラミング</a> / <a href="index.html">ころころウォーカー</a> / 歩き方HELP</div>
+    <header class="walker-heading help-heading">
+      <div>
+        <p class="eyebrow">WALKING GUIDE / 1 FRAME AT A TIME</p>
+        <h1>棒人間は、どうして前へ進む？</h1>
+        <p>一度に読む必要はありません。「次の一コマ」を押し、図に新しく現れたものだけを追ってください。</p>
+      </div>
+      <button class="help-close-button" id="closeHelp" type="button">HELPを閉じてゲームへ戻る</button>
+    </header>
+
+    <aside class="help-model-note" aria-label="この解説の前提">
+      <strong>最初の約束</strong>
+      <p><b>画面右が前、画面左が後ろ。</b>「左足・右足」は足の名前です。このゲームは、本物の歩行をそのまま再現せず、足を出す・接地する・押す動きを短い操作へまとめた簡略モデルです。</p>
+    </aside>
+
+    <nav class="help-topic-nav" aria-label="歩き方HELPのテーマ">
+      <button type="button" data-help-topic="push" aria-pressed="true" aria-controls="helpLab"><span>まず見る</span><b>一歩でなぜ進む？</b><small>足と地面の力</small></button>
+      <button type="button" data-help-topic="brace" aria-pressed="false" aria-controls="helpLab"><span>歩き続ける</span><b>踏ん張るの意味</b><small>惰性と次の足の準備</small></button>
+      <button type="button" data-help-topic="arms" aria-pressed="false" aria-controls="helpLab"><span>転ばない工夫</span><b>腕は何を変える？</b><small>前進ではなく回転</small></button>
+      <button type="button" data-help-topic="mistakes" aria-pressed="false" aria-controls="helpLab"><span>失敗を読む</span><b>なぜ、つまずいた？</b><small>ゲーム内の4つの理由</small></button>
+    </nav>
+
+    <section class="help-lab" id="helpLab" data-topic="push" data-step="0" aria-labelledby="helpTopicTitle">
+      <header class="help-lab-header">
+        <div><p class="panel-step" id="helpTopicKicker">まず見る</p><h2 id="helpTopicTitle">一歩で、なぜ右へ進む？</h2></div>
+        <p id="helpTopicLead">足を出したあと、足裏と地面の間で何が起きるかを一つずつ見ます。</p>
+      </header>
+
+      <div class="help-progress">
+        <strong id="helpStepCount">1 / 6</strong>
+        <div class="help-step-dots" id="helpStepDots" role="group" aria-label="解説のコマ"></div>
+      </div>
+
+      <div class="help-stage-grid">
+        <figure class="help-scene-card">
+          <div class="help-direction-key" aria-hidden="true"><span>← 後ろ（画面左）</span><b>進む向き</b><span>前（画面右）→</span></div>
+          <svg id="gaitScene" viewBox="0 0 760 440" role="img" aria-labelledby="gaitSceneTitle gaitSceneDesc">
+            <title id="gaitSceneTitle">止まっている棒人間</title>
+            <desc id="gaitSceneDesc">画面右が前、左が後ろです。まだ力の矢印はありません。</desc>
+            <defs>
+              <linearGradient id="helpSky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#e5f2f0"/><stop offset="1" stop-color="#fff5df"/></linearGradient>
+              <marker id="arrowOrange" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#c95f38"/></marker>
+              <marker id="arrowBlue" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#176b87"/></marker>
+              <marker id="arrowGreen" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#477a59"/></marker>
+            </defs>
+            <rect width="760" height="440" rx="18" fill="url(#helpSky)"/>
+            <path d="M0 352 H760 V440 H0 Z" fill="#c7d6a2"/>
+            <line x1="0" y1="352" x2="760" y2="352" stroke="#304b3c" stroke-width="5"/>
+            <text x="28" y="42" class="direction-label">← 後ろ（画面左）</text>
+            <text x="548" y="42" class="direction-label">前（画面右）→</text>
+
+            <g id="helpGhostFigure" class="help-ghost" hidden>
+              <circle cx="316" cy="200" r="27"/><line x1="316" y1="228" x2="316" y2="294"/><polyline points="316,294 296,324 282,352"/><polyline points="316,294 336,324 350,352"/>
+            </g>
+
+            <g id="helpFigure" transform="translate(330 352)">
+              <circle id="helpHead" cx="0" cy="-152" r="31"/>
+              <circle class="help-eye" cx="9" cy="-158" r="3"/>
+              <line id="helpTorso" x1="0" y1="-121" x2="0" y2="-62"/>
+              <polyline id="helpLeftLeg" class="help-limb help-active-limb" points="0,-62 -14,-30 -21,0"/>
+              <polyline id="helpRightLeg" class="help-limb" points="0,-62 15,-30 22,0"/>
+              <polyline id="helpLeftArm" class="help-arm" points="0,-108 -22,-84 -36,-59"/>
+              <polyline id="helpRightArm" class="help-arm" points="0,-108 22,-84 36,-59"/>
+            </g>
+
+            <g id="helpFootLabels" class="help-svg-note">
+              <text id="helpLeftFootLabel" x="309" y="385">左足</text>
+              <text id="helpRightFootLabel" x="352" y="385">右足</text>
+            </g>
+            <g id="helpContact" hidden>
+              <circle id="helpContactRing" cx="388" cy="352" r="16" class="contact-ring"/>
+              <circle id="helpContactDot" cx="388" cy="352" r="5" class="contact-dot"/>
+              <text id="helpContactLabel" x="404" y="331" class="contact-label">接地点</text>
+            </g>
+            <g id="helpPushArrow" hidden>
+              <line id="helpPushLine" x1="374" y1="371" x2="212" y2="371" class="force-arrow push-arrow" marker-end="url(#arrowOrange)"/>
+              <text id="helpPushLabel" x="220" y="406" class="push-label">足が地面を後ろへ押す</text>
+            </g>
+            <g id="helpReactionArrow" hidden>
+              <line id="helpReactionLine" x1="393" y1="334" x2="553" y2="334" class="force-arrow reaction-arrow" marker-end="url(#arrowBlue)"/>
+              <text id="helpReactionLabel" x="421" y="315" class="reaction-label">地面が足を前へ押す</text>
+              <polyline id="helpTransferPath" points="388,347 354,320 330,290" class="transfer-path"/>
+              <text id="helpTransferLabel" x="300" y="275" class="transfer-label">力が脚を通って体へ</text>
+            </g>
+            <g id="helpSpeedArrow" hidden>
+              <line id="helpSpeedLine" x1="376" y1="137" x2="579" y2="137" class="force-arrow speed-arrow" marker-end="url(#arrowGreen)"/>
+              <text id="helpSpeedLabel" x="410" y="116" class="speed-label">前向き速度が残る</text>
+            </g>
+            <g id="helpRotationArrow" hidden>
+              <path id="helpRotationPath" d="M392 171 C443 191 449 250 410 278" class="force-arrow rotation-arrow" marker-end="url(#arrowBlue)"/>
+              <text id="helpRotationLabel" x="447" y="212" class="reaction-label">体の回転</text>
+            </g>
+            <g id="helpRecovery" hidden>
+              <rect x="420" y="64" width="180" height="72" rx="14" class="recovery-panel"/>
+              <text x="437" y="88" class="recovery-caption">次の足の準備</text>
+              <circle id="helpRecoveryDot1" cx="446" cy="111" r="10" class="recovery-dot"/>
+              <circle id="helpRecoveryDot2" cx="475" cy="111" r="10" class="recovery-dot"/>
+              <text id="helpRecoveryLabel" x="499" y="117" class="recovery-label">準備 あと2</text>
+            </g>
+            <g id="helpFailureMark" hidden>
+              <rect x="420" y="52" width="180" height="145" rx="14" class="failure-panel"/>
+              <text x="434" y="74" class="failure-panel-title">今回見る条件</text>
+              <g data-failure-reason="wrong-foot" class="failure-row"><circle cx="437" cy="94" r="6"/><text x="450" y="99">足の順番</text></g>
+              <g data-failure-reason="recovering" class="failure-row"><circle cx="437" cy="117" r="6"/><text x="450" y="122">次の足の準備</text></g>
+              <g data-failure-reason="long" class="failure-row"><circle cx="437" cy="140" r="6"/><text x="450" y="145">大股の条件</text></g>
+              <g data-failure-reason="slip" class="failure-row"><circle cx="437" cy="163" r="6"/><text x="450" y="168">でこぼこの滑り</text></g>
+              <g data-failure-reason="fall" class="failure-row"><circle cx="437" cy="186" r="6"/><text x="450" y="191">つまずき／転倒</text></g>
+              <path d="M548 216 L602 270 M602 216 L548 270" class="failure-mark"/>
+              <text x="516" y="300" class="failure-label">うまく押せない</text>
+            </g>
+          </svg>
+          <figcaption id="helpSceneCaption">問いを立て、次のコマで足裏に注目します。</figcaption>
+        </figure>
+
+        <article class="help-explanation" aria-live="polite" aria-atomic="true">
+          <p class="help-question-label">このコマの問い</p>
+          <h3 id="helpStepQuestion">右へ進みたい。地面をどちらへ押せばよい？</h3>
+          <div class="help-frame-title"><span id="helpFrameNumber">FRAME 1</span><strong id="helpStepTitle">まず、向きをそろえる</strong></div>
+          <p id="helpStepText">右が「前」、左が「後ろ」です。左足・右足という名前と、画面の左右を分けて考えます。</p>
+          <dl class="help-observation">
+            <div><dt>図で見る場所</dt><dd id="helpLookFor">地面と、画面右上の「前」の矢印</dd></div>
+            <div><dt>ゲームの数値</dt><dd id="helpMetric">前向き速度 0.000</dd></div>
+          </dl>
+          <p class="help-takeaway"><span>このコマで分かること</span><b id="helpTakeaway">まだ止まっている。まず方向の約束を確認する。</b></p>
+          <p class="help-caution" id="helpCaution">このページでは「前＝画面右」に固定して説明します。</p>
+        </article>
+      </div>
+
+      <div class="help-controls" role="group" aria-label="一コマ解説の操作">
+        <button type="button" id="helpPrev" aria-controls="helpLab">← ひとつ前</button>
+        <button type="button" id="helpNext" class="primary-help-control" aria-controls="helpLab">次の一コマ →</button>
+        <button type="button" id="helpReset" aria-controls="helpLab">最初から</button>
+      </div>
+      <p class="help-keyboard-note">キーボードの ← → でも一コマずつ移動できます。自動では進みません。</p>
+    </section>
+
+    <section class="help-reference" aria-labelledby="motionDictionaryTitle">
+      <div class="section-heading"><div><p class="panel-step">あとから見返す</p><h2 id="motionDictionaryTitle">動きの意味を、短く整理</h2></div><p>詳しい理由は上の4テーマで一コマずつ確認できます。</p></div>
+      <div class="motion-dictionary">
+        <article><span>左足・右足の一歩</span><h3>接地して、地面を後ろへ押す</h3><p>成功すると前向き速度を足す。足の名前と進む向きは別。</p></article>
+        <article><span>踏ん張る</span><h3>推進0で、一拍待つ</h3><p>残った速度で進みながら、次の足の準備を1段階進める。</p></article>
+        <article><span>腕</span><h3>前進ではなく、回転を変える</h3><p>傾きと反対へ振るのは立て直す候補。必ず戻るとは限らない。</p></article>
+        <article><span>大股</span><h3>大きく進めるが、条件つき</h3><p>停止中・大きな傾き・急な坂では、このゲームの規則上つまずく。</p></article>
+      </div>
+    </section>
+
+    <section class="help-accuracy" aria-labelledby="accuracyTitle">
+      <div><p class="panel-step">ここは区別する</p><h2 id="accuracyTitle">ゲームの約束と、本物の歩行</h2><p>分かりやすくするために省略した部分があります。図の理解を、そのまま人体の厳密な説明にはしません。</p></div>
+      <div class="help-comparison-wrap"><table>
+        <thead><tr><th scope="col">見るところ</th><th scope="col">このゲーム</th><th scope="col">本物の歩行</th></tr></thead>
+        <tbody>
+          <tr><th scope="row">一歩</th><td>足を出す・接地・押すを1操作へまとめる</td><td>制動・支持・蹴り出しなどが連続する</td></tr>
+          <tr><th scope="row">前向き速度</th><td>「勢い」と呼ぶゲーム内の速度に近い値</td><td>速度と運動量は別の物理量</td></tr>
+          <tr><th scope="row">踏ん張る</th><td>推進0の待ち拍。速度を少し失い、準備を進める</td><td>支持や姿勢制御にも力を使う</td></tr>
+          <tr><th scope="row">転倒</th><td>傾きが限界を越えると判定</td><td>重心・接地位置・関節など複数条件が関わる</td></tr>
+        </tbody>
+      </table></div>
+    </section>
+
+    <section class="help-try-card">
+      <div><p class="panel-step">ゲームで確かめる</p><h2>左の小さな一歩 → 踏ん張る2回 → 右の小さな一歩</h2><p>まず足だけで試し、次に傾きと反対の腕を選んで違いを比べよう。</p></div>
+      <button class="help-close-button" type="button" data-close-help>ゲームへ戻って試す</button>
+    </section>
+
+    <noscript><section class="notice"><h2>JavaScriptなしで読むまとめ</h2><ol><li>画面右が前。左足・右足は足の名前。</li><li>一歩は、足を出す・接地する・地面を後ろへ押す、をまとめた操作。</li><li>地面から前向きに押し返され、このゲームの前向き速度が増える。</li><li>踏ん張りは推進0。残った速度で進み、次の足の準備を1段階進める。</li><li>腕は前進速度でなく体の回転を変える。</li></ol></section></noscript>
+  </main>
+
+  <footer class="footer"><span>家族のまなび帳<br>読んで、動かして、考える。</span><span><a href="index.html">ころころウォーカー</a> · <a href="../index.html">プログラミング</a></span></footer>
+  <script src="../../../assets/reinforcement-walker/engine.js?v=20261004-1"></script>
+  <script src="../../../assets/reinforcement-walker/help.js?v=20261004-1"></script>
+</body>
+</html>

@@ -61,9 +61,18 @@
 
 .learning-entrances {
   display: grid;
-  grid-template-columns: minmax(210px, .8fr) repeat(2, minmax(0, 1fr));
+  grid-template-columns: minmax(190px, .76fr) repeat(3, minmax(0, 1fr));
   gap: 10px;
   margin: 0 0 18px;
+}
+
+.learning-entrances .recommended-entrance {
+  border-color: #d2a656;
+  background: #fff9e9;
+}
+
+.learning-entrances .recommended-entrance span {
+  color: #9a5d27;
 }
 
 .learning-entrances > div,
@@ -575,6 +584,27 @@
   color: #4d554a;
   font-size: 10px;
   line-height: 1.55;
+}
+
+.motion-help-link {
+  display: inline-flex;
+  min-height: 34px;
+  align-items: center;
+  margin-top: 9px;
+  padding: 6px 10px;
+  border: 1px solid #b47a49;
+  border-radius: 8px;
+  background: #fff;
+  color: #7a472b;
+  font-size: 10px;
+  font-weight: 900;
+  line-height: 1.4;
+  text-decoration: none;
+}
+
+.motion-help-link:hover,
+.motion-help-link:focus-visible {
+  background: #fff1d8;
 }
 
 .motion-cause[data-phase="coast"] {
@@ -1805,7 +1835,8 @@
 
   .mode-badge {
     display: inline-block;
-    margin-top: 14px;
+    align-self: flex-start;
+    margin-top: 0;
   }
 
   .game-shell {
@@ -2022,6 +2053,7 @@
   .control-panel,
   .manual-controls,
   .learning-entrances,
+  .motion-help-link,
   .replay-toolbar,
   .parameter-lab,
   .reward-presets,
