@@ -74,6 +74,7 @@
       totalSteps:0,correctSteps:0,stumbles:0,counterArm:0,armChoices:0,
       effort:0,
       lastAction:7,stepFlash:0,
+      lastMotion:{kind:'ready',speedBefore:0,pushAdded:0,speedAfter:0,dx:0,reason:''},
       components:{forward:0,balance:0,energy:0,fall:0}
     };
   }
@@ -150,6 +151,7 @@
     const r=runtime||engine;
     const action=ACTIONS[clamp(actionIndex|0,0,ACTION_COUNT-1)];
     const oldX=bot.x;
+    const speedBefore=bot.vx;
     const slope=terrainSlope(bot.x)*(1+engine.physics.roughness*2.2);
     const oldTarget=bot.armTarget;
     const armCommandDelta=action.arm-oldTarget;
@@ -165,6 +167,7 @@
     let effort=Math.abs(armCommandDelta)*.36+Math.abs(bot.armV)*.12;
     let stumbled=false;
     let stumbleReason='';
+    let pushAdded=0;
     if(action.leg!==0){
       effort+=.72+action.stride*.36;
       bot.totalSteps++;
@@ -179,7 +182,8 @@
       const slipped=correct&&ready&&!longRisk&&random(r)<=slipChance;
       if(correct&&ready&&!longRisk&&!slipped){
         const upright=clamp(1-Math.abs(bot.lean)/.86,.12,1);
-        bot.vx+=.022+.031*action.stride*upright;
+        pushAdded=.022+.031*action.stride*upright;
+        bot.vx+=pushAdded;
         bot.leanV+=action.leg*(.03+.047*action.stride);
         bot.nextFoot=-bot.nextFoot;
         bot.recovery=action.stride>1?3:2;
@@ -220,6 +224,16 @@
     }
 
     const dx=Math.max(0,bot.x-oldX);
+    const motion={
+      kind:stumbled?'stumble':action.leg===0?'coast':'push',
+      speedBefore,
+      pushAdded,
+      speedAfter:bot.vx,
+      dx,
+      reason:stumbleReason,
+      action:actionIndex
+    };
+    bot.lastMotion=motion;
     const upright=clamp(1-Math.abs(bot.lean)/.86,0,1);
     const components={
       forward:dx*engine.reward.forward,
@@ -232,7 +246,7 @@
     bot.effort+=effort;
     bot.reward+=reward;
     Object.keys(components).forEach(key=>{bot.components[key]+=components[key];});
-    return {reward,done:!bot.alive,components,action,slope,stumbled,stumbleReason,dx};
+    return {reward,done:!bot.alive,components,action,slope,stumbled,stumbleReason,dx,motion};
   }
 
   function snapshot(bot,actionIndex){
@@ -242,6 +256,7 @@
       time:bot.time,reward:bot.reward,alive:bot.alive,finished:bot.finished,
       effort:bot.effort,
       lastAction:actionIndex===undefined?bot.lastAction:actionIndex,stepFlash:bot.stepFlash,
+      lastMotion:Object.assign({},bot.lastMotion),
       components:Object.assign({},bot.components)
     };
   }

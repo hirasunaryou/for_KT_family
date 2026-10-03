@@ -32,7 +32,7 @@
   let replays=[];
   let humanBest=0;
   let aiBest=0;
-  let metric='reward';
+  let metric='distance';
   let training=false;
   let cancelTraining=false;
   let testTimer=0;
@@ -61,12 +61,46 @@
 
   function leanMeasure(value){return Math.abs(value)<.005?'中央 0.00':`${value<0?'左':'右'} ${fixed(Math.abs(value),2)}`;}
 
+  function renderMotionCause(motion,subject=bot){
+    const host=$('motionCause');
+    if(!host)return;
+    const detail=motion||{kind:'ready',speedBefore:0,pushAdded:0,speedAfter:0,dx:0,reason:'',action:7};
+    const phase=detail.kind||'ready';
+    host.dataset.phase=phase;
+    if($('motionPushValue'))$('motionPushValue').textContent=`+${fixed(detail.pushAdded||0,3)}`;
+    if($('motionSpeedValue'))$('motionSpeedValue').textContent=`${fixed(detail.speedBefore||0,3)} → ${fixed(detail.speedAfter||0,3)}`;
+    if($('motionDistanceValue'))$('motionDistanceValue').textContent=`+${fixed(detail.dx||0,2)} m`;
+
+    let title='なぜ一歩で右へ進む？';
+    let text='このゲームの「一歩」は、足を出して接地するだけでなく、地面を後ろへ押すところまでを1操作にまとめています。地面から右向きに押し返され、前向きの勢いが増えます。';
+    if(phase==='push'){
+      const action=E.ACTIONS[detail.action]||E.ACTIONS[7];
+      title='地面を後ろへ押したので、体が前へ進んだ';
+      text=`「${action.label}」で、足が地面を左へ押した扱いです。地面から体へ右向きの押し返しが働き、前向きの勢いを ${fixed(detail.pushAdded,3)} 足しました。`;
+    }else if(phase==='coast'){
+      title=detail.speedBefore>.0005?'踏ん張り中は、新しい推進を足さず惰性で進む':'勢いがないと、踏ん張るだけでは進まない';
+      text=detail.speedBefore>.0005
+        ?`「踏ん張る」は新しい前向きの勢いを足しません。前の一歩の勢いは ${fixed(detail.speedBefore,3)} → ${fixed(detail.speedAfter,3)} と少し減りますが、残った勢いで ${fixed(detail.dx,2)} m進み、その間に次の足の準備を1回進めます。`
+        :'いまは前の一歩の勢いがありません。「踏ん張る」は次の足の準備と姿勢の調整だけを行うため、これだけを続けても前へ進みません。';
+    }else if(phase==='stumble'){
+      const reasons={'wrong-foot':'足の順番が違った','recovering':'次の足の準備が終わっていなかった','long-rest':'止まったまま大股を選んだ','long-lean':'傾いたまま大股を選んだ','long-slope':'急な坂で大股を選んだ',slip:'でこぼこで滑った'};
+      title='条件がそろわず、地面をうまく押せなかった';
+      text=`${reasons[detail.reason]||'一歩が乱れた'}ため、今回足した前向きの勢いは0です。${detail.dx>.005?`残っていた勢いで ${fixed(detail.dx,2)} mだけ進みました。`:'前へ進む勢いもほとんど残りませんでした。'}`;
+    }
+    if($('motionCauseTitle'))$('motionCauseTitle').textContent=title;
+    if($('motionCauseText'))$('motionCauseText').textContent=text;
+    host.querySelectorAll('[data-motion-stage]').forEach(stage=>{
+      const name=stage.dataset.motionStage;
+      stage.classList.toggle('is-active',phase==='push'?(name==='push'||name==='reaction'):phase==='coast'?name==='coast':false);
+    });
+  }
+
   function resetActionInsight(){
     const host=$('actionInsight');
     if(host){host.dataset.outcome='ready';host.dataset.reason='none';}
     if($('actionChoice'))$('actionChoice').textContent='まだ一歩を選んでいません';
     if($('actionResult'))$('actionResult').textContent='左足の短い一歩から試してみよう';
-    if($('actionWhy'))$('actionWhy').textContent='足は左右交互。一歩の直後は「踏ん張る」で次の足を出す準備をします。';
+    if($('actionWhy'))$('actionWhy').textContent='一歩で地面を後ろへ押して勢いを作り、その後は「踏ん張る」で次の足を出す準備をします。';
     if($('actionNext'))$('actionNext').textContent='観察 → 予想 → 一歩 → 結果、の順で比べよう。';
   }
 
@@ -76,7 +110,7 @@
     if($('bodySpin'))$('bodySpin').textContent=spinName(subject.leanV);
     if($('nextFootStatus'))$('nextFootStatus').textContent=footName(subject.nextFoot);
     if($('recoveryStatus'))$('recoveryStatus').textContent=subject.recovery>0?`あと ${subject.recovery} 回`:'OK';
-    if($('recoveryHint'))$('recoveryHint').textContent=subject.recovery>0?'「踏ん張る」で1回ずつ進む':'いま次の足を出せます';
+    if($('recoveryHint'))$('recoveryHint').textContent=subject.recovery>0?'「踏ん張って整える」で準備を1回ずつ進める':'いま次の足を出せます';
 
     const overrideAction=actionOverride===null?null:E.ACTIONS[actionOverride];
     const selected=E.ARM_COMMANDS[overrideAction?overrideAction.armIndex:armIndex]||E.ARM_COMMANDS[1];
@@ -97,10 +131,17 @@
     if($('armHintText'))$('armHintText').textContent=message;
 
     const suggested=subject.recovery>0?'brace':subject.nextFoot<0?'left':'right';
+    const slope=E.terrainSlope(subject.x)*(1+engine.physics.roughness*2.2);
+    const longSafe=subject.recovery<=0&&subject.vx>=.022&&Math.abs(subject.lean)<=.29&&Math.abs(slope)<=.075;
     document.querySelectorAll('[data-leg]').forEach(button=>{
       const id=button.dataset.leg;
-      button.classList.toggle('is-next',suggested==='brace'?id==='brace':id.startsWith(`${suggested}-`));
+      const recommended=suggested==='brace'?id==='brace':id===`${suggested}-short`;
+      const challenge=suggested!=='brace'&&longSafe&&id===`${suggested}-long`;
+      button.classList.toggle('is-next',recommended);
+      button.classList.toggle('is-challenge',challenge);
+      button.dataset.guideLabel=recommended?(suggested==='brace'?'次':'おすすめ'):challenge?'挑戦':'';
     });
+    renderMotionCause(subject.lastMotion,subject);
   }
 
   function renderManualOutcome(result,before,after){
@@ -113,8 +154,8 @@
     let why='';
     if(action.leg===0){
       outcome='brace';reason='brace';
-      resultText=`踏ん張った · 準備 ${before.recovery} → ${after.recovery} · 傾き ${leanMeasure(before.lean)} → ${leanMeasure(after.lean)}`;
-      why=before.recovery>0?'足を出さず、次の一歩の準備を1回進めました。':'足を出さず、速さと回転を少し弱めました。';
+      resultText=`踏ん張って整えた · 惰性で +${fixed(result.dx,2)} m · 準備 ${before.recovery} → ${after.recovery}`;
+      why=before.vx>.0005?'新しい推進は足さず、前の一歩の勢いを少し失いながら、次の足の準備を1回進めました。':'前の勢いがないため前進せず、姿勢と足の準備だけを整えました。';
     }else if(result.stumbled){
       outcome='stumble';reason=result.stumbleReason||'slip';
       const reasons={
@@ -129,7 +170,7 @@
       why=reasons[reason]||reasons.slip;
     }else{
       resultText=`一歩成功 · +${fixed(result.dx,2)} m · 傾き ${leanMeasure(before.lean)} → ${leanMeasure(after.lean)}`;
-      why=action.stride>1?'大股は推進が大きいぶん、足側への回転も大きくなります。':'順番と準備が合い、小さな一歩で速度を足しました。';
+      why=action.stride>1?'大股で地面を強く後ろへ押した扱いになり、推進と足側への回転が大きくなりました。':'順番と準備が合い、地面を後ろへ押した扱いになったので前向きの勢いが増えました。';
     }
     const armLabel=E.ARM_COMMANDS[action.armIndex].label;
     host.dataset.outcome=outcome;
@@ -327,6 +368,8 @@
       button.addEventListener('click',()=>playReplay(replay));
       host.appendChild(button);
     });
+    const toolbar=$('replayToolbar');
+    if(toolbar)toolbar.hidden=training||engine.episodes<=0||replays.length<2;
   }
 
   function playReplay(replay){
@@ -369,6 +412,7 @@
     training=true;
     cancelTraining=false;
     setMode('training');
+    renderReplayButtons();
     lockExperimentControls(true);
     const progress=$('trainingProgress');
     if(progress)progress.hidden=false;
@@ -409,6 +453,7 @@
       if(returnFocus&&returnFocus.focus)returnFocus.focus({preventScroll:true});
     }
     setMode('ready');
+    renderReplayButtons();
     updateHud();
     drawChart();
     renderDiscoveries();
@@ -870,6 +915,11 @@
     if($('resetLearning'))$('resetLearning').addEventListener('click',()=>resetLearning('学習とQテーブルを0回に戻しました。'));
     if($('stopTraining'))$('stopTraining').addEventListener('click',stopTraining);
     if($('stopReplay'))$('stopReplay').addEventListener('click',stopReplayPlayback);
+    document.querySelectorAll('[data-start-manual]').forEach(link=>link.addEventListener('click',event=>{
+      event.preventDefault();
+      if(training){announce('学習中です。「ここで止める」を押すと手動へ戻れます。');return;}
+      startManual();
+    }));
 
     ['rewardForward','rewardBalance','rewardEnergy','rewardFall'].forEach(id=>{
       if(!$(id))return;
