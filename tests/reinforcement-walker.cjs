@@ -1,0 +1,32 @@
+const fs=require('fs');
+const path=require('path');
+const assert=require('assert');
+const {JSDOM}=require('jsdom');
+const root=path.join(__dirname,'..');
+const html=fs.readFileSync(path.join(root,'study/programming/reinforcement-walker/index.html'),'utf8');
+const js=fs.readFileSync(path.join(root,'assets/reinforcement-walker/app.js'),'utf8');
+const programming=fs.readFileSync(path.join(root,'study/programming/index.html'),'utf8');
+assert(html.includes('id="world"'),'walker canvas is present');
+assert(html.includes('data-train="500"'),'training controls are present');
+assert(html.includes('id="qBars"')&&html.includes('id="rewardChart"'),'learning displays are present');
+assert(html.includes('学習率')&&html.includes('未来の重み')&&html.includes('冒険率'),'parameters are explained');
+assert(js.includes("const ACTIONS=['left','wait','right']"),'three actions are defined');
+assert(js.includes('params.alpha*(reward+params.gamma*future-current[action])'),'Q-learning update is implemented');
+assert(programming.includes('reinforcement-walker/index.html'),'programming index links to walker');
+
+(async()=>{
+  const dom=new JSDOM(html,{runScripts:'outside-only',url:'https://example.test/study/programming/reinforcement-walker/'});
+  const fakeContext={fillStyle:'',strokeStyle:'',lineWidth:1,font:'',textAlign:'start',beginPath(){},moveTo(){},lineTo(){},stroke(){},fill(){},fillRect(){},arc(){},ellipse(){},roundRect(){},save(){},restore(){},translate(){},rotate(){},setLineDash(){},fillText(){},clearRect(){},createLinearGradient(){return {addColorStop(){}};}};
+  dom.window.HTMLCanvasElement.prototype.getContext=()=>fakeContext;
+  dom.window.requestAnimationFrame=()=>0;
+  dom.window.eval(js);
+  const doc=dom.window.document;
+  doc.querySelector('[data-action="left"]').click();
+  assert.notStrictEqual(doc.getElementById('episodeReward').textContent,'0.0','manual action changes reward');
+  doc.querySelector('[data-train="500"]').click();
+  for(let i=0;i<200&&doc.getElementById('episode').textContent!=='500';i++)await new Promise(resolve=>setTimeout(resolve,5));
+  assert.strictEqual(doc.getElementById('episode').textContent,'500','500 training episodes complete');
+  assert.strictEqual(doc.getElementById('modeBadge').textContent,'AIテスト','training changes to test mode');
+  assert.notStrictEqual(doc.getElementById('chartSummary').textContent,'学習前','reward chart summary updates');
+  console.log('reinforcement walker checks passed');
+})().catch(error=>{console.error(error);process.exitCode=1;});
