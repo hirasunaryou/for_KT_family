@@ -17,7 +17,7 @@
     const correct=(action===0&&bot.nextFoot===0)||(action===2&&bot.nextFoot===1);
     if(dir){bot.leanV+=dir*.31;if(correct){bot.speed+=.22;bot.nextFoot=1-bot.nextFoot;}else{bot.leanV+=dir*.2;bot.speed*=.78;}bot.stepFlash=1;}
     bot.leanV+=bot.lean*.115+(Math.random()-.5)*params.noise;bot.leanV*=.88;bot.lean+=bot.leanV*.12;
-    bot.speed=Math.max(0,Math.min(1.6,bot.speed*.985));bot.x+=bot.speed*.055;bot.time++;bot.stepFlash*=.82;bot.lastAction=ACTIONS[action];
+    bot.speed=Math.max(0,Math.min(1.6,bot.speed*.985));bot.x+=bot.speed*.055;best=Math.max(best,bot.x);bot.time++;bot.stepFlash*=.82;bot.lastAction=ACTIONS[action];
     let reward=(bot.x-oldX)*14+.005-Math.abs(bot.lean)*.045-(action===1?.025:0);
     if(Math.abs(bot.lean)>1.02||bot.time>700){bot.alive=false;reward+=Math.abs(bot.lean)>1.02?-18:8;}
     bot.reward+=reward;updateHud();return {reward,done:!bot.alive};
@@ -26,7 +26,7 @@
   function trainingEpisode(){resetBot();let guard=0;while(bot.alive&&guard++<720){const old=stateKey(),action=choose(old,true),result=physics(action),next=result.done?null:stateKey();updateQ(old,action,result.reward,next);}rewards.push(bot.reward);episodeCount++;best=Math.max(best,bot.x);}
   async function train(count){running=false;mode='training';setMode();disableControls(true);$('trainingProgress').hidden=false;const chunk=count>100?20:5;for(let i=0;i<count;i++){trainingEpisode();if(i%chunk===0||i===count-1){$('trainingBar').value=Math.round((i+1)/count*100);$('trainingLabel').textContent=`学習中 ${i+1} / ${count}回`;drawChart();await new Promise(r=>setTimeout(r,0));}}$('trainingProgress').hidden=true;disableControls(false);startTest();}
   function startTest(){resetBot();mode='test';running=true;timer=0;setMode();$('coach').textContent='冒険なし。AIは今まででQ値が最も高かった行動だけを選びます。';}
-  function startManual(){resetBot();mode='manual';running=true;timer=0;setMode();$('coach').textContent='A と D を交互に押してみよう。傾いた側の足を出すと立て直しやすい。';}
+  function startManual(){resetBot();mode='manual';running=true;timer=0;setMode();$('coach').textContent='A と D を交互に押してみよう。傾いた側と反対の足を出すと立て直しやすい。';}
   function setMode(){const labels={manual:'手動チャレンジ',training:'高速で学習中',test:'AIテスト'};$('modeBadge').textContent=labels[mode];$('manualControls').hidden=mode!=='manual';}
   function manualAction(index){if(mode!=='manual')return;if(!bot.alive){startManual();return;}physics(index);flash(ACTIONS[index]);}
   function flash(name){const el=document.querySelector(`[data-action="${name}"]`);if(el){el.classList.add('pressed');setTimeout(()=>el.classList.remove('pressed'),120);}}
