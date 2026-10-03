@@ -75,6 +75,55 @@ function checkPhysicsAndRewards(){
   closeTo(traced.reward,Object.values(traced.components).reduce((sum,value)=>sum+value,0),'episode reward equals all accumulated components',1e-7);
 }
 
+function actionIndex(id){
+  const index=Engine.ACTIONS.findIndex(action=>action.id===id);
+  assert(index>=0,`action ${id} exists`);
+  return index;
+}
+
+function checkMovementPrinciples(){
+  const make=()=>({
+    engine:Engine.createEngine({seed:1,physics:{roughness:0}}),
+    bot:Engine.createBot({seed:2},false),
+    runtime:{seed:3}
+  });
+
+  let scene=make();
+  let result=Engine.step(scene.engine,scene.bot,actionIndex('left-short-arms-center'),scene.runtime);
+  assert(!result.stumbled&&scene.bot.x>0,'a short correct first step creates propulsion');
+  assert.strictEqual(scene.bot.nextFoot,1,'a successful left step changes the next foot to right');
+  assert.strictEqual(scene.bot.recovery,2,'a short step needs two brace actions before the next foot');
+  assert(result.dx>0,'step result exposes the distance used by the explanation');
+
+  scene=make();
+  result=Engine.step(scene.engine,scene.bot,actionIndex('left-long-arms-center'),scene.runtime);
+  assert(result.stumbled,'a long stride from rest stumbles');
+  assert.strictEqual(result.stumbleReason,'long-rest','the UI can explain why the long first stride failed');
+
+  scene=make();
+  Engine.step(scene.engine,scene.bot,actionIndex('left-short-arms-center'),scene.runtime);
+  result=Engine.step(scene.engine,scene.bot,actionIndex('right-short-arms-center'),scene.runtime);
+  assert(result.stumbled,'the other foot still stumbles during recovery');
+  assert.strictEqual(result.stumbleReason,'recovering','recovery failure has an exact reason code');
+
+  scene=make();
+  Engine.step(scene.engine,scene.bot,actionIndex('left-short-arms-center'),scene.runtime);
+  Engine.step(scene.engine,scene.bot,actionIndex('brace-arms-center'),scene.runtime);
+  Engine.step(scene.engine,scene.bot,actionIndex('brace-arms-center'),scene.runtime);
+  result=Engine.step(scene.engine,scene.bot,actionIndex('right-short-arms-center'),scene.runtime);
+  assert(!result.stumbled,'two brace actions prepare the other foot after a short step');
+  assert.strictEqual(scene.bot.correctSteps,2,'the alternating sequence records two correct steps');
+
+  const left=make();
+  const right=make();
+  left.bot.lean=right.bot.lean=.35;
+  Engine.step(left.engine,left.bot,actionIndex('brace-arms-left'),left.runtime);
+  Engine.step(right.engine,right.bot,actionIndex('brace-arms-right'),right.runtime);
+  assert(Math.abs(left.bot.lean)<Math.abs(right.bot.lean),'an arm swing opposite the lean corrects more than a same-side swing');
+  closeTo(left.bot.x,0,'arms do not directly propel the walker');
+  closeTo(right.bot.x,0,'arms do not directly propel the walker');
+}
+
 function checkQUpdate(){
   const terminal=Engine.createEngine({seed:40,learning:{alpha:1,gamma:.5,epsilon:0}});
   const state=3,action=4,nextState=9;
@@ -152,8 +201,22 @@ async function checkPageAndUi(){
   assert(staticDoc.getElementById('equationNumbers'),'the numeric Q update can be inspected');
   assert(staticDoc.getElementById('qTableBody'),'visited Q-table rows have a dedicated table body');
   assert.strictEqual(staticDoc.querySelectorAll('#qHeatmap [data-q-action]').length,15,'the initial Q heatmap exposes all 15 actions');
+  assert.strictEqual(staticDoc.querySelectorAll('#qHeatmap [role="row"]').length,6,'the Q heatmap has accessible table rows');
+  assert.strictEqual(staticDoc.querySelectorAll('#qHeatmap [role="cell"][aria-live="off"]').length,15,'Q cells do not create live-region flooding');
   assert.strictEqual(staticDoc.querySelectorAll('#rewardForward, #rewardBalance, #rewardEnergy, #rewardFall').length,4,'all four reward terms can be designed');
   assert(staticDoc.getElementById('stopTraining'),'long training can be stopped between episodes');
+  assert.strictEqual(staticDoc.getElementById('trainingBar').getAttribute('aria-labelledby'),'trainingLabel','training progress has an accessible name');
+  assert(staticDoc.getElementById('stopReplay'),'long learning replays can be stopped');
+  assert(staticDoc.getElementById('chartA11y'),'the learning chart has a text equivalent');
+  assert.strictEqual(staticDoc.querySelectorAll('#discoveries [data-discovery-status]').length,5,'each discovery exposes found or not-found text');
+  assert(staticDoc.getElementById('movementTheory'),'movement principles sit beside the manual controls');
+  assert(staticDoc.getElementById('actionInsight'),'each manual action has a dynamic explanation');
+  assert(staticDoc.getElementById('qStory'),'one Q-table update has a focused explanation');
+  assert(staticDoc.getElementById('parameterFocus'),'one parameter at a time has a focused explanation');
+  assert(/成功確率ではありません/.test(staticDoc.getElementById('qStory').textContent),'Q value is explicitly distinguished from a probability');
+  assert(/足は交互|足の順番/.test(staticDoc.getElementById('movementTheory').textContent),'alternating feet are explained');
+  assert(/腕.*回転|回転.*腕/.test(staticDoc.getElementById('movementTheory').textContent),'arm rotation is explained');
+  assert(/踏ん張る/.test(staticDoc.getElementById('movementTheory').textContent),'bracing and recovery are explained');
   window.HTMLCanvasElement.prototype.getContext=()=>fakeCanvasContext();
   window.requestAnimationFrame=()=>0;
   window.cancelAnimationFrame=()=>{};
@@ -173,14 +236,35 @@ async function checkPageAndUi(){
   assert.strictEqual(debug.bot.time,beforeArmTime,'selecting an arm direction alone does not advance simulated time');
   closeTo(debug.bot.x,beforeArmX,'selecting an arm direction alone does not move the walker');
   assert.strictEqual(uiStepCalls,0,'arm selection alone does not call the shared physics step');
+  debug.bot.lean=.35;
+  doc.querySelector('[data-arm="arms-left"]').click();
+  assert.strictEqual(doc.getElementById('armHint').dataset.balanceEffect,'recover','opposite arm is described as the recovery side');
+  doc.querySelector('[data-arm="arms-right"]').click();
+  assert.strictEqual(doc.getElementById('armHint').dataset.balanceEffect,'worsen','same-side arm warns that lean may grow');
+  doc.querySelector('[data-arm="arms-center"]').click();
+  debug.bot.lean=0;
   doc.querySelector('[data-leg="left-short"]').click();
   assert.strictEqual(uiStepCalls,1,'the next leg click calls the shared physics exactly once');
   assert.strictEqual(debug.bot.time,beforeArmTime+1,'the compound leg-and-arm action advances exactly one time step');
   assert(debug.bot.x>beforeArmX,'the first valid compound step advances the walker');
+  assert.strictEqual(doc.getElementById('actionInsight').dataset.outcome,'push','a successful step is labelled as propulsion');
+  assert.strictEqual(doc.getElementById('nextFootStatus').textContent,'右足','the body readout changes to the next foot');
+  assert(/あと 2 回/.test(doc.getElementById('recoveryStatus').textContent),'the body readout exposes short-step recovery');
+  doc.querySelector('[data-leg="right-short"]').click();
+  assert.strictEqual(uiStepCalls,2,'a premature second foot still advances physics exactly once');
+  assert.strictEqual(doc.getElementById('actionInsight').dataset.outcome,'stumble','a premature foot is labelled as a stumble');
+  assert.strictEqual(doc.getElementById('actionInsight').dataset.reason,'recovering','the dynamic explanation exposes recovery as the cause');
+  debug.startManual();
+  debug.bot.time=debug.engine.physics.maxSteps-1;
+  doc.querySelector('[data-leg="brace"]').click();
+  assert.strictEqual(debug.bot.doneReason,'timeout','the manual test can end by time rather than a fall');
+  assert(/時間切れ/.test(doc.getElementById('coach').textContent)&&!/ころん/.test(doc.getElementById('coach').textContent),'timeout guidance is not mislabeled as a fall');
+  debug.startManual();
 
   const train50=doc.querySelector('[data-train="50"]');
   assert(train50,'fast training button can be operated');
   train50.click();
+  assert.strictEqual(doc.activeElement,doc.getElementById('stopTraining'),'keyboard focus moves to the stop control during training');
   assert(doc.getElementById('resetLearning').disabled,'reset is disabled while asynchronous training is active');
   assert(doc.getElementById('rewardForward').disabled,'reward sliders are disabled while asynchronous training is active');
   assert(doc.querySelector('[data-reward-preset]').disabled,'reward presets are disabled while asynchronous training is active');
@@ -201,16 +285,43 @@ async function checkPageAndUi(){
     await new Promise(resolve=>setTimeout(resolve,4));
   }
   assert(!trainingProgress||trainingProgress.hidden,'training returns control to the learner after the batch');
+  assert(!/まだ学習前/.test(doc.getElementById('chartA11y').textContent),'training updates the chart text equivalent');
 
   if(debug&&debug.engine){
     assert.strictEqual(debug.engine.episodes,50,'UI count agrees with the engine count');
     assert(debug.engine.q.some(value=>value!==0),'training changes the Q table');
+    const update=debug.engine.lastUpdate;
+    const story=doc.getElementById('qStory');
+    assert.strictEqual(Number(story.dataset.state),update.state,'Q story uses the last updated state');
+    assert.strictEqual(Number(story.dataset.action),update.action,'Q story uses the last updated action');
+    assert.strictEqual(Number(doc.getElementById('qHeatmap').dataset.state),update.state,'Q heatmap shows the same state as the story');
+    assert.strictEqual(doc.querySelectorAll(`.last-updated[data-q-action="${update.action}"]`).length,1,'exactly one Q cell marks the updated action');
+    closeTo(Number(doc.getElementById('qStoryOld').dataset.value),update.old,'Q story old value matches the engine');
+    closeTo(Number(doc.getElementById('qStoryReward').dataset.value),update.reward,'Q story reward matches the engine');
+    closeTo(Number(doc.getElementById('qStoryFuture').dataset.value),update.future,'Q story future value matches the engine');
+    closeTo(Number(doc.getElementById('qStoryNew').dataset.value),update.value,'Q story new value matches the engine');
+    assert(!/まだ更新/.test(doc.getElementById('equationNumbers').textContent),'numeric formula appears after learning');
   }
   const contributionIds=['rewardContributionForward','rewardContributionBalance','rewardContributionEnergy','rewardContributionFall'];
   const contributions=contributionIds.map(id=>doc.getElementById(id)).filter(Boolean);
   if(contributions.length){
     assert.strictEqual(contributions.length,4,'the last episode exposes all four reward contributions');
     assert(contributions.some(element=>!/^[-+−]0\.00$/.test(element.textContent.trim())),'training replaces the reward-breakdown placeholders');
+  }
+
+  const alpha=doc.getElementById('alpha');
+  if(alpha&&debug){
+    doc.querySelector('[data-parameter-focus="epsilon"]').click();
+    assert.strictEqual(doc.getElementById('parameterFocus').dataset.parameter,'epsilon','parameter tabs reveal one selected concept');
+    assert(/今は約/.test(doc.getElementById('parameterFocusExample').textContent),'epsilon distinguishes initial and current exploration');
+    doc.querySelector('[data-parameter-focus="alpha"]').click();
+    alpha.value=String(Number(alpha.value)+.01);
+    alpha.dispatchEvent(new window.Event('input',{bubbles:true}));
+    closeTo(Number(doc.getElementById('alphaValue').textContent),Number(alpha.value),'parameter preview updates while dragging');
+    alpha.dispatchEvent(new window.Event('change',{bubbles:true}));
+    assert.strictEqual(debug.engine.episodes,0,'confirming a parameter starts a fair experiment from zero');
+    assert.strictEqual(debug.history.length,0,'parameter reset clears the mixed-condition graph history');
+    assert(!debug.engine.q.some(value=>value!==0),'parameter reset clears the mixed-condition Q table');
   }
 
   const rewardInput=doc.querySelector('[data-reward], #rewardForward, #forwardReward');
@@ -235,6 +346,7 @@ async function checkPageAndUi(){
 
 checkEngineContract();
 checkPhysicsAndRewards();
+checkMovementPrinciples();
 checkQUpdate();
 checkDeterminismAndFiniteNumbers();
 checkPageAndUi()
