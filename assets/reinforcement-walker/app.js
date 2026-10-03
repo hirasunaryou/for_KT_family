@@ -72,20 +72,20 @@
     if($('motionDistanceValue'))$('motionDistanceValue').textContent=`+${fixed(detail.dx||0,2)} m`;
 
     let title='なぜ一歩で右へ進む？';
-    let text='このゲームの「一歩」は、足を出して接地するだけでなく、地面を後ろへ押すところまでを1操作にまとめています。地面から右向きに押し返され、前向きの勢いが増えます。';
+    let text='このゲームの「一歩」は、足を出して接地するだけでなく、地面を後ろへ押すところまでを1操作にまとめています。地面が足を前へ押し、その力が体へ伝わって前向き速度が増えます。';
     if(phase==='push'){
       const action=E.ACTIONS[detail.action]||E.ACTIONS[7];
       title='地面を後ろへ押したので、体が前へ進んだ';
-      text=`「${action.label}」で、足が地面を左へ押した扱いです。地面から体へ右向きの押し返しが働き、前向きの勢いを ${fixed(detail.pushAdded,3)} 足しました。`;
+      text=`「${action.label}」で、足が地面を後ろ（画面左）へ押した扱いです。地面が足を前へ押し、その力が体へ伝わって前向き速度を ${fixed(detail.pushAdded,3)} 足しました。その後、同じ操作内の抵抗と坂の影響を受けます。`;
     }else if(phase==='coast'){
-      title=detail.speedBefore>.0005?'踏ん張り中は、新しい推進を足さず惰性で進む':'勢いがないと、踏ん張るだけでは進まない';
+      title=detail.speedBefore>.0005?'踏ん張り中は、新しい推進を足さず惰性で進む':'速度がないと、踏ん張るだけでは進まない';
       text=detail.speedBefore>.0005
-        ?`「踏ん張る」は新しい前向きの勢いを足しません。前の一歩の勢いは ${fixed(detail.speedBefore,3)} → ${fixed(detail.speedAfter,3)} と少し減りますが、残った勢いで ${fixed(detail.dx,2)} m進み、その間に次の足の準備を1回進めます。`
-        :'いまは前の一歩の勢いがありません。「踏ん張る」は次の足の準備と姿勢の調整だけを行うため、これだけを続けても前へ進みません。';
+        ?`「踏ん張る」は新しい前向き速度を足しません。前の一歩の速度は ${fixed(detail.speedBefore,3)} → ${fixed(detail.speedAfter,3)} と少し減りますが、残った速度で ${fixed(detail.dx,2)} m進み、その間に次の足の準備を1回進めます。`
+        :'いまは前の一歩の速度がありません。「踏ん張る」は次の足の準備を進めます。回転を弱める成分もありますが、傾き・坂・腕の効果しだいでは操作後の回転が強まることもあり、これだけを続けても前へ進みません。';
     }else if(phase==='stumble'){
       const reasons={'wrong-foot':'足の順番が違った','recovering':'次の足の準備が終わっていなかった','long-rest':'止まったまま大股を選んだ','long-lean':'傾いたまま大股を選んだ','long-slope':'急な坂で大股を選んだ',slip:'でこぼこで滑った'};
       title='条件がそろわず、地面をうまく押せなかった';
-      text=`${reasons[detail.reason]||'一歩が乱れた'}ため、今回足した前向きの勢いは0です。${detail.dx>.005?`残っていた勢いで ${fixed(detail.dx,2)} mだけ進みました。`:'前へ進む勢いもほとんど残りませんでした。'}`;
+      text=`${reasons[detail.reason]||'一歩が乱れた'}ため、今回増えた前向き速度は0です。${detail.dx>.005?`残っていた速度で ${fixed(detail.dx,2)} mだけ進みました。`:'前向き速度もほとんど残りませんでした。'}`;
     }
     if($('motionCauseTitle'))$('motionCauseTitle').textContent=title;
     if($('motionCauseText'))$('motionCauseText').textContent=text;
@@ -93,6 +93,12 @@
       const name=stage.dataset.motionStage;
       stage.classList.toggle('is-active',phase==='push'?(name==='push'||name==='reaction'):phase==='coast'?name==='coast':false);
     });
+    const helpLink=$('motionHelpLink');
+    if(helpLink){
+      const helpTopic=phase==='coast'?'brace':phase==='stumble'?'mistakes':'push';
+      helpLink.href=`help.html#${helpTopic}`;
+      helpLink.textContent=phase==='coast'?'踏ん張りの場面を、大きな図で一コマずつ見る →':phase==='stumble'?'この失敗の理由を、HELPで分けて見る →':'この場面を、大きな図で一コマずつ見る →';
+    }
   }
 
   function resetActionInsight(){
@@ -100,7 +106,7 @@
     if(host){host.dataset.outcome='ready';host.dataset.reason='none';}
     if($('actionChoice'))$('actionChoice').textContent='まだ一歩を選んでいません';
     if($('actionResult'))$('actionResult').textContent='左足の短い一歩から試してみよう';
-    if($('actionWhy'))$('actionWhy').textContent='一歩で地面を後ろへ押して勢いを作り、その後は「踏ん張る」で次の足を出す準備をします。';
+    if($('actionWhy'))$('actionWhy').textContent='一歩で地面を後ろへ押して前向き速度を作り、その後は「踏ん張る」で次の足を出す準備をします。';
     if($('actionNext'))$('actionNext').textContent='観察 → 予想 → 一歩 → 結果、の順で比べよう。';
   }
 
@@ -110,7 +116,7 @@
     if($('bodySpin'))$('bodySpin').textContent=spinName(subject.leanV);
     if($('nextFootStatus'))$('nextFootStatus').textContent=footName(subject.nextFoot);
     if($('recoveryStatus'))$('recoveryStatus').textContent=subject.recovery>0?`あと ${subject.recovery} 回`:'OK';
-    if($('recoveryHint'))$('recoveryHint').textContent=subject.recovery>0?'「踏ん張って整える」で準備を1回ずつ進める':'いま次の足を出せます';
+    if($('recoveryHint'))$('recoveryHint').textContent=subject.recovery>0?'「踏ん張る・1拍待つ」で準備を1回ずつ進める':'いま次の足を出せます';
 
     const overrideAction=actionOverride===null?null:E.ACTIONS[actionOverride];
     const selected=E.ARM_COMMANDS[overrideAction?overrideAction.armIndex:armIndex]||E.ARM_COMMANDS[1];
@@ -118,13 +124,13 @@
     let effect='neutral';
     let message='腕は前進力ではなく、体の回り方を変えます。';
     if(selected.arm===0){
-      message='次の一歩で腕を中央へ戻します。戻す瞬間にも反対向きの回転が出ます。';
+      message='次の操作で腕を中央へ戻します。戻す瞬間にも反対向きの回転が出ます。';
     }else if(Math.abs(subject.lean)>.12&&Math.sign(selected.arm)===-Math.sign(subject.lean)){
       effect='recover';message='傾きと反対向き。体を中央へ戻す候補です。';
     }else if(Math.abs(subject.lean)>.12&&Math.sign(selected.arm)===Math.sign(subject.lean)){
       effect='worsen';message='傾きと同じ向き。さらに傾くかもしれません。';
     }else{
-      message=`次の一歩で、体へ${selected.arm<0?'左':'右'}向きの回転を足します。`;
+      message=`次の操作で、体へ${selected.arm<0?'左':'右'}向きの回転を足します。`;
     }
     if(armHost)armHost.dataset.balanceEffect=effect;
     if($('armHintChoice'))$('armHintChoice').textContent=selected.label.replace('腕','腕を').replace('←','左へ ←').replace('→','右へ →').replace('・','まんなか');
@@ -154,8 +160,8 @@
     let why='';
     if(action.leg===0){
       outcome='brace';reason='brace';
-      resultText=`踏ん張って整えた · 惰性で +${fixed(result.dx,2)} m · 準備 ${before.recovery} → ${after.recovery}`;
-      why=before.vx>.0005?'新しい推進は足さず、前の一歩の勢いを少し失いながら、次の足の準備を1回進めました。':'前の勢いがないため前進せず、姿勢と足の準備だけを整えました。';
+      resultText=`一拍待った · 惰性で +${fixed(result.dx,2)} m · 準備 ${before.recovery} → ${after.recovery}`;
+      why=before.vx>.0005?'新しい推進は足さず、前の一歩の速度を少し失いながら、次の足の準備を1回進めました。':'前向き速度がないため前進せず、次の足の準備を1回進めました。踏ん張りには回転を弱める成分もありますが、ほかの力も同時に働きます。';
     }else if(result.stumbled){
       outcome='stumble';reason=result.stumbleReason||'slip';
       const reasons={
@@ -170,7 +176,7 @@
       why=reasons[reason]||reasons.slip;
     }else{
       resultText=`一歩成功 · +${fixed(result.dx,2)} m · 傾き ${leanMeasure(before.lean)} → ${leanMeasure(after.lean)}`;
-      why=action.stride>1?'大股で地面を強く後ろへ押した扱いになり、推進と足側への回転が大きくなりました。':'順番と準備が合い、地面を後ろへ押した扱いになったので前向きの勢いが増えました。';
+      why=action.stride>1?'大股で地面を強く後ろへ押した扱いになり、推進と足側への回転が大きくなりました。':'順番と準備が合い、地面を後ろへ押した扱いになったので前向き速度が増えました。';
     }
     const armLabel=E.ARM_COMMANDS[action.armIndex].label;
     host.dataset.outcome=outcome;
@@ -303,9 +309,9 @@
     if(host){host.dataset.outcome='preview';host.dataset.reason='arm-selected';}
     if($('actionChoice'))$('actionChoice').textContent=`${label}を選択`;
     if($('actionResult'))$('actionResult').textContent='まだ体は動いていません';
-    if($('actionWhy'))$('actionWhy').textContent=$('armHintText')?$('armHintText').textContent:'次の一歩で足と腕を同時に動かします。';
-    if($('actionNext'))$('actionNext').textContent=`次の足ボタンで、${label}と足を同時に試します。`;
-    if($('coach'))$('coach').textContent=`「${label}」を選択。腕だけでは時間は進まず、次の足と同時に動きます。`;
+    if($('actionWhy'))$('actionWhy').textContent=$('armHintText')?$('armHintText').textContent:'次の操作で足と腕を同時に動かします。';
+    if($('actionNext'))$('actionNext').textContent=`次の操作（足を出す／一拍待つ）に、${label}を組み合わせます。`;
+    if($('coach'))$('coach').textContent=`「${label}」を選択。腕だけでは時間は進まず、次の操作（足を出す／一拍待つ）と同時に動きます。`;
     announce(`${label}を選びました。次の足運びと組み合わせます。`);
   }
 
