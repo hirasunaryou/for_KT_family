@@ -8,7 +8,7 @@
   <link rel="icon" href="../../../assets/icon.svg">
   <link rel="stylesheet" href="../../../assets/family/style.css">
   <link rel="stylesheet" href="../../../assets/family/navigation.css">
-  <link rel="stylesheet" href="../../../assets/reinforcement-walker/style.css">
+  <link rel="stylesheet" href="../../../assets/reinforcement-walker/style.css?v=20261003-2">
 </head>
 <body class="has-site-navigation walker-page">
   <a class="skip" href="#main">ゲームへスキップ</a>
@@ -31,6 +31,7 @@
         <div class="replay-toolbar" aria-label="学習リプレイ">
           <div><span class="toolbar-label">学習の早送り</span><small>保存した失敗や発見をもう一度見る</small></div>
           <div class="replay-buttons" id="replayButtons"><button type="button" data-replay="untrained" aria-pressed="true">学習前</button></div>
+          <button class="replay-stop" id="stopReplay" type="button" hidden>再生を止める</button>
         </div>
         <p class="live-status" id="liveStatus" role="status" aria-live="polite">準備完了。まずは手動で歩いてみよう。</p>
         <div class="hud" aria-label="現在の記録">
@@ -40,24 +41,49 @@
           <div><span>人間の最高</span><strong id="humanBest">0.0 m</strong></div>
           <div><span>AIの最高</span><strong id="aiBest">0.0 m</strong></div>
         </div>
-        <p class="coach" id="coach">短い一歩から始めよう。傾いた方向と反対へ腕を振ると、立て直せるかもしれない。</p>
+        <p class="coach" id="coach">短い一歩から始めよう。傾いた方向と反対へ腕を振ると、立て直しやすくなります。</p>
+        <section class="movement-theory" id="movementTheory" aria-labelledby="movementTheoryTitle">
+          <div class="movement-heading"><div><p class="panel-step">一歩ずつ観察</p><h2 id="movementTheoryTitle">いまの体はどうなっている？</h2></div><span>このゲーム内の簡略モデル</span></div>
+          <div class="body-readout" aria-label="棒人間の現在の状態">
+            <div><span>体の傾き</span><strong id="bodyLean">ほぼまっすぐ</strong><small id="bodySpin">回転は静か</small></div>
+            <div><span>次に出す足</span><strong id="nextFootStatus">左足</strong><small>左右は進行方向ではなく足の名前</small></div>
+            <div><span>一歩の準備</span><strong id="recoveryStatus">OK</strong><small id="recoveryHint">いま足を出せます</small></div>
+          </div>
+          <div class="arm-hint" id="armHint" data-balance-effect="neutral"><span>選んだ腕</span><strong id="armHintChoice">まんなか</strong><p id="armHintText">腕は前進力ではなく、体の回り方を変えます。</p></div>
+          <div class="action-insight" id="actionInsight" data-outcome="ready" data-reason="none">
+            <div><span>選んだ動き</span><strong id="actionChoice">まだ一歩を選んでいません</strong></div>
+            <div><span>起きたこと</span><strong id="actionResult">左足の短い一歩から試してみよう</strong></div>
+            <p id="actionWhy">足は左右交互。一歩の直後は「踏ん張る」で次の足を出す準備をします。</p>
+            <small id="actionNext">観察 → 予想 → 一歩 → 結果、の順で比べよう。</small>
+          </div>
+          <details class="movement-rules">
+            <summary>歩ける理屈を4つで見る</summary>
+            <ol>
+              <li><b>足は交互</b><span>左・右は使う足の名前。どちらの足でも右へ進み、出した足の側へ体が回ります。</span></li>
+              <li><b>一歩のあとに休む</b><span>短い一歩は2回、長い一歩は3回「踏ん張る」と、反対の足を出せます。</span></li>
+              <li><b>大股は条件つき</b><span>よく進む一方、停止中・大きく傾いた体・急な坂ではつまずきます。</span></li>
+              <li><b>腕は回転の舵</b><span>傾きと反対へ振ると戻しやすくなります。腕だけでは前進しません。</span></li>
+            </ol>
+            <p>本物の人の歩行を厳密に再現したものではなく、傾き・速さ・足の順番を観察しやすくしたゲームのルールです。</p>
+          </details>
+        </section>
         <div class="manual-controls" id="manualControls">
           <fieldset class="control-bank">
             <legend>足：一歩を選ぶ</legend>
             <div class="leg-controls">
-              <button type="button" data-leg="left-short"><kbd>A</kbd><span>左・短</span></button>
-              <button type="button" data-leg="left-long"><kbd>Shift+A</kbd><span>左・長</span></button>
+              <button type="button" data-leg="left-short"><kbd>A</kbd><span>左足・小さく</span></button>
+              <button type="button" data-leg="left-long"><kbd>Shift+A</kbd><span>左足・大きく</span></button>
               <button type="button" data-leg="brace"><kbd>S</kbd><span>踏ん張る</span></button>
-              <button type="button" data-leg="right-short"><kbd>D</kbd><span>右・短</span></button>
-              <button type="button" data-leg="right-long"><kbd>Shift+D</kbd><span>右・長</span></button>
+              <button type="button" data-leg="right-short"><kbd>D</kbd><span>右足・小さく</span></button>
+              <button type="button" data-leg="right-long"><kbd>Shift+D</kbd><span>右足・大きく</span></button>
             </div>
           </fieldset>
           <fieldset class="control-bank">
             <legend>腕：次の一歩で振る方向を選ぶ</legend>
             <div class="arm-controls">
-              <button type="button" data-arm="arms-left"><kbd>J</kbd><span>左へ振る</span></button>
+              <button type="button" data-arm="arms-left"><kbd>J</kbd><span>腕を左へ ←</span></button>
               <button type="button" data-arm="arms-center"><kbd>K</kbd><span>まんなか</span></button>
-              <button type="button" data-arm="arms-right"><kbd>L</kbd><span>右へ振る</span></button>
+              <button type="button" data-arm="arms-right"><kbd>L</kbd><span>腕を右へ →</span></button>
             </div>
           </fieldset>
         </div>
@@ -69,7 +95,7 @@
           <p class="panel-step">2 · AIに試行させる</p><h2>失敗を何回重ねる？</h2><p>回数は今の続きに追加されます。500回ではまだ不器用。工夫が育つ途中も観察しよう。</p>
           <div class="train-buttons"><button type="button" data-train="50">さらに50回</button><button type="button" data-train="500">さらに500回</button><button type="button" data-train="2000">さらに2,000回</button><button type="button" data-train="5000">さらに5,000回</button></div>
           <p class="local-compute-note">学習計算は、この端末のブラウザ内で実行します。GitHub Pagesは画面のファイルを配るだけです。</p>
-          <div class="training-progress" id="trainingProgress" hidden><span id="trainingLabel">学習中</span><progress id="trainingBar" max="100" value="0">0%</progress><button class="stop-button" id="stopTraining" type="button">ここで止める</button></div>
+          <div class="training-progress" id="trainingProgress" hidden><span id="trainingLabel">学習中</span><progress id="trainingBar" max="100" value="0" aria-labelledby="trainingLabel">0%</progress><button class="stop-button" id="stopTraining" type="button">ここで止める</button></div>
         </section>
         <section><p class="panel-step">3 · 冒険なしでテスト</p><p>学習中の偶然ではなく、いま一番よいと思っている動きだけで歩きます。</p><button class="wide-button accent-button" id="testAi" type="button">0回のAIを見る</button><button class="text-button" id="resetLearning" type="button">Qテーブルと記録を0に戻す</button></section>
       </aside>
@@ -80,17 +106,18 @@
         <div class="card-heading"><div><p class="panel-step">AIの発見ノート</p><h2>何かコツを見つけた？</h2></div><span id="discoveryCount">0 / 5</span></div>
         <p>結果が条件を満たしたときだけ印がつきます。学習回数だけでは開きません。</p>
         <ul class="discovery-list" id="discoveries">
-          <li data-discovery="first-meter"><span aria-hidden="true">○</span><div><b>最初の1 m</b><small>最近20回のうち3回以上で越える</small></div></li>
-          <li data-discovery="alternating"><span aria-hidden="true">○</span><div><b>足を交互に</b><small>8歩以上で65%以上、正しい足を選ぶ</small></div></li>
-          <li data-discovery="counter-arm"><span aria-hidden="true">○</span><div><b>反対の腕で立て直す</b><small>腕を8回以上使い、55%以上成功</small></div></li>
-          <li data-discovery="ten-meters"><span aria-hidden="true">○</span><div><b>10 mの壁</b><small>でこぼこ道を越える</small></div></li>
-          <li data-discovery="steady-walk"><span aria-hidden="true">○</span><div><b>安定した歩き</b><small>20 m以上を少ないよろめきで</small></div></li>
+          <li data-discovery="first-meter"><span aria-hidden="true">○</span><div><b>最初の1 m</b><small>最近20回のうち3回以上で越える</small><span class="visually-hidden" data-discovery-status>未発見</span></div></li>
+          <li data-discovery="alternating"><span aria-hidden="true">○</span><div><b>足を交互に</b><small>8歩以上で65%以上、正しい足を選ぶ</small><span class="visually-hidden" data-discovery-status>未発見</span></div></li>
+          <li data-discovery="counter-arm"><span aria-hidden="true">○</span><div><b>反対の腕を選ぶ</b><small>腕を8回以上使い、55%以上で傾きと反対を選ぶ</small><span class="visually-hidden" data-discovery-status>未発見</span></div></li>
+          <li data-discovery="ten-meters"><span aria-hidden="true">○</span><div><b>10 mの壁</b><small>でこぼこ道を越える</small><span class="visually-hidden" data-discovery-status>未発見</span></div></li>
+          <li data-discovery="steady-walk"><span aria-hidden="true">○</span><div><b>安定した歩き</b><small>20 m以上を少ないよろめきで</small><span class="visually-hidden" data-discovery-status>未発見</span></div></li>
         </ul>
       </article>
       <article class="learning-card chart-card">
         <div class="card-heading"><div><p class="panel-step">全試行の記録</p><h2>はちゃめちゃから歩行へ</h2></div><span id="chartSummary">学習前</span></div>
         <div class="metric-buttons" id="metricButtons" aria-label="グラフに表示する記録"><button type="button" data-metric="reward" aria-pressed="true">報酬</button><button type="button" data-metric="distance" aria-pressed="false">距離</button><button type="button" data-metric="alternation" aria-pressed="false">足の交互率</button></div>
-        <canvas id="rewardChart" width="640" height="290" aria-label="試行ごとの記録。細い線は各試行、太い線は移動平均です"></canvas>
+        <canvas id="rewardChart" width="640" height="290" aria-label="試行ごとの記録。細い線は各試行、太い線は移動平均です" aria-describedby="chartA11y"></canvas>
+        <p class="visually-hidden" id="chartA11y">まだ学習前です。</p>
         <p>細い線は毎回の結果、太い線は最近の平均。急な大成功だけでなく、安定して伸びているかを見よう。</p>
       </article>
     </section>
@@ -119,40 +146,73 @@
 
     <details class="parameter-lab">
       <summary>実験室：AIの学び方と地面を変える</summary>
-      <p class="details-intro">値を大きくすれば必ず賢くなるわけではありません。ひとつずつ変えて、グラフの形を比べよう。</p>
-      <div class="parameter-grid">
-        <label for="alpha">学習率 <output id="alphaValue">0.28</output><input id="alpha" type="range" min="0.05" max="0.8" step="0.01" value="0.28"><small>新しい経験で予想を書き換える強さ</small></label>
-        <label for="gamma">未来の重み <output id="gammaValue">0.94</output><input id="gamma" type="range" min="0" max="0.99" step="0.01" value="0.94"><small>目先だけでなく、先の成功を考える度合い</small></label>
-        <label for="epsilon">冒険率 <output id="epsilonValue">0.58</output><input id="epsilon" type="range" min="0" max="0.9" step="0.01" value="0.58"><small>よさそうな行動以外も試す最初の割合</small></label>
-        <label for="roughness">地面のでこぼこ <output id="roughnessValue">0.16</output><input id="roughness" type="range" min="0" max="0.4" step="0.01" value="0.16"><small>坂・すべり・偶然の揺れの強さ</small></label>
+      <p class="details-intro">一度に見るのは1項目だけ。値を動かす前に予想し、学習グラフがどう変わるか比べよう。</p>
+      <div class="parameter-tabs" id="parameterTabs" aria-label="説明する実験パラメータ">
+        <button type="button" data-parameter-focus="alpha" aria-pressed="true" aria-controls="parameterFocus">学習率 α</button>
+        <button type="button" data-parameter-focus="gamma" aria-pressed="false" aria-controls="parameterFocus">未来 γ</button>
+        <button type="button" data-parameter-focus="epsilon" aria-pressed="false" aria-controls="parameterFocus">冒険 ε</button>
+        <button type="button" data-parameter-focus="roughness" aria-pressed="false" aria-controls="parameterFocus">でこぼこ</button>
       </div>
+      <div class="parameter-focus" id="parameterFocus" data-parameter="alpha">
+        <section class="parameter-explanation">
+          <p class="panel-step" id="parameterFocusCategory">AIの学び方</p>
+          <h3 id="parameterFocusTitle">一度の経験を、どれくらい強く覚える？</h3>
+          <p id="parameterFocusLead">小さいとゆっくり安定して変わり、大きいと一度の偶然にも強く動きます。</p>
+          <div class="focus-meter" aria-hidden="true"><i id="parameterFocusMeter"></i></div>
+          <p class="parameter-example" id="parameterFocusExample">設定 28% → 学習開始時の実効値 28%。予想を今回の目標へ28%近づけます。</p>
+          <small id="parameterFocusScale">左：ゆっくり覚える ／ 右：一気に覚える</small>
+        </section>
+        <div class="parameter-grid" id="parameterControl">
+          <label for="alpha" data-parameter-panel="alpha">学習率の設定値 <output id="alphaValue">0.28</output><input id="alpha" type="range" min="0.05" max="0.8" step="0.01" value="0.28"><small>実際の学習率は、学習回数とともに少しずつ下がります。</small></label>
+          <label for="gamma" data-parameter-panel="gamma" hidden>未来の重み <output id="gammaValue">0.94</output><input id="gamma" type="range" min="0" max="0.99" step="0.01" value="0.94"><small>先でもらう報酬を、今の一歩へどれだけ戻すか。</small></label>
+          <label for="epsilon" data-parameter-panel="epsilon" hidden>最初の冒険率 <output id="epsilonValue">0.58</output><input id="epsilon" type="range" min="0" max="0.9" step="0.01" value="0.58"><small>実際の冒険率は、学習回数とともに少しずつ下がります。</small></label>
+          <label for="roughness" data-parameter-panel="roughness" hidden>地面のでこぼこ <output id="roughnessValue">0.16</output><input id="roughness" type="range" min="0" max="0.4" step="0.01" value="0.16"><small>AIの頭ではなく、坂・すべり・偶然の揺れを変えます。</small></label>
+        </div>
+      </div>
+      <p class="reset-note">公平に比べるため、値を確定するとQテーブルと学習記録を0回へ戻します。</p>
     </details>
 
     <details class="math-lab">
       <summary>数学室：Qテーブルと更新式をのぞく</summary>
       <div class="math-grid">
-        <section aria-labelledby="qHeatmapTitle">
-          <div class="card-heading"><div><p class="panel-step">いま見ている状態</p><h2 id="qHeatmapTitle">15通りのQ値</h2></div><span class="state-chip" id="stateLabel">ほぼ直立 · 左足の番</span></div>
-          <p>5つの足の動き × 3つの腕の向き。色が濃いほど、AIが「よさそう」と予想しています。</p>
-          <div class="q-heatmap" id="qHeatmap" role="table" aria-label="現在の状態における15行動のQ値">
-            <span class="q-head-label" role="columnheader">足 ＼ 腕</span><span class="q-head-label" role="columnheader">左へ</span><span class="q-head-label" role="columnheader">中央</span><span class="q-head-label" role="columnheader">右へ</span>
-            <span class="q-row-label" role="rowheader">左・短</span><output class="q-cell" data-q-action="0" aria-label="左短、腕左">0.00</output><output class="q-cell" data-q-action="1" aria-label="左短、腕中央">0.00</output><output class="q-cell" data-q-action="2" aria-label="左短、腕右">0.00</output>
-            <span class="q-row-label" role="rowheader">左・長</span><output class="q-cell" data-q-action="3" aria-label="左長、腕左">0.00</output><output class="q-cell" data-q-action="4" aria-label="左長、腕中央">0.00</output><output class="q-cell" data-q-action="5" aria-label="左長、腕右">0.00</output>
-            <span class="q-row-label" role="rowheader">踏ん張る</span><output class="q-cell" data-q-action="6" aria-label="踏ん張る、腕左">0.00</output><output class="q-cell" data-q-action="7" aria-label="踏ん張る、腕中央">0.00</output><output class="q-cell" data-q-action="8" aria-label="踏ん張る、腕右">0.00</output>
-            <span class="q-row-label" role="rowheader">右・短</span><output class="q-cell" data-q-action="9" aria-label="右短、腕左">0.00</output><output class="q-cell" data-q-action="10" aria-label="右短、腕中央">0.00</output><output class="q-cell" data-q-action="11" aria-label="右短、腕右">0.00</output>
-            <span class="q-row-label" role="rowheader">右・長</span><output class="q-cell" data-q-action="12" aria-label="右長、腕左">0.00</output><output class="q-cell" data-q-action="13" aria-label="右長、腕中央">0.00</output><output class="q-cell" data-q-action="14" aria-label="右長、腕右">0.00</output>
+        <section class="q-story" id="qStory" data-state="" data-action="" aria-labelledby="qStoryTitle">
+          <p class="panel-step">最後に学んだ1マスだけ</p><h2 id="qStoryTitle">AIのメモを1枚見る</h2>
+          <p><b>Q値</b>は「この状態でこの行動をすると、この先も含めて何点くらいもらえそうか」という予想です。成功確率ではありません。</p>
+          <dl class="q-story-facts">
+            <div><dt>状態</dt><dd id="qStoryState">まだ学習前</dd></div>
+            <div><dt>選んだ行動</dt><dd id="qStoryAction">—</dd></div>
+            <div><dt>今回の報酬</dt><dd><span id="qStoryReward">—</span></dd></div>
+            <div><dt>次の最高Q</dt><dd><span id="qStoryFuture">—</span></dd></div>
+          </dl>
+          <div class="q-update-flow" aria-label="Q値の書き換え">
+            <div><span>前の予想</span><span class="q-value" id="qStoryOld">—</span></div><b aria-hidden="true">→</b>
+            <div><span>今回の目標</span><span class="q-value" id="qStoryTarget">—</span></div><b aria-hidden="true">→</b>
+            <div><span>新しい予想</span><span class="q-value" id="qStoryNew">—</span></div>
           </div>
-          <p class="q-note" id="qNote">まだ経験がないので、15通りとも同じ予想です。</p>
+          <p class="q-change-note" id="qStoryChange">AIに学習させると、最後の一手をここでゆっくり読み解けます。</p>
+          <details class="equation-detail">
+            <summary>同じ1回を数式で見る</summary>
+            <div class="equation-box" aria-label="Q学習の更新式">Q(s, a) ← Q(s, a) + α [ r + γ max Q(s′, a′) − Q(s, a) ]</div>
+            <p>新しい予想 ＝ 前の予想 ＋ 学習率 ×（今回の目標 − 前の予想）</p>
+            <p class="equation-numbers" id="equationNumbers">まだ更新はありません。AIに1回以上学習させると、実際の数字が入ります。</p>
+          </details>
         </section>
-        <section aria-labelledby="equationTitle">
-          <p class="panel-step">最後の1回の書き換え</p><h2 id="equationTitle">Q学習の更新式</h2>
-          <div class="equation-box" aria-label="Q学習の更新式">Q(s, a) ← Q(s, a) + α [ r + γ max Q(s′, a′) − Q(s, a) ]</div>
-          <p>いまの予想に、<b>学習率 α</b> ぶんだけ「今回わかった差」を足します。</p>
-          <p class="equation-numbers" id="equationNumbers">まだ更新はありません。AIに1回以上学習させると、実際の数字が入ります。</p>
+        <section aria-labelledby="qHeatmapTitle">
+          <div class="card-heading"><div><p class="panel-step">同じ状態を横に比べる</p><h2 id="qHeatmapTitle">15通りのQ値</h2></div><span class="state-chip" id="stateLabel">学習前の現在状態</span></div>
+          <p>5つの足 × 3つの腕。最後に書き換えたマスを枠で示し、同じ状態の別の作戦と比べます。</p>
+          <div class="q-heatmap" id="qHeatmap" role="table" aria-label="現在の状態における15行動のQ値">
+            <div class="q-row" role="row"><span class="q-head-label" role="columnheader">足 ＼ 腕</span><span class="q-head-label" role="columnheader">左へ</span><span class="q-head-label" role="columnheader">中央</span><span class="q-head-label" role="columnheader">右へ</span></div>
+            <div class="q-row" role="row"><span class="q-row-label" role="rowheader">左・短</span><output class="q-cell" data-q-action="0" role="cell" aria-live="off" aria-label="左短、腕左">0.00</output><output class="q-cell" data-q-action="1" role="cell" aria-live="off" aria-label="左短、腕中央">0.00</output><output class="q-cell" data-q-action="2" role="cell" aria-live="off" aria-label="左短、腕右">0.00</output></div>
+            <div class="q-row" role="row"><span class="q-row-label" role="rowheader">左・長</span><output class="q-cell" data-q-action="3" role="cell" aria-live="off" aria-label="左長、腕左">0.00</output><output class="q-cell" data-q-action="4" role="cell" aria-live="off" aria-label="左長、腕中央">0.00</output><output class="q-cell" data-q-action="5" role="cell" aria-live="off" aria-label="左長、腕右">0.00</output></div>
+            <div class="q-row" role="row"><span class="q-row-label" role="rowheader">踏ん張る</span><output class="q-cell" data-q-action="6" role="cell" aria-live="off" aria-label="踏ん張る、腕左">0.00</output><output class="q-cell" data-q-action="7" role="cell" aria-live="off" aria-label="踏ん張る、腕中央">0.00</output><output class="q-cell" data-q-action="8" role="cell" aria-live="off" aria-label="踏ん張る、腕右">0.00</output></div>
+            <div class="q-row" role="row"><span class="q-row-label" role="rowheader">右・短</span><output class="q-cell" data-q-action="9" role="cell" aria-live="off" aria-label="右短、腕左">0.00</output><output class="q-cell" data-q-action="10" role="cell" aria-live="off" aria-label="右短、腕中央">0.00</output><output class="q-cell" data-q-action="11" role="cell" aria-live="off" aria-label="右短、腕右">0.00</output></div>
+            <div class="q-row" role="row"><span class="q-row-label" role="rowheader">右・長</span><output class="q-cell" data-q-action="12" role="cell" aria-live="off" aria-label="右長、腕左">0.00</output><output class="q-cell" data-q-action="13" role="cell" aria-live="off" aria-label="右長、腕中央">0.00</output><output class="q-cell" data-q-action="14" role="cell" aria-live="off" aria-label="右長、腕右">0.00</output></div>
+          </div>
+          <p class="q-note" id="qNote">まだ経験がないので、15通りとも同じ予想です。0は「普通」ではなく、未経験の0かもしれません。</p>
         </section>
       </div>
       <section class="q-table-section" aria-labelledby="qTableTitle">
-        <div class="card-heading"><div><p class="panel-step">訪問した状態だけ抜粋</p><h2 id="qTableTitle">Qテーブル</h2></div><span>最大 5,040状態 × 15行動 = 75,600個の予想</span></div>
+        <div class="card-heading"><div><p class="panel-step">メモ全体の一部</p><h2 id="qTableTitle">Qテーブル</h2></div><span>傾き・回転・速さ・足の準備・腕・坂で5,040状態 × 15行動 = 75,600個の予想</span></div>
         <div class="q-table-wrap"><table><thead><tr><th scope="col">状態</th><th scope="col">訪問</th><th scope="col">いちばんの行動</th><th scope="col">最大Q値</th></tr></thead><tbody id="qTableBody"><tr><td colspan="4">まだ訪れた状態がありません。</td></tr></tbody></table></div>
       </section>
     </details>
@@ -165,7 +225,7 @@
   </main>
 
   <footer class="footer"><span>家族のまなび帳<br>読んで、動かして、考える。</span><span><a href="../../../index.html">ホーム</a> · <a href="../index.html">プログラミング</a></span></footer>
-  <script src="../../../assets/reinforcement-walker/engine.js"></script>
-  <script src="../../../assets/reinforcement-walker/app.js"></script>
+  <script src="../../../assets/reinforcement-walker/engine.js?v=20261003-2"></script>
+  <script src="../../../assets/reinforcement-walker/app.js?v=20261003-2"></script>
 </body>
 </html>

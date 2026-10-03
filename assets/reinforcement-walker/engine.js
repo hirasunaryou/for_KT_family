@@ -164,16 +164,20 @@
 
     let effort=Math.abs(armCommandDelta)*.36+Math.abs(bot.armV)*.12;
     let stumbled=false;
+    let stumbleReason='';
     if(action.leg!==0){
       effort+=.72+action.stride*.36;
       bot.totalSteps++;
       const correct=action.leg===bot.nextFoot;
       const ready=bot.recovery<=0;
-      const longRisk=action.stride>1&&(
-        Math.abs(bot.lean)>.29||Math.abs(slope)>.075||bot.vx<.022
-      );
+      const longRiskReason=action.stride<=1?''
+        :bot.vx<.022?'long-rest'
+        :Math.abs(bot.lean)>.29?'long-lean'
+        :Math.abs(slope)>.075?'long-slope':'';
+      const longRisk=Boolean(longRiskReason);
       const slipChance=engine.physics.roughness*(action.stride>1?.085:.028);
-      if(correct&&ready&&!longRisk&&random(r)>slipChance){
+      const slipped=correct&&ready&&!longRisk&&random(r)<=slipChance;
+      if(correct&&ready&&!longRisk&&!slipped){
         const upright=clamp(1-Math.abs(bot.lean)/.86,.12,1);
         bot.vx+=.022+.031*action.stride*upright;
         bot.leanV+=action.leg*(.03+.047*action.stride);
@@ -182,7 +186,9 @@
         bot.correctSteps++;
         bot.stepFlash=1;
       }else{
-        stumbled=true;bot.stumbles++;bot.vx*=.58;
+        stumbled=true;
+        stumbleReason=!correct?'wrong-foot':!ready?'recovering':longRiskReason||'slip';
+        bot.stumbles++;bot.vx*=.58;
         // A mistimed step wastes a noticeable amount of energy.  Without this,
         // the walker can "reward hack" by kicking while it coasts forward.
         effort+=16.45+action.stride*4;
@@ -226,7 +232,7 @@
     bot.effort+=effort;
     bot.reward+=reward;
     Object.keys(components).forEach(key=>{bot.components[key]+=components[key];});
-    return {reward,done:!bot.alive,components,action,slope,stumbled};
+    return {reward,done:!bot.alive,components,action,slope,stumbled,stumbleReason,dx};
   }
 
   function snapshot(bot,actionIndex){
@@ -283,6 +289,6 @@
   return {
     LEG_COMMANDS,ARM_COMMANDS,ACTIONS,STATE_SHAPE,STATE_COUNT,ACTION_COUNT,Q_COUNT,DEFAULTS,
     createEngine,resetEngine,createBot,stateParts,stateIndex,encodeState,decodeState,qValues,
-    chooseAction,updateQ,step,runEpisode,evaluate,terrainHeight,terrainSlope,snapshot,clamp
+    chooseAction,updateQ,step,runEpisode,evaluate,terrainHeight,terrainSlope,snapshot,clamp,effectiveRate
   };
 });

@@ -39,11 +39,112 @@
   let playback=null;
   let lastUiDraw=0;
   let lastEpisode=null;
+  let focusedParameter='alpha';
   let dirty=true;
 
   const fmt=n=>Number(n||0).toLocaleString('ja-JP');
   const fixed=(n,d=1)=>Number.isFinite(n)?n.toFixed(d):'0.0';
   const currentAction=(legIndex,selectedArm=armIndex)=>legIndex*E.ARM_COMMANDS.length+selectedArm;
+
+  function footName(value){return value<0?'左足':'右足';}
+
+  function leanName(value){
+    const amount=Math.abs(value);
+    if(amount<.04)return 'ほぼまっすぐ';
+    return `${value<0?'左':'右'}へ${amount>.31?'大きく':amount>.12?'少し':'わずかに'}`;
+  }
+
+  function spinName(value){
+    if(Math.abs(value)<.035)return '回転は静か';
+    return `${value<0?'左':'右'}へ${Math.abs(value)>.18?'速く':'ゆっくり'}回転`;
+  }
+
+  function leanMeasure(value){return Math.abs(value)<.005?'中央 0.00':`${value<0?'左':'右'} ${fixed(Math.abs(value),2)}`;}
+
+  function resetActionInsight(){
+    const host=$('actionInsight');
+    if(host){host.dataset.outcome='ready';host.dataset.reason='none';}
+    if($('actionChoice'))$('actionChoice').textContent='まだ一歩を選んでいません';
+    if($('actionResult'))$('actionResult').textContent='左足の短い一歩から試してみよう';
+    if($('actionWhy'))$('actionWhy').textContent='足は左右交互。一歩の直後は「踏ん張る」で次の足を出す準備をします。';
+    if($('actionNext'))$('actionNext').textContent='観察 → 予想 → 一歩 → 結果、の順で比べよう。';
+  }
+
+  function updateMovementTheory(subject=bot,actionOverride=null){
+    if(!subject)return;
+    if($('bodyLean'))$('bodyLean').textContent=leanName(subject.lean);
+    if($('bodySpin'))$('bodySpin').textContent=spinName(subject.leanV);
+    if($('nextFootStatus'))$('nextFootStatus').textContent=footName(subject.nextFoot);
+    if($('recoveryStatus'))$('recoveryStatus').textContent=subject.recovery>0?`あと ${subject.recovery} 回`:'OK';
+    if($('recoveryHint'))$('recoveryHint').textContent=subject.recovery>0?'「踏ん張る」で1回ずつ進む':'いま次の足を出せます';
+
+    const overrideAction=actionOverride===null?null:E.ACTIONS[actionOverride];
+    const selected=E.ARM_COMMANDS[overrideAction?overrideAction.armIndex:armIndex]||E.ARM_COMMANDS[1];
+    const armHost=$('armHint');
+    let effect='neutral';
+    let message='腕は前進力ではなく、体の回り方を変えます。';
+    if(selected.arm===0){
+      message='次の一歩で腕を中央へ戻します。戻す瞬間にも反対向きの回転が出ます。';
+    }else if(Math.abs(subject.lean)>.12&&Math.sign(selected.arm)===-Math.sign(subject.lean)){
+      effect='recover';message='傾きと反対向き。体を中央へ戻す候補です。';
+    }else if(Math.abs(subject.lean)>.12&&Math.sign(selected.arm)===Math.sign(subject.lean)){
+      effect='worsen';message='傾きと同じ向き。さらに傾くかもしれません。';
+    }else{
+      message=`次の一歩で、体へ${selected.arm<0?'左':'右'}向きの回転を足します。`;
+    }
+    if(armHost)armHost.dataset.balanceEffect=effect;
+    if($('armHintChoice'))$('armHintChoice').textContent=selected.label.replace('腕','腕を').replace('←','左へ ←').replace('→','右へ →').replace('・','まんなか');
+    if($('armHintText'))$('armHintText').textContent=message;
+
+    const suggested=subject.recovery>0?'brace':subject.nextFoot<0?'left':'right';
+    document.querySelectorAll('[data-leg]').forEach(button=>{
+      const id=button.dataset.leg;
+      button.classList.toggle('is-next',suggested==='brace'?id==='brace':id.startsWith(`${suggested}-`));
+    });
+  }
+
+  function renderManualOutcome(result,before,after){
+    const host=$('actionInsight');
+    if(!host||!result||!result.action)return;
+    const action=result.action;
+    let outcome='push';
+    let reason='success';
+    let resultText='';
+    let why='';
+    if(action.leg===0){
+      outcome='brace';reason='brace';
+      resultText=`踏ん張った · 準備 ${before.recovery} → ${after.recovery} · 傾き ${leanMeasure(before.lean)} → ${leanMeasure(after.lean)}`;
+      why=before.recovery>0?'足を出さず、次の一歩の準備を1回進めました。':'足を出さず、速さと回転を少し弱めました。';
+    }else if(result.stumbled){
+      outcome='stumble';reason=result.stumbleReason||'slip';
+      const reasons={
+        'wrong-foot':`いま出す番は${footName(before.nextFoot)}でした。足の順番が違います。`,
+        recovering:`前の一歩からまだ準備中でした。「踏ん張る」があと${before.recovery}回必要です。`,
+        'long-rest':'まだ止まっている状態で大股を選んだため、姿勢を崩しました。',
+        'long-lean':'体が大きく傾いた状態で大股を選んだため、姿勢を崩しました。',
+        'long-slope':'急な坂で大股を選んだため、姿勢を崩しました。',
+        slip:'足の順番と準備は合っていましたが、でこぼこで滑りました。'
+      };
+      resultText=`つまずいた · 惰性を含め +${fixed(result.dx,2)} m · 傾き ${leanMeasure(before.lean)} → ${leanMeasure(after.lean)}`;
+      why=reasons[reason]||reasons.slip;
+    }else{
+      resultText=`一歩成功 · +${fixed(result.dx,2)} m · 傾き ${leanMeasure(before.lean)} → ${leanMeasure(after.lean)}`;
+      why=action.stride>1?'大股は推進が大きいぶん、足側への回転も大きくなります。':'順番と準備が合い、小さな一歩で速度を足しました。';
+    }
+    const armLabel=E.ARM_COMMANDS[action.armIndex].label;
+    host.dataset.outcome=outcome;
+    host.dataset.reason=reason;
+    if($('actionChoice'))$('actionChoice').textContent=`${action.label.replace('＋',' ＋ ')}`;
+    if($('actionResult'))$('actionResult').textContent=`${resultText} ／ この一歩の報酬 ${signed(result.reward)}`;
+    if($('actionWhy'))$('actionWhy').textContent=why;
+    const nextText=after.alive
+      ?`${after.recovery>0?`次は「踏ん張る」あと${after.recovery}回`:`次は${footName(after.nextFoot)}`}。${armLabel}が傾きにどう効いたかも比べよう。`
+      :after.finished?'20 m完走。最後の一歩と報酬を見比べよう。'
+      :after.doneReason==='timeout'?'時間切れまで立てました。距離と使った力を見比べよう。'
+      :'転倒する直前の「傾き」と腕の向きを見直して、もう一度試そう。';
+    if($('actionNext'))$('actionNext').textContent=nextText;
+    announce(`${action.label}。${resultText}。${why} ${nextText}`);
+  }
 
   function announce(message){
     const el=$('liveStatus');
@@ -53,6 +154,19 @@
   function stopMotion(){
     if(testTimer){clearInterval(testTimer);testTimer=0;}
     playback=null;
+    if($('stopReplay'))$('stopReplay').hidden=true;
+    setReplayActive(null);
+  }
+
+  function setReplayActive(episode){
+    document.querySelectorAll('[data-replay]').forEach(button=>button.setAttribute('aria-pressed',episode!==null&&Number(button.dataset.replay)===Number(episode)?'true':'false'));
+  }
+
+  function revealStage(){
+    const stage=$('gameStage');
+    if(window.innerWidth<=980&&stage&&stage.scrollIntoView){
+      stage.scrollIntoView({behavior:reduceMotion?'auto':'smooth',block:'start'});
+    }
   }
 
   function setMode(next){
@@ -64,7 +178,7 @@
   }
 
   function lockExperimentControls(locked){
-    const selectors='#manualStart,#testAi,#resetLearning,[data-train],[data-reward-preset],#rewardForward,#rewardBalance,#rewardEnergy,#rewardFall,#alpha,#gamma,#epsilon,#roughness';
+    const selectors='#manualStart,#testAi,#resetLearning,[data-train],[data-reward-preset],[data-parameter-focus],#rewardForward,#rewardBalance,#rewardEnergy,#rewardFall,#alpha,#gamma,#epsilon,#roughness';
     document.querySelectorAll(selectors).forEach(control=>{control.disabled=locked;});
     if($('stopTraining'))$('stopTraining').disabled=!locked;
   }
@@ -75,6 +189,8 @@
     armIndex=1;
     document.querySelectorAll('[data-arm]').forEach(button=>button.setAttribute('aria-pressed',button.dataset.arm==='arms-center'?'true':'false'));
     updateHud();
+    updateMovementTheory(bot);
+    resetActionInsight();
     drawWorld(bot);
     updateMath(bot);
     dirty=false;
@@ -101,10 +217,11 @@
     stopMotion();
     resetBot(false);
     setMode('manual');
-    if($('coach'))$('coach').textContent='足だけではすぐ倒れます。A / S / D と腕の J / K / L を組み合わせて、まず1 mを目指そう。';
+    if($('coach'))$('coach').textContent='「傾き・次の足・準備」を観察してから一歩。まず1 mを目指そう。';
     announce('手動チャレンジを開始しました。足と腕を操作できます。');
     const focusTarget=document.querySelector('.stage-column');
     if(focusTarget&&focusTarget.focus)focusTarget.focus({preventScroll:true});
+    revealStage();
   }
 
   function manualLeg(legId){
@@ -113,14 +230,19 @@
     const legIndex=E.LEG_COMMANDS.findIndex(item=>item.id===legId);
     if(legIndex<0)return;
     const action=currentAction(legIndex);
+    const before=E.snapshot(bot);
     const result=E.step(engine,bot,action,runtime);
     dirty=true;
     humanBest=Math.max(humanBest,bot.x);
     flash(`[data-leg="${legId}"]`);
     updateHud();
+    updateMovementTheory(bot);
+    renderManualOutcome(result,before,bot);
     updateMath(bot);
     if(result.done){
-      const summary=bot.finished?`やった！ ${fixed(bot.x)} m完走。`:`${fixed(bot.x)} mでころんだ。腕の向きと足の順番を変えてみよう。`;
+      const summary=bot.finished?`やった！ ${fixed(bot.x)} m完走。`
+        :bot.doneReason==='timeout'?`${fixed(bot.x)} m。時間切れまで立ち続けました。`
+        :`${fixed(bot.x)} mでころんだ。腕の向きと足の順番を変えてみよう。`;
       if($('coach'))$('coach').textContent=summary;
       announce(summary);
     }
@@ -135,7 +257,14 @@
     document.querySelectorAll('[data-arm]').forEach(button=>button.setAttribute('aria-pressed',button.dataset.arm===armId?'true':'false'));
     flash(`[data-arm="${armId}"]`);
     const label=E.ARM_COMMANDS[next].label;
-    if($('coach'))$('coach').textContent=`「${label}」を選択。次の足ボタンで、足と腕を同時に動かします。`;
+    updateMovementTheory(bot);
+    const host=$('actionInsight');
+    if(host){host.dataset.outcome='preview';host.dataset.reason='arm-selected';}
+    if($('actionChoice'))$('actionChoice').textContent=`${label}を選択`;
+    if($('actionResult'))$('actionResult').textContent='まだ体は動いていません';
+    if($('actionWhy'))$('actionWhy').textContent=$('armHintText')?$('armHintText').textContent:'次の一歩で足と腕を同時に動かします。';
+    if($('actionNext'))$('actionNext').textContent=`次の足ボタンで、${label}と足を同時に試します。`;
+    if($('coach'))$('coach').textContent=`「${label}」を選択。腕だけでは時間は進まず、次の足と同時に動きます。`;
     announce(`${label}を選びました。次の足運びと組み合わせます。`);
   }
 
@@ -193,6 +322,7 @@
       button.className='replay-chip';
       button.textContent=replay.label;
       button.dataset.replay=String(replay.episode);
+      button.setAttribute('aria-pressed',playback&&playback.replay.episode===replay.episode?'true':'false');
       button.setAttribute('aria-label',`${replay.label}の歩き方を再生`);
       button.addEventListener('click',()=>playReplay(replay));
       host.appendChild(button);
@@ -202,15 +332,39 @@
   function playReplay(replay){
     if(training||!replay)return;
     stopMotion();
+    setReplayActive(replay.episode);
     setMode('replay');
-    playback={replay,index:0,started:performance.now(),frameMs:reduceMotion?180:72};
+    if(reduceMotion){
+      const finalFrame=replay.trace[replay.trace.length-1];
+      drawWorld(finalFrame);updateHud(finalFrame);updateMovementTheory(finalFrame,finalFrame.lastAction);updateMath(finalFrame);
+      dirty=false;setMode('ready');
+      if($('coach'))$('coach').textContent=`${replay.label}：動きを減らす設定のため、最後の姿勢を表示中。${outcomeText(replay.result)}`;
+      announce(`${replay.label}の最後の姿勢を表示しました。${outcomeText(replay.result)}`);
+      revealStage();
+      return;
+    }
+    playback={replay,index:0,started:performance.now(),frameMs:72};
+    if($('stopReplay'))$('stopReplay').hidden=false;
     dirty=true;
     if($('coach'))$('coach').textContent=`${replay.label}の歩き方。足だけでなく、長い腕がどちらへ振られているか見てみよう。`;
     announce(`${replay.label}の学習リプレイを再生します。`);
+    revealStage();
+  }
+
+  function stopReplayPlayback(){
+    if(!playback)return;
+    const replay=playback.replay;
+    playback=null;dirty=true;
+    if($('stopReplay'))$('stopReplay').hidden=true;
+    setReplayActive(null);
+    setMode('ready');
+    if($('coach'))$('coach').textContent=`${replay.label}の再生を止めました。別の節目と見比べられます。`;
+    announce(`${replay.label}の学習リプレイを停止しました。`);
   }
 
   async function train(count){
     if(training)return;
+    const returnFocus=document.activeElement;
     stopMotion();
     training=true;
     cancelTraining=false;
@@ -218,37 +372,49 @@
     lockExperimentControls(true);
     const progress=$('trainingProgress');
     if(progress)progress.hidden=false;
+    const stopControl=$('stopTraining');
+    if(stopControl&&stopControl.focus)stopControl.focus({preventScroll:true});
     const startEpisode=engine.episodes;
     const finalEpisode=startEpisode+count;
     announce(`さらに${fmt(count)}回の学習を始めました。`);
     let newestReplay=null;
 
-    for(let i=0;i<count&&!cancelTraining;i++){
-      const episode=engine.episodes+1;
-      const wantsTrace=replayMilestones.has(episode)||episode===finalEpisode;
-      const result=E.runEpisode(engine,{learn:true,trace:wantsTrace});
-      history.push(historyRecord(result));
-      lastEpisode=result;
-      if(wantsTrace){addReplay(result,`${fmt(result.episode)}回`);newestReplay=replays.find(item=>item.episode===result.episode);}
+    let lastPaint=-Infinity;
+    try{
+      for(let i=0;i<count&&!cancelTraining;i++){
+        const episode=engine.episodes+1;
+        const wantsTrace=replayMilestones.has(episode)||episode===finalEpisode;
+        const result=E.runEpisode(engine,{learn:true,trace:wantsTrace});
+        history.push(historyRecord(result));
+        lastEpisode=result;
+        if(wantsTrace){addReplay(result,`${fmt(result.episode)}回`);newestReplay=replays.find(item=>item.episode===result.episode);}
 
-      if(i%20===0||i===count-1){
-        if($('trainingBar'))$('trainingBar').value=Math.round((i+1)/count*100);
-        if($('trainingLabel'))$('trainingLabel').textContent=`${fmt(engine.episodes)}回まで学習中 · 今回 ${fmt(i+1)} / ${fmt(count)}`;
-        updateHud();
-        drawChart();
-        renderDiscoveries();
-        await new Promise(resolve=>window.setTimeout(resolve,0));
+        const now=performance.now();
+        if(i===0||i===count-1||now-lastPaint>=80){
+          if($('trainingBar'))$('trainingBar').value=Math.round((i+1)/count*100);
+          if($('trainingLabel'))$('trainingLabel').textContent=`${fmt(engine.episodes)}回まで学習中 · 今回 ${fmt(i+1)} / ${fmt(count)}`;
+          updateHud();
+          if(document.querySelector('.math-lab[open]'))updateMath(bot);
+          if(document.querySelector('.parameter-lab[open]'))renderParameterFocus();
+          drawChart();
+          renderDiscoveries();
+          lastPaint=now;
+        }
+        if(i%20===0)await new Promise(resolve=>window.setTimeout(resolve,0));
       }
+    }finally{
+      training=false;
+      lockExperimentControls(false);
+      if(progress)progress.hidden=true;
+      if(returnFocus&&returnFocus.focus)returnFocus.focus({preventScroll:true});
     }
-
-    training=false;
-    lockExperimentControls(false);
-    if(progress)progress.hidden=true;
     setMode('ready');
     updateHud();
     drawChart();
     renderDiscoveries();
     renderQTable();
+    updateMath(bot);
+    renderParameterFocus();
     renderRewardBreakdown(lastEpisode);
     const learned=engine.episodes-startEpisode;
     const message=cancelTraining?`${fmt(learned)}回で学習を止めました。`:`${fmt(learned)}回の追加学習が完了しました。`;
@@ -268,6 +434,7 @@
     setMode('test');
     if($('coach'))$('coach').textContent='冒険なし。いま最もQ値が高い行動だけを選びます。同じ体でも学習前と変わった？';
     announce(`${fmt(engine.episodes)}回学習したAIのテストを始めました。`);
+    revealStage();
     testTimer=window.setInterval(()=>{
       if(!bot.alive){clearInterval(testTimer);testTimer=0;return;}
       const state=E.stateIndex(bot);
@@ -333,6 +500,7 @@
     drawChart();
     renderDiscoveries();
     renderQTable();
+    renderParameterFocus();
     renderRewardBreakdown(null);
     if($('coach'))$('coach').textContent='新しい実験を開始。報酬の決め方が変わると、同じ行動の点数も変わります。';
     announce(reason||'学習を0回に戻しました。');
@@ -364,15 +532,22 @@
     const checks=[
       {key:'first-meter',name:'1 mの壁',detail:'最近20回のうち3回以上、1 mを越えた',done:recent.filter(r=>r.distance>=1).length>=3},
       {key:'alternating',name:'足の交互運動',detail:'8歩以上で、正しい足を65%以上選んだ',done:history.some(r=>r.legActions>=8&&r.correctRatio>=.65&&r.distance>=2)},
-      {key:'counter-arm',name:'カウンター腕',detail:'腕を8回以上使い、55%以上で傾きと反対へ振った',done:history.some(r=>r.armChoices>=8&&r.counterArmRatio>=.55&&r.distance>=2)},
+      {key:'counter-arm',name:'カウンター腕',detail:'腕を8回以上使い、55%以上で傾きと反対を選んだ',done:history.some(r=>r.armChoices>=8&&r.counterArmRatio>=.55&&r.distance>=2)},
       {key:'ten-meters',name:'10 mの旅',detail:'少し長い歩き方を発見',done:history.some(r=>r.distance>=10)},
       {key:'steady-walk',name:'安定歩行',detail:'20 m以上、つまずき2回以下',done:history.some(r=>r.distance>=20&&r.stumbles<=2)}
     ];
     const existing=host.querySelector('[data-discovery]');
     if(existing){
-      checks.forEach(item=>{const row=host.querySelector(`[data-discovery="${item.key}"]`);if(row){row.classList.toggle('found',item.done);const mark=row.querySelector('[aria-hidden="true"]');if(mark)mark.textContent=item.done?'✓':'○';}});
+      checks.forEach(item=>{
+        const row=host.querySelector(`[data-discovery="${item.key}"]`);
+        if(row){
+          row.classList.toggle('found',item.done);
+          const mark=row.querySelector('[aria-hidden="true"]');if(mark)mark.textContent=item.done?'✓':'○';
+          const status=row.querySelector('[data-discovery-status]');if(status)status.textContent=item.done?'発見済み':'未発見';
+        }
+      });
     }else{
-      host.innerHTML=checks.map(item=>`<li class="${item.done?'found':''}" data-discovery="${item.key}"><span aria-hidden="true">${item.done?'✓':'○'}</span><div><b>${item.name}</b><small>${item.detail}</small></div></li>`).join('');
+      host.innerHTML=checks.map(item=>`<li class="${item.done?'found':''}" data-discovery="${item.key}"><span aria-hidden="true">${item.done?'✓':'○'}</span><div><b>${item.name}</b><small>${item.detail}</small><span class="visually-hidden" data-discovery-status>${item.done?'発見済み':'未発見'}</span></div></li>`).join('');
     }
     if($('discoveryCount'))$('discoveryCount').textContent=`${checks.filter(item=>item.done).length} / ${checks.length}`;
   }
@@ -402,13 +577,17 @@
       cctx.fillStyle='#65706b';cctx.font='15px sans-serif';cctx.textAlign='center';
       cctx.fillText('学習すると、失敗も発見もここに残ります',w/2,h/2);cctx.textAlign='start';
       if($('chartSummary'))$('chartSummary').textContent='学習前';
+      if($('chartA11y'))$('chartA11y').textContent='まだ学習前です。学習後に、試行ごとの報酬・距離・足の交互率を文章でも説明します。';
       return;
     }
     const meta=metricMeta[metric];
     const all=history.map(meta.value);
     const average=movingAverage(all,Math.max(5,Math.min(60,Math.round(all.length/20))));
-    let min=Infinity,max=-Infinity;
-    for(const value of all){if(value<min)min=value;if(value>max)max=value;}
+    let min=Infinity,max=-Infinity,observedMin=Infinity,observedMax=-Infinity;
+    for(const value of all){
+      if(value<min)min=value;if(value>max)max=value;
+      if(value<observedMin)observedMin=value;if(value>observedMax)observedMax=value;
+    }
     for(const value of average){if(value<min)min=value;if(value>max)max=value;}
     if(metric==='distance'){min=0;max=Math.max(1,max);}
     if(metric==='alternation'){min=0;max=100;}
@@ -416,7 +595,7 @@
     const toX=index=>48+index/Math.max(1,all.length-1)*(w-70);
     const toY=value=>24+(max-value)/(max-min)*(h-54);
     const raw=downsample(history,650);
-    cctx.strokeStyle='rgba(23,107,135,.22)';cctx.lineWidth=1;cctx.beginPath();
+    cctx.strokeStyle='rgba(23,107,135,.72)';cctx.lineWidth=1;cctx.beginPath();
     raw.forEach(({item,index},i)=>{const x=toX(index),y=toY(meta.value(item));i?cctx.lineTo(x,y):cctx.moveTo(x,y);});cctx.stroke();
     cctx.strokeStyle=meta.color;cctx.lineWidth=3;cctx.beginPath();
     downsample(average,650).forEach(({item:value,index},i)=>{const x=toX(index),y=toY(value);i?cctx.lineTo(x,y):cctx.moveTo(x,y);});cctx.stroke();
@@ -426,41 +605,82 @@
     const recent=all.slice(-Math.min(50,all.length));
     const recentAverage=recent.reduce((a,b)=>a+b,0)/recent.length;
     if($('chartSummary'))$('chartSummary').textContent=`直近平均 ${fixed(recentAverage,metric==='alternation'?0:1)}${metric==='distance'?' m':metric==='alternation'?'%':''}`;
+    if($('chartA11y')){
+      const early=all.slice(0,Math.min(50,all.length));
+      const earlyAverage=early.reduce((a,b)=>a+b,0)/early.length;
+      const tolerance=Math.max(.01,(max-min)*.03);
+      const trend=recentAverage>earlyAverage+tolerance?'上向き':recentAverage<earlyAverage-tolerance?'下向き':'ほぼ横ばい';
+      const unit=metric==='distance'?'メートル':metric==='alternation'?'パーセント':'点';
+      $('chartA11y').textContent=`${fmt(all.length)}回分の${meta.label}。最小 ${fixed(observedMin,1)} ${unit}、最大 ${fixed(observedMax,1)} ${unit}、最新 ${fixed(all[all.length-1],1)} ${unit}、直近平均 ${fixed(recentAverage,1)} ${unit}。最初の平均と比べて${trend}です。`;
+    }
   }
 
   function stateDescription(subject){
-    const parts=E.stateParts(subject);
+    const parts=typeof subject==='number'?E.decodeState(subject):E.stateParts(subject);
     const lean=['大きく左','左','少し左','まっすぐ','少し右','右','大きく右'][parts[0]];
-    const motion=['左へ急','左へ','静か','右へ','右へ急'][parts[1]];
+    const motion=['左へ速く回転','左へ回転','回転は静か','右へ回転','右へ速く回転'][parts[1]];
     const pace=['停止','ゆっくり','前進','速い'][parts[2]];
-    const foot=parts[3]<2?'左足の番':'右足の番';
-    return {parts,text:`${lean} · ${motion} · ${pace} · ${foot}`};
+    const gait=['左足・準備OK','左足・休み中','右足・準備OK','右足・休み中'][parts[3]];
+    const arm=['腕は左へ動く','腕は静か','腕は右へ動く'][parts[4]];
+    const slope=['下り坂','ほぼ平ら','上り坂'][parts[5]];
+    return {parts,text:`${lean} · ${motion} · ${pace} · ${gait} · ${arm} · ${slope}`};
   }
 
   function updateMath(subject){
     if(!subject)return;
-    const state=E.stateIndex(subject);
-    const description=stateDescription(subject);
-    if($('stateLabel'))$('stateLabel').textContent=`状態 ${state}｜${description.text}`;
-    renderQHeatmap(state);
     const u=engine.lastUpdate;
-    if($('equationNumbers')){
-      $('equationNumbers').textContent=u
-        ?`${fixed(u.old,3)} + ${fixed(u.alpha,3)} × (${fixed(u.reward,3)} + ${fixed(engine.learning.gamma,2)} × ${fixed(u.future,3)} − ${fixed(u.old,3)}) = ${fixed(u.value,3)}`
-        :'まだ更新前です。学習すると、実際の数字を代入して表示します。';
-    }
+    const state=u?u.state:E.stateIndex(subject);
+    const description=stateDescription(state);
+    if($('stateLabel'))$('stateLabel').textContent=`${u?'最後に学んだ':'現在の'}状態 ${state}｜${description.text}`;
+    renderQStory(u);
+    renderQHeatmap(state,u?u.action:null);
   }
 
-  function renderQHeatmap(state){
+  function setQStoryNumber(id,value,digits=3,suffix=''){
+    const output=$(id);
+    if(!output)return;
+    output.dataset.value=String(value);
+    output.textContent=`${value>=0?'+':''}${fixed(value,digits)}${suffix}`;
+  }
+
+  function renderQStory(update){
+    const host=$('qStory');
+    if(!host)return;
+    if(!update){
+      host.dataset.state='';host.dataset.action='';
+      if($('qStoryState'))$('qStoryState').textContent='まだ学習前';
+      if($('qStoryAction'))$('qStoryAction').textContent='—';
+      ['qStoryReward','qStoryFuture','qStoryOld','qStoryTarget','qStoryNew'].forEach(id=>{if($(id)){delete $(id).dataset.value;$(id).textContent='—';}});
+      if($('qStoryChange'))$('qStoryChange').textContent='AIに学習させると、最後の一手をここでゆっくり読み解けます。';
+      if($('equationNumbers'))$('equationNumbers').textContent='まだ更新前です。学習すると、実際の数字を代入して表示します。';
+      return;
+    }
+    const description=stateDescription(update.state);
+    host.dataset.state=String(update.state);
+    host.dataset.action=String(update.action);
+    if($('qStoryState'))$('qStoryState').textContent=`${update.state}｜${description.text}`;
+    if($('qStoryAction'))$('qStoryAction').textContent=E.ACTIONS[update.action].label;
+    setQStoryNumber('qStoryReward',update.reward);
+    setQStoryNumber('qStoryFuture',update.future,3,update.done?'（終了）':'');
+    setQStoryNumber('qStoryOld',update.old);
+    setQStoryNumber('qStoryTarget',update.target);
+    setQStoryNumber('qStoryNew',update.value);
+    const changeText=update.td>.0005?'予想を上げました':update.td<-.0005?'予想を下げました':'予想はほぼ変わりませんでした';
+    if($('qStoryChange'))$('qStoryChange').textContent=`目標との差は ${signed(update.td)}。一度に全部は信じず、実効学習率 ${fixed(update.alpha*100,1)}% だけ反映し、${changeText}。`;
+    if($('equationNumbers'))$('equationNumbers').textContent=`${fixed(update.old,3)} + ${fixed(update.alpha,3)} × (${fixed(update.reward,3)} + ${fixed(engine.learning.gamma,2)} × ${fixed(update.future,3)} − ${fixed(update.old,3)}) = ${fixed(update.value,3)}`;
+  }
+
+  function renderQHeatmap(state,focusAction){
     const host=$('qHeatmap');
     if(!host)return;
+    host.dataset.state=String(state);
     const values=E.qValues(engine,state);
     const maxAbs=Math.max(.001,...values.map(Math.abs));
     const bestIndex=values.indexOf(Math.max(...values));
     let cells=host.querySelectorAll('[data-q-action]');
     if(cells.length!==E.ACTION_COUNT){
       host.innerHTML='';
-      E.ACTIONS.forEach((action,index)=>{const cell=document.createElement('output');cell.className='q-cell';cell.dataset.qAction=String(index);host.appendChild(cell);});
+      E.ACTIONS.forEach((action,index)=>{const cell=document.createElement('output');cell.className='q-cell';cell.dataset.qAction=String(index);cell.setAttribute('role','cell');cell.setAttribute('aria-live','off');host.appendChild(cell);});
       cells=host.querySelectorAll('[data-q-action]');
     }
     cells.forEach((cell,index)=>{
@@ -470,12 +690,15 @@
       cell.classList.toggle('positive',value>=0);
       cell.classList.toggle('negative',value<0);
       cell.classList.toggle('best',index===bestIndex&&maxAbs>.001);
-      cell.title=`${E.ACTIONS[index].label}: Q=${fixed(value,3)}`;
+      cell.classList.toggle('last-updated',index===focusAction);
+      cell.title=`${E.ACTIONS[index].label}: Q=${fixed(value,3)}${index===focusAction?'（最後に書き換え）':''}`;
     });
     if($('qNote')){
       const spread=Math.max(...values)-Math.min(...values);
       const best=values.indexOf(Math.max(...values));
-      $('qNote').textContent=spread<.001?'この状態の経験がまだ少なく、15通りの予想に差がありません。':`この状態では「${E.ACTIONS[best].label}」の予想が最高です。`;
+      $('qNote').textContent=focusAction!==null&&focusAction!==undefined
+        ?`橙の枠が、最後に書き換えた「${E.ACTIONS[focusAction].label}」。${spread<.001?'ほかの予想との差はまだ小さいです。':`いま最高の予想は「${E.ACTIONS[best].label}」です。`}`
+        :'まだ経験がないので15通りとも同じ予想です。0は「普通」ではなく、未経験の0かもしれません。';
     }
   }
 
@@ -490,6 +713,65 @@
       const max=Math.max(...values);const action=values.indexOf(max);
       return `<tr><th scope="row">${state}</th><td>${fmt(engine.visits[state])}</td><td>${E.ACTIONS[action].label}</td><td>${fixed(max,3)}</td></tr>`;
     }).join('')||'<tr><td colspan="4">まだ学習していません。</td></tr>';
+  }
+
+  function renderParameterFocus(){
+    const input=$(focusedParameter);
+    if(!input)return;
+    const value=Number(input.value);
+    const min=Number(input.min||0);
+    const max=Number(input.max||1);
+    const ratio=max>min?(value-min)/(max-min):0;
+    if($(`${focusedParameter}Value`))$(`${focusedParameter}Value`).textContent=value.toFixed(2);
+    document.querySelectorAll('[data-parameter-focus]').forEach(button=>button.setAttribute('aria-pressed',button.dataset.parameterFocus===focusedParameter?'true':'false'));
+    document.querySelectorAll('[data-parameter-panel]').forEach(panel=>{panel.hidden=panel.dataset.parameterPanel!==focusedParameter;});
+    if($('parameterFocus'))$('parameterFocus').dataset.parameter=focusedParameter;
+    if($('parameterFocusMeter'))$('parameterFocusMeter').style.width=`${Math.round(ratio*100)}%`;
+
+    let category='AIの学び方';
+    let title='';
+    let lead='';
+    let example='';
+    let scale='';
+    if(focusedParameter==='alpha'){
+      const effective=E.effectiveRate(value,engine.episodes,.18,2400);
+      const u=engine.lastUpdate;
+      title='一度の経験を、どれくらい強く覚える？';
+      lead='小さいとゆっくり安定して変わり、大きいと一度の偶然にも強く動きます。';
+      example=u
+        ?`設定 ${fixed(value*100,0)}% → 今の実効値 ${fixed(effective*100,1)}%。同じ目標なら ${fixed(u.old,2)} → ${fixed(u.old+effective*(u.target-u.old),2)}。`
+        :`設定 ${fixed(value*100,0)}% → 学習開始時の実効値 ${fixed(effective*100,1)}%。予想を今回の目標へこの割合だけ近づけます。`;
+      scale='左：ゆっくり覚える ／ 右：一気に覚える';
+    }else if(focusedParameter==='gamma'){
+      const u=engine.lastUpdate;
+      title='先のごほうびを、今の一歩へどれくらい戻す？';
+      lead='0なら今回だけ。1に近いほど、この一歩が後の成功につながるかも考えます。';
+      example=`1手先は ${fixed(value*100,0)}%、2手先は ${fixed(value*value*100,0)}% 残す。${u?`最後の次Q ${fixed(u.future,2)} のうち ${fixed(value*u.future,2)} を目標へ加えます。`:''}`;
+      scale='左：目先を重視 ／ 右：遠い成功も重視';
+    }else if(focusedParameter==='epsilon'){
+      const effective=E.effectiveRate(value,engine.episodes,.09,1850);
+      title='いつもの一番以外も、どれくらい試す？';
+      lead='高いと珍妙な動きから新しい作戦を探し、低いと知っている作戦を繰り返します。';
+      example=`開始時 ${fixed(value*100,0)}% → ${fmt(engine.episodes)}回学習した今は約 ${fixed(effective*100,1)}%。100回なら約${Math.round(effective*100)}回が冒険です。`;
+      scale='左：知っている作戦 ／ 右：未知の作戦も試す';
+    }else{
+      category='世界の設定（AIの頭ではない）';
+      title='練習する道を、どれくらい意地悪にする？';
+      lead='坂の影響、偶然の揺れ、足の滑りが増えます。同じ作戦でも結果が少し変わります。';
+      example=`坂の影響は ${fixed(1+value*2.2,2)} 倍。1回の大股で滑る確率は約 ${fixed(value*.085*100,2)}%。`;
+      scale='左：なめらか ／ 右：でこぼこ・揺れが強い';
+    }
+    if($('parameterFocusCategory'))$('parameterFocusCategory').textContent=category;
+    if($('parameterFocusTitle'))$('parameterFocusTitle').textContent=title;
+    if($('parameterFocusLead'))$('parameterFocusLead').textContent=lead;
+    if($('parameterFocusExample'))$('parameterFocusExample').textContent=example;
+    if($('parameterFocusScale'))$('parameterFocusScale').textContent=scale;
+  }
+
+  function selectParameterFocus(name){
+    if(!['alpha','gamma','epsilon','roughness'].includes(name))return;
+    focusedParameter=name;
+    renderParameterFocus();
   }
 
   function drawWorld(subject){
@@ -537,9 +819,9 @@
     const rightKnee=[12+stride*(activeLeg>0),-20],rightFoot=[18+stride*(activeLeg>0),0];
     limb([hip,leftKnee,leftFoot],activeLeg<0?accent:ink,6);
     limb([hip,rightKnee,rightFoot],activeLeg>0?accent:ink,6);
-    const leftHand=[-36-arm*25,-55-arm*9],rightHand=[36-arm*25,-55+arm*9];
-    limb([shoulder,[-22-arm*12,-76],leftHand],ink,5);
-    limb([shoulder,[22-arm*12,-76],rightHand],ink,5);
+    const leftHand=[-36+arm*25,-55-arm*9],rightHand=[36+arm*25,-55+arm*9];
+    limb([shoulder,[-22+arm*12,-76],leftHand],ink,5);
+    limb([shoulder,[22+arm*12,-76],rightHand],ink,5);
     g.fillStyle='#fffdf6';g.strokeStyle=ink;g.lineWidth=6;g.beginPath();g.arc(0,-126,31,0,Math.PI*2);g.fill();g.stroke();
     g.fillStyle=ink;g.beginPath();g.arc(-9,-132,2.8,0,Math.PI*2);g.arc(9,-132,2.8,0,Math.PI*2);g.fill();
     g.strokeStyle=ink;g.lineWidth=2.5;g.beginPath();g.moveTo(-8,-116);g.lineTo(8,-116);g.stroke();
@@ -548,19 +830,25 @@
 
   function animationFrame(now){
     let display=bot;
-    const wasPlaying=Boolean(playback);
+    let frameChanged=false;
     if(playback){
       const elapsed=now-playback.started;
-      playback.index=Math.min(playback.replay.trace.length-1,Math.floor(elapsed/playback.frameMs));
+      const nextIndex=Math.max(0,Math.min(playback.replay.trace.length-1,Math.floor(elapsed/playback.frameMs)));
+      frameChanged=nextIndex!==playback.index;
+      playback.index=nextIndex;
       display=playback.replay.trace[playback.index];
       if(playback.index>=playback.replay.trace.length-1&&elapsed>(playback.index+3)*playback.frameMs){
         const replay=playback.replay;playback=null;setMode('ready');
+        if($('stopReplay'))$('stopReplay').hidden=true;
+        setReplayActive(null);
         if($('coach'))$('coach').textContent=`${replay.label}：${outcomeText(replay.result)} 別の節目と見比べてみよう。`;
+        announce(`${replay.label}の再生が終わりました。${outcomeText(replay.result)}`);
+        frameChanged=true;
       }
     }
-    if(wasPlaying||dirty){
+    if(frameChanged||dirty){
       drawWorld(display);
-      if(now-lastUiDraw>180){updateHud(display);updateMath(display);lastUiDraw=now;}
+      if(now-lastUiDraw>180){updateHud(display);updateMovementTheory(display,mode==='manual'?null:display.lastAction);updateMath(display);lastUiDraw=now;}
       dirty=false;
     }
     window.requestAnimationFrame(animationFrame);
@@ -576,10 +864,12 @@
       drawChart();
     }));
     document.querySelectorAll('[data-reward-preset]').forEach(button=>button.addEventListener('click',()=>applyRewardPreset(button.dataset.rewardPreset)));
+    document.querySelectorAll('[data-parameter-focus]').forEach(button=>button.addEventListener('click',()=>selectParameterFocus(button.dataset.parameterFocus)));
     if($('manualStart'))$('manualStart').addEventListener('click',startManual);
     if($('testAi'))$('testAi').addEventListener('click',startTest);
     if($('resetLearning'))$('resetLearning').addEventListener('click',()=>resetLearning('学習とQテーブルを0回に戻しました。'));
     if($('stopTraining'))$('stopTraining').addEventListener('click',stopTraining);
+    if($('stopReplay'))$('stopReplay').addEventListener('click',stopReplayPlayback);
 
     ['rewardForward','rewardBalance','rewardEnergy','rewardFall'].forEach(id=>{
       if(!$(id))return;
@@ -591,12 +881,19 @@
     });
 
     const paramBindings={alpha:['learning','alpha'],gamma:['learning','gamma'],epsilon:['learning','epsilon'],roughness:['physics','roughness']};
+    const parameterNames={alpha:'学習率',gamma:'未来の重み',epsilon:'冒険率',roughness:'地面のでこぼこ'};
     Object.entries(paramBindings).forEach(([id,[group,key]])=>{
       if(!$(id))return;
       $(id).addEventListener('input',event=>{
         engine[group][key]=Number(event.target.value);
         if($(`${id}Value`))$(`${id}Value`).textContent=Number(event.target.value).toFixed(2);
         if(id==='roughness')dirty=true;
+        renderParameterFocus();
+      });
+      $(id).addEventListener('change',event=>{
+        engine[group][key]=Number(event.target.value);
+        renderParameterFocus();
+        resetLearning(`${parameterNames[id]}を確定したので、公平に比べられるよう0回から新しい実験を始めました。`);
       });
     });
 
@@ -624,10 +921,11 @@
     renderQTable();
     renderRewardBreakdown(null);
     updateRewardFormula();
+    renderParameterFocus();
     window.requestAnimationFrame(animationFrame);
     window.__walkerDebug={
       get engine(){return engine;},get history(){return history;},get replays(){return replays;},get bot(){return bot;},
-      train,startTest,startManual,resetLearning
+      train,startTest,startManual,resetLearning,selectParameterFocus
     };
   }
 
