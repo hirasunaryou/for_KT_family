@@ -1,0 +1,274 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="ころころウォーカーと同じQ学習を、一つの場面と三つの動きに絞って、予想・報酬・Q値・探索の順に体験する強化学習ガイド。">
+  <title>AIは、どうやって歩き方を覚える？ | 家族のまなび帳</title>
+  <link rel="icon" href="../../../assets/icon.svg">
+  <link rel="stylesheet" href="../../../assets/family/style.css">
+  <link rel="stylesheet" href="../../../assets/family/navigation.css">
+  <link rel="stylesheet" href="../../../assets/reinforcement-walker/style.css?v=20261004-2">
+  <link rel="stylesheet" href="../../../assets/reinforcement-walker/help.css?v=20261004-4">
+  <link rel="stylesheet" href="../../../assets/reinforcement-walker/learn.css?v=20261004-1">
+  <noscript><style>.learn-lab,.learn-interactive-intro{display:none}.learn-print-guide{display:block}.learn-static-intro{display:inline}</style></noscript>
+</head>
+<body class="has-site-navigation walker-page walker-help-page walker-learn-page">
+  <a class="skip" href="#learnGuideStart">AIの学び方へスキップ</a>
+  <nav class="site-return-nav" aria-label="サイト内の移動">
+    <a class="site-home-link" href="../../../index.html">サイトのトップ</a>
+    <a href="../index.html">教材一覧</a>
+    <a href="index.html" data-close-learn>ゲームへ戻る</a>
+  </nav>
+  <header class="masthead">
+    <a class="brand" href="../../../index.html"><span class="brand-icon">f.</span>家族のまなび帳</a>
+    <nav aria-label="家族サイト"><a href="../index.html">プログラミング</a><a href="../../../questions/index.html">日々の疑問</a></nav>
+  </header>
+
+  <main class="walker-wrap walker-help-wrap" id="main">
+    <div class="crumbs"><a href="../../../index.html">ホーム</a> / <a href="../index.html">プログラミング</a> / <a href="index.html">ころころウォーカー</a> / AIの学び方</div>
+    <header class="walker-heading help-heading learn-heading">
+      <div>
+        <p class="eyebrow">REINFORCEMENT LEARNING / ONE EXPERIENCE AT A TIME</p>
+        <h1>AIは、何を覚えたの？</h1>
+        <p><span class="learn-interactive-intro">歩き方の正解は教えていません。一つの場面を大きくして、AIの「どれが得そう？」が育つ瞬間を6コマで止めながら見ます。</span><span class="learn-static-intro">下の6コマ一覧を、上から順に一つずつ追ってください。</span></p>
+      </div>
+      <a class="help-close-button" href="index.html#trainingControls" data-close-learn>ゲームで確かめる</a>
+    </header>
+
+    <aside class="help-model-note learn-model-note" id="learnGuideStart" tabindex="-1" aria-label="この解説の前提">
+      <strong>このページの一点</strong>
+      <p><b>Q値は「この場面で、この動きを選ぶと、この先も含めて何点くらいになりそうか」という予想メモ。</b> 正解表でも成功確率でもありません。説明用の別実験なので、ゲーム本体の学習回数やQテーブルは変えません。</p>
+    </aside>
+
+    <div class="learn-sibling-link"><span>先に「なぜ一歩で進む？」を知りたいときは</span><a href="help.html#push">歩き方HELPへ →</a></div>
+
+    <section class="help-lab learn-lab" id="learnLab" data-learn-step="0" aria-labelledby="learnLabTitle">
+      <header class="help-lab-header">
+        <div><p class="panel-step">AIの好みが育つ6コマ</p><h2 id="learnLabTitle">一つの経験を、消えない速さで見る</h2></div>
+        <p>本編では一瞬で何千回も起きる「状態 → 行動 → 報酬 → Q更新」を、ここでは自分で一コマずつ進めます。</p>
+      </header>
+
+      <div class="help-progress learn-progress">
+        <strong id="learnStepCount">1 / 6</strong>
+        <div class="help-step-dots" id="learnStepDots" role="group" aria-label="AIの学び方のコマ"></div>
+      </div>
+
+      <div class="learn-state-strip" aria-labelledby="learnStateTitle">
+        <div><span>毎回ここへ戻す</span><strong id="learnStateTitle">AIが見ている「いまの場面」</strong></div>
+        <dl id="learnStateChips">
+          <div><dt>傾き</dt><dd data-state-part="lean">まっすぐ</dd></div>
+          <div><dt>回転</dt><dd data-state-part="spin">静か</dd></div>
+          <div><dt>速さ</dt><dd data-state-part="speed">ほぼ停止</dd></div>
+          <div><dt>足の段階</dt><dd data-state-part="gait">左・準備OK</dd></div>
+          <div><dt>腕の動き</dt><dd data-state-part="arm">静か</dd></div>
+          <div><dt>坂</dt><dd data-state-part="slope">上り側</dd></div>
+        </dl>
+      </div>
+
+      <div class="help-stage-grid learn-stage-grid">
+        <figure class="help-scene-card learn-scene-card" tabindex="-1">
+          <svg id="learnScene" viewBox="0 0 760 340" role="img" aria-labelledby="learnSceneTitle learnSceneDesc">
+            <title id="learnSceneTitle">同じ開始姿勢へ戻した棒人間</title>
+            <desc id="learnSceneDesc">棒人間はほぼまっすぐ立ち、左足を出せる状態です。まだAIは三つの動きを試していません。</desc>
+            <defs>
+              <linearGradient id="learnSky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#dff0ef"/><stop offset="1" stop-color="#fff8e9"/></linearGradient>
+              <marker id="learnArrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M0 0 L10 5 L0 10 Z" fill="#26718a"/></marker>
+            </defs>
+            <rect width="760" height="340" rx="18" fill="url(#learnSky)"/>
+            <path d="M0 277 Q170 272 360 280 T760 274 V340 H0 Z" fill="#c7d6a2"/>
+            <path d="M0 277 Q170 272 360 280 T760 274" fill="none" stroke="#304b3c" stroke-width="5"/>
+            <g id="learnStartMarker">
+              <line x1="238" y1="64" x2="238" y2="281" stroke="#7d9c94" stroke-width="2" stroke-dasharray="7 7"/>
+              <text x="178" y="50" class="learn-svg-small">毎回ここへRESET</text>
+            </g>
+            <g id="learnGhostFigure" class="learn-ghost-figure" hidden>
+              <circle cx="238" cy="141" r="31"/><line x1="238" y1="172" x2="238" y2="226"/><polyline points="238,226 219,251 208,278"/><polyline points="238,226 257,252 270,278"/>
+            </g>
+            <g id="learnFigure" transform="translate(238 278)">
+              <circle cx="0" cy="-137" r="34"/>
+              <circle class="learn-eye" cx="11" cy="-143" r="3.5"/>
+              <line x1="0" y1="-103" x2="0" y2="-52"/>
+              <polyline id="learnLeftLeg" class="learn-limb learn-active-limb" points="0,-52 -17,-27 -29,0"/>
+              <polyline id="learnRightLeg" class="learn-limb" points="0,-52 18,-26 31,0"/>
+              <polyline class="learn-arm" points="0,-91 -24,-70 -37,-48"/>
+              <polyline class="learn-arm" points="0,-91 24,-70 37,-48"/>
+            </g>
+            <g id="learnMotionArrow" hidden>
+              <line x1="285" y1="189" x2="435" y2="189" stroke="#26718a" stroke-width="8" stroke-linecap="round" marker-end="url(#learnArrow)"/>
+              <text x="300" y="168" class="learn-svg-label">少し前へ</text>
+            </g>
+            <g id="learnStumbleMark" hidden>
+              <path d="M362 112 L416 166 M416 112 L362 166" fill="none" stroke="#b74f3d" stroke-width="12" stroke-linecap="round"/>
+              <text x="343" y="193" class="learn-svg-fail">つまずいた</text>
+            </g>
+            <g id="learnChoiceBubble">
+              <rect x="478" y="62" width="228" height="118" rx="15" class="learn-bubble"/>
+              <text x="500" y="90" class="learn-svg-small">AIの予想メモ（Q値）</text>
+              <text x="500" y="121" class="learn-svg-q" id="learnBubbleQ">0.00　0.00　0.00</text>
+              <text x="500" y="150" class="learn-svg-note" id="learnBubbleNote">どれも未経験で同点</text>
+            </g>
+            <g id="learnResetSweep" hidden>
+              <path d="M150 303 H430" stroke="#4a6c63" stroke-width="3" stroke-dasharray="7 7"/>
+              <text x="198" y="326" class="learn-svg-small">結果を比べたら同じ開始場面へ戻る</text>
+            </g>
+          </svg>
+          <figcaption id="learnSceneCaption">人には歩き方の予想がある。でも未経験のAIは、三つともQ値0.00です。</figcaption>
+
+          <div class="learn-demo-panels">
+            <section class="learn-demo-panel learn-prediction-panel" data-learn-panel="0" aria-labelledby="learnPredictTitle">
+              <h3 id="learnPredictTitle">あなたなら、どれが高得点だと予想する？</h3>
+              <div class="learn-action-choices" id="learnActionChoices" role="group" aria-label="高得点になりそうな動きの予想">
+                <button type="button" data-learn-action="left-short-arms-center" aria-pressed="false"><b>左足・小さく</b><small>小さな歩幅</small></button>
+                <button type="button" data-learn-action="left-long-arms-center" aria-pressed="false"><b>左足・大きく</b><small>大きな歩幅</small></button>
+                <button type="button" data-learn-action="brace-arms-center" aria-pressed="false"><b>一拍待つ</b><small>足は出さない</small></button>
+              </div>
+              <p id="learnActionFeedback">まずは自分の予想を一つ選んでください。ここではまだ正解を表示しません。</p>
+            </section>
+
+            <section class="learn-demo-panel learn-reward-panel" data-learn-panel="1" aria-labelledby="learnRewardTitle" hidden>
+              <h3 id="learnRewardTitle">同じ場面で、変えたのは動きだけ</h3>
+              <div class="learn-result-cards" id="learnResultCards" role="group" aria-label="三つの動きの結果"></div>
+              <div class="learn-reward-breakdown">
+                <div class="learn-total-reward"><span>この1手の合計報酬</span><strong id="learnRewardTotal">+0.000</strong><small id="learnRewardOutcome">前へ進んだ</small></div>
+                <dl>
+                  <div data-reward-component="forward"><dt>前進</dt><dd id="learnRewardForward">+0.000</dd></div>
+                  <div data-reward-component="balance"><dt>直立</dt><dd id="learnRewardBalance">+0.000</dd></div>
+                  <div data-reward-component="energy"><dt>使った力</dt><dd id="learnRewardEnergy">−0.000</dd></div>
+                  <div data-reward-component="fall"><dt>転倒</dt><dd id="learnRewardFall">−0.000</dd></div>
+                </dl>
+              </div>
+              <p id="learnRewardWhy">AIに「左足が正解」とは伝えていません。動いた結果を、四つの基準で採点しただけです。</p>
+              <p class="learn-next-focus"><span>次のコマ</span>三つを比べたので、ここからは成功した「左足・小さく」の一経験だけを追います。</p>
+            </section>
+
+            <section class="learn-demo-panel learn-q-panel" data-learn-panel="2" aria-labelledby="learnQTitle" hidden>
+              <h3 id="learnQTitle">この経験を、Qメモの1マスへ残す</h3>
+              <p class="learn-focus-switch"><b>ここから追う経験：</b> 左足・小さく → 少し前進 → 正の報酬</p>
+              <div class="learn-q-cards" id="learnQCards" aria-label="この状態の三つのQ値">
+                <div data-q-cell="left-short-arms-center"><span>左足・小さく</span><strong data-q-value>0.000</strong><small data-q-status>未経験</small></div>
+                <div data-q-cell="left-long-arms-center"><span>左足・大きく</span><strong data-q-value>0.000</strong><small data-q-status>未経験</small></div>
+                <div data-q-cell="brace-arms-center"><span>一拍待つ</span><strong data-q-value>0.000</strong><small data-q-status>未経験</small></div>
+              </div>
+              <button class="learn-do-button" id="learnExperienceButton" type="button">小さな一歩の経験を覚える</button>
+              <div class="learn-update-track" id="learnUpdateTrack">
+                <div><span>前の予想</span><strong id="learnOldQ">0.000</strong></div><b aria-hidden="true">→</b>
+                <div><span>今回の目標</span><strong id="learnTargetQ">—</strong></div><b aria-hidden="true">→</b>
+                <div><span>新しい予想</span><strong id="learnNewQ">—</strong></div>
+              </div>
+              <details class="learn-math-details"><summary>実際の数を数式へ入れて見る</summary><p id="learnWordFormula">新Q = 前Q + 学習率 ×（今回の目標 − 前Q）</p><code id="learnNumberFormula">ボタンを押すと実数が入ります</code><p>今回の次の場面はまだ未経験なので、次の最大Qは0です。Q値は直前の報酬そのものではなく、この先も含めた予想です。</p></details>
+            </section>
+
+            <section class="learn-demo-panel learn-repeat-panel" data-learn-panel="3" aria-labelledby="learnRepeatTitle" hidden>
+              <h3 id="learnRepeatTitle">1回の成功だけで、全部は信じない</h3>
+              <p>同じ経験をもう一度もらうたび、Q値は目標へ少しずつ近づきます。</p>
+              <div class="learn-repeat-readout"><span>この同じ経験</span><strong id="learnRepeatCount">0回</strong><small id="learnPolicyReadout">まだ比較できません</small></div>
+              <div class="learn-q-meter" aria-label="小さな一歩のQ値が育つ様子"><span>0</span><div><i id="learnQMeterFill"></i><b id="learnQMeterPoint">Q 0.000</b></div><span id="learnQMeterGoal">目標</span></div>
+              <div class="learn-repeat-buttons" id="learnRepeatButtons" role="group" aria-label="同じ経験を繰り返す">
+                <button type="button" data-repeat="1">もう1回</button><button type="button" data-repeat="10">さらに10回</button><button type="button" data-repeat="50">さらに50回</button>
+              </div>
+              <p class="learn-inline-note">ここは一つの経験だけを拡大した模型です。本編では、転ぶ・完走・時間切れまで何度も別の場面へ移ります。</p>
+            </section>
+
+            <section class="learn-demo-panel learn-explore-panel" data-learn-panel="4" aria-labelledby="learnExploreTitle" hidden>
+              <h3 id="learnExploreTitle">よさそうな手を知っていても、別案を試す</h3>
+              <div class="learn-choice-reasons">
+                <article><span>活用</span><b>今いちばんQが高い動き</b><p>実力テストではこちらだけ。</p></article>
+                <article class="is-exploration"><span>探索</span><b>あえて別の動き</b><p>知らない案を調べる練習。</p></article>
+              </div>
+              <button class="learn-do-button learn-explore-button" id="learnExploreButton" type="button">探索で「停止中の大股」を試す</button>
+              <div class="learn-explore-result" id="learnExploreResult" hidden><span>探索で選んだ一例</span><strong>つまずいた。でも、失敗もメモになる。</strong><p>大股のQ値 <b id="learnExploreOld">0.000</b> → <b id="learnExploreNew">−0.000</b></p></div>
+              <p class="learn-inline-note">大股が最善だと思ったのではありません。学習中の珍妙な動きは、「忘れた」のではなく調査中の場合があります。</p>
+            </section>
+
+            <section class="learn-demo-panel learn-unknown-panel" data-learn-panel="5" aria-labelledby="learnUnknownTitle" hidden>
+              <h3 id="learnUnknownTitle">場面が変わると、別のQメモを見る</h3>
+              <div class="learn-state-rows" role="table" aria-label="経験した状態と未知の状態のQ値">
+                <div role="row" class="learn-state-row is-known"><div role="rowheader"><span>経験した場面</span><b>まっすぐ</b></div><div role="cell"><span>小さな一歩</span><strong id="learnKnownQ">0.000</strong></div><div role="cell"><span>大股</span><strong id="learnKnownLongQ">0.000</strong></div></div>
+                <div role="row" class="learn-state-row is-unknown"><div role="rowheader"><span>別の場面</span><b>右へ傾いた</b></div><div role="cell"><span>小さな一歩</span><strong>0.000</strong><small>未経験</small></div><div role="cell"><span>大股</span><strong>0.000</strong><small>未経験</small></div></div>
+              </div>
+              <button class="learn-do-button" id="learnUnknownButton" type="button">未知の場面でAIに選ばせる</button>
+              <p id="learnUnknownResult" class="learn-unknown-result">未経験どうしは同点。まだ、どれを選ぶべきか分かりません。</p>
+              <div class="learn-final-insight" id="learnFinalInsight" hidden><span>ここでアハ！</span><strong>小さな「この場面では、これが得そう」の集まりが、外から見ると歩き方に見える。</strong></div>
+            </section>
+          </div>
+        </figure>
+
+        <article class="help-explanation learn-explanation" aria-live="off">
+          <p class="help-question-label">このコマの問い</p>
+          <h3 id="learnQuestion">人には予想がある。未経験のAIは？</h3>
+          <div class="help-frame-title"><span id="learnFrameNumber">FRAME 1</span><strong id="learnTitle">同じ場面から比べる</strong></div>
+          <p id="learnText">AIが見ているのは棒人間の絵そのものではなく、傾き・回転・速さ・足の段階・腕の動き・坂を区切った6つの情報です。</p>
+          <dl class="help-observation">
+            <div><dt>見るところ</dt><dd id="learnLookFor">人の予想と、AIの未経験Q=0.00を分ける</dd></div>
+            <div><dt>今回変えるもの</dt><dd id="learnChanged">行動だけ。開始状態と採点ルールは同じ</dd></div>
+          </dl>
+          <p class="help-takeaway"><span>このコマで分かること</span><b id="learnTakeaway">AIは「いまの状態」に対して、次の「行動」を選ぶ。</b></p>
+          <p class="help-caution" id="learnCaution">Q=0は「普通」ではなく、まだ試していない0かもしれません。</p>
+        </article>
+      </div>
+
+      <div class="help-controls learn-controls" role="group" aria-label="AIの学び方の操作">
+        <button type="button" id="learnPrev" aria-controls="learnLab">← ひとつ前</button>
+        <button type="button" id="learnNext" class="primary-help-control" aria-controls="learnLab">次の気づき →</button>
+        <button type="button" id="learnReset" aria-controls="learnLab">最初から</button>
+      </div>
+      <p class="help-keyboard-note">図や説明にフォーカスがあるときは、キーボードの ← → でも一コマずつ移動できます。自動では進みません。</p>
+      <p class="visually-hidden" id="learnLive" role="status" aria-live="polite" aria-atomic="true">1コマ目。同じ場面から比べます。</p>
+    </section>
+
+    <section class="help-print-guide learn-print-guide" aria-labelledby="learnPrintTitle">
+      <header><p class="panel-step">紙・JavaScriptなしでもたどれる</p><h2 id="learnPrintTitle">AIの好みが育つ6コマ</h2><p>説明用の同じ開始場面で、三つの動きを比べます。数値はこのゲームの標準設定による例です。</p></header>
+      <article class="help-print-topic"><h3>1．同じ場面から予想する</h3><ol><li data-learn-static-frame><b>状態と行動：</b>AIは傾き・回転・速さ・足の段階・腕の動き・坂をまとめた状態を見て、行動を選びます。未経験なら三つのQ値は0です。</li></ol></article>
+      <article class="help-print-topic"><h3>2．結果を点数へ変える</h3><ol><li data-learn-static-frame><b>報酬：</b>小さな一歩は前進、直立、力、転倒を足して約+0.45。大股はつまずき約−1.00。一拍待つはほぼ前進せず約+0.02。正解ではなく結果の採点だけを返します。</li></ol></article>
+      <article class="help-print-topic"><h3>3．一つのQ値だけ直す</h3><ol><li data-learn-static-frame><b>1回の更新：</b>小さな一歩のQだけが、0.000から約+0.13へ変わります。ほかのマスは未経験の0のままです。Q値は成功確率ではありません。</li></ol></article>
+      <article class="help-print-topic"><h3>4．繰り返して好みが育つ</h3><ol><li data-learn-static-frame><b>少しずつ信じる：</b>新Q = 前Q + 学習率 ×（報酬 + 未来の重み × 次の最大Q − 前Q）。一度の成功を丸のみせず、経験を重ねて予想を近づけます。</li></ol></article>
+      <article class="help-print-topic"><h3>5．探索で、あえて別案を試す</h3><ol><li data-learn-static-frame><b>探索と活用：</b>学習中は、いま高いQを使う「活用」だけでなく、知らない動きを調べる「探索」もします。変な失敗は調査中かもしれません。</li></ol></article>
+      <article class="help-print-topic"><h3>6．場面ごとに別のQメモ</h3><ol><li data-learn-static-frame><b>方策：</b>経験した場面では高いQの動きを選べます。傾きなどが変わった未知の状態では、別の行をまだ学ぶ必要があります。この小さな好みの集まりが歩行に見えます。</li></ol></article>
+    </section>
+
+    <section class="learn-big-picture" aria-labelledby="learnBigPictureTitle">
+      <div><p class="panel-step">拡大鏡を外す</p><h2 id="learnBigPictureTitle">今見た1マスが、本編では75,600個</h2><p>大きな数字を暗記する必要はありません。「同じことを、たくさんの場面と動きで繰り返す」とつながれば十分です。</p></div>
+      <div class="learn-scale-cards">
+        <article><span>この6コマ</span><strong>1場面 × 3動作</strong><p>変化を見やすく拡大</p></article>
+        <b aria-hidden="true">→</b>
+        <article><span>ころころウォーカー</span><strong>5,040状態 × 15行動</strong><p>75,600個のQ予想</p></article>
+      </div>
+      <p class="learn-loop-sentence"><span>状態を見る</span><b>→</b><span>行動する</span><b>→</b><span>報酬を受け取る</span><b>→</b><span>Qを少し直す</span><b>↺</b></p>
+    </section>
+
+    <section class="learn-next-questions" aria-labelledby="learnNextTitle">
+      <div class="section-heading"><div><p class="panel-step">次に一つだけ変える</p><h2 id="learnNextTitle">分かった気がしたら、予想して確かめる</h2></div><p>答えを読むより、「こうなるはず」を持ってからゲームへ戻ると、グラフの意味が変わって見えます。</p></div>
+      <div class="learn-question-cards">
+        <a href="index.html#trainingControls" data-close-learn><span>回数を変える</span><b>0 → 50 → 500 → 2,000回</b><p>一回のまぐれと、安定して育った方策はどう違う？</p></a>
+        <a href="index.html#rewardTitle" data-close-learn><span>採点を変える</span><b>何をほめるAIにする？</b><p>前進・直立・省エネ・転倒。報酬を変えると、どんな歩き方になる？</p></a>
+        <a href="index.html#mathTitle" data-close-learn><span>数式を深掘り</span><b>α・γと全15行動を見る</b><p>学習率、未来の重み、実際のQテーブルを確かめる。</p></a>
+      </div>
+    </section>
+
+    <details class="learn-glossary">
+      <summary>あとから見返す：強化学習の7つの言葉</summary>
+      <dl>
+        <div><dt>状態</dt><dd>AIが見ている「いまの場面」</dd></div>
+        <div><dt>行動</dt><dd>その場面で試す動き</dd></div>
+        <div><dt>報酬</dt><dd>結果につける数の採点</dd></div>
+        <div><dt>Q値</dt><dd>その先も含む期待点の予想メモ。成功確率ではない</dd></div>
+        <div><dt>学習率 α</dt><dd>一回の経験を、予想へどれくらい取り込むか</dd></div>
+        <div><dt>未来の重み γ</dt><dd>次の場面の良さを、今の行動へどれくらい戻すか</dd></div>
+        <div><dt>探索／活用</dt><dd>別案を調べる／いま一番よさそうな案を使う</dd></div>
+      </dl>
+    </details>
+
+    <section class="help-try-card learn-try-card">
+      <div><p class="panel-step">ゲームで確かめる</p><h2>AIは正解を覚えたのではなく、「場面ごとの好み」を育てた</h2><p>まず50回。次に500回。同じ条件で冒険なしのテストをして、最高記録だけでなく距離のグラフが安定して伸びるか見よう。</p></div>
+      <a class="help-close-button" href="index.html#trainingControls" data-close-learn>ゲームで50回から試す</a>
+    </section>
+
+    <noscript><p class="notice">JavaScriptなしでは、全6コマを上の一覧で順に読めます。</p></noscript>
+  </main>
+
+  <footer class="footer"><span>家族のまなび帳<br>読んで、動かして、考える。</span><span><a href="index.html">ころころウォーカー</a> · <a href="help.html#push">歩き方HELP</a></span></footer>
+  <script src="../../../assets/reinforcement-walker/engine.js?v=20261004-1"></script>
+  <script src="../../../assets/reinforcement-walker/learn.js?v=20261004-1"></script>
+</body>
+</html>

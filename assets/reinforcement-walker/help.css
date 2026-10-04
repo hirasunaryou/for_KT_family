@@ -70,6 +70,21 @@
   line-height: 1.7;
 }
 
+.help-sibling-route {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  justify-content: flex-end;
+  margin: -5px 2px 15px;
+  color: #5b716c;
+  font-size: 11px;
+}
+
+.help-sibling-route a {
+  color: var(--walker-blue);
+  font-weight: 800;
+}
+
 .help-topic-nav {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -791,6 +806,11 @@
   .help-lab-header {
     grid-template-columns: 1fr;
     gap: 6px;
+  }
+
+  .help-sibling-route {
+    align-items: flex-start;
+    justify-content: flex-start;
   }
 
   .help-topic-nav {

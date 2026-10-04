@@ -8,7 +8,7 @@
   <link rel="icon" href="../../../assets/icon.svg">
   <link rel="stylesheet" href="../../../assets/family/style.css">
   <link rel="stylesheet" href="../../../assets/family/navigation.css">
-  <link rel="stylesheet" href="../../../assets/reinforcement-walker/style.css?v=20261004-1">
+  <link rel="stylesheet" href="../../../assets/reinforcement-walker/style.css?v=20261004-2">
 </head>
 <body class="has-site-navigation walker-page">
   <a class="skip" href="#main">ゲームへスキップ</a>
@@ -26,10 +26,10 @@
     </header>
 
     <nav class="learning-entrances" aria-label="おすすめの始め方">
-      <div><p class="panel-step">好きな入口から</p><strong>分からない動きは、HELPで一コマずつ確認できます</strong></div>
-      <a class="recommended-entrance" href="help.html#push" target="_blank" rel="opener"><span>最初におすすめ · 約5分</span><b>歩き方を一コマずつ見る</b><small>足と地面の力 → 踏ん張り → 腕 → 失敗</small></a>
-      <a href="#manualControls" data-start-manual><span>じっくり発見する</span><b>自分の手で一歩ずつ</b><small>一歩 → 踏ん張る → 次の足。失敗の理由まで観察する</small></a>
-      <a href="#trainingControls"><span>5分で要点をつかむ</span><b>AIの変化を先に見る</b><small>50回学習 → 学習前と比較 → AIテスト</small></a>
+      <div><p class="panel-step">おすすめの順番</p><strong>自分で苦戦 → AIの頭の中 → 回数を増やして実験</strong></div>
+      <a href="#manualControls" data-start-manual><span>1 · まず自分で苦戦</span><b>自分の手で一歩ずつ</b><small>同じ体だから、AIが何に困るか分かる</small></a>
+      <a class="recommended-entrance" href="learn.html" target="_blank" rel="opener"><span>2 · 手動のあとにおすすめ · 約7分</span><b>AIの学び方を6コマで</b><small>予想 → 報酬 → Q値 → 探索 → 方策</small></a>
+      <a href="help.html#push" target="_blank" rel="opener"><span>歩く理屈が気になったら</span><b>歩き方を一コマずつ</b><small>足と地面の力 → 踏ん張り → 腕 → 失敗</small></a>
     </nav>
 
     <section class="game-shell" aria-label="ころころウォーカーの実験">
@@ -149,10 +149,11 @@
     <section class="idea-strip" aria-labelledby="ideaTitle">
       <div><p class="panel-step">いま体験したこと</p><h2 id="ideaTitle">正解を教えず、結果を返す</h2></div>
       <ol><li><b>状態を見る</b><span>傾き、勢い、腕、足、坂</span></li><li><b>行動する</b><span>足5通り × 腕3通り</span></li><li><b>報酬を受け取る</b><span>何をほめるかは人が設計</span></li><li><b>Q値を直す</b><span>失敗も次の予想に残る</span></li></ol>
+      <a class="idea-guide-link" href="learn.html" target="_blank" rel="opener"><span>この4つが一回でどうつながる？</span><b>AIの頭の中を、6コマで止めて見る →</b></a>
     </section>
 
     <section class="reward-lab" aria-labelledby="rewardTitle">
-      <div class="section-heading"><div><p class="panel-step">報酬デザイン研究所</p><h2 id="rewardTitle">何を「よい歩き」とする？</h2></div><p>速さだけをほめると転びながら突進するかも。転倒だけを強く罰すると、一歩も動かないかも。教え方から実験しよう。</p></div>
+      <div class="section-heading"><div><p class="panel-step">報酬デザイン研究所</p><h2 id="rewardTitle">何を「よい歩き」とする？</h2></div><p>速さだけをほめると転びながら突進するかも。転倒だけを強く罰すると、一歩も動かないかも。教え方から実験しよう。<a class="section-help-link" href="learn.html#reward" target="_blank" rel="opener">まず「報酬とは？」を一コマで見る</a></p></div>
       <div class="reward-layout">
         <div>
           <div class="reward-presets" aria-label="報酬のおすすめ設定"><button type="button" data-reward-preset="balanced" aria-pressed="true">バランス型</button><button type="button" data-reward-preset="speed" aria-pressed="false">前進だいじ</button><button type="button" data-reward-preset="survival" aria-pressed="false">転ばない</button><button type="button" data-reward-preset="efficient" aria-pressed="false">省エネ</button></div>
@@ -206,11 +207,12 @@
     </details>
 
     <details class="math-lab">
-      <summary>数学室：Qテーブルと更新式をのぞく</summary>
+      <summary id="mathTitle">数学室：Qテーブルと更新式をのぞく</summary>
       <div class="math-grid">
         <section class="q-story" id="qStory" data-state="" data-action="" aria-labelledby="qStoryTitle">
           <p class="panel-step">最後に学んだ1マスだけ</p><h2 id="qStoryTitle">AIのメモを1枚見る</h2>
           <p><b>Q値</b>は「この状態でこの行動をすると、この先も含めて何点くらいもらえそうか」という予想です。成功確率ではありません。</p>
+          <a class="section-help-link" href="learn.html#q" target="_blank" rel="opener">1回の経験で、この1マスが変わるところを見る →</a>
           <dl class="q-story-facts">
             <div><dt>状態</dt><dd id="qStoryState">まだ学習前</dd></div>
             <div><dt>選んだ行動</dt><dd id="qStoryAction">—</dd></div>
