@@ -1,0 +1,244 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="ころころウォーカーの報酬設計を、予想・一手の採点・5000回学習・3条件比較の順に体験する強化学習ガイド。">
+  <title>何をほめると、どんなAIに育つ？ | 家族のまなび帳</title>
+  <link rel="icon" href="../../../assets/icon.svg">
+  <link rel="stylesheet" href="../../../assets/family/style.css">
+  <link rel="stylesheet" href="../../../assets/family/navigation.css">
+  <link rel="stylesheet" href="../../../assets/reinforcement-walker/style.css?v=20261004-2">
+  <link rel="stylesheet" href="../../../assets/reinforcement-walker/help.css?v=20261004-4">
+  <link rel="stylesheet" href="../../../assets/reinforcement-walker/reward.css?v=20261004-1">
+  <noscript><style>.reward-lab,.reward-interactive-intro{display:none}.reward-print-guide{display:block}.reward-static-intro{display:inline}</style></noscript>
+</head>
+<body class="has-site-navigation walker-page walker-help-page walker-reward-page">
+  <a class="skip" href="#rewardGuideStart">報酬の実験へスキップ</a>
+  <nav class="site-return-nav" aria-label="サイト内の移動">
+    <a class="site-home-link" href="../../../index.html">サイトのトップ</a>
+    <a href="../index.html">教材一覧</a>
+    <a href="index.html" data-close-reward>ゲームへ戻る</a>
+  </nav>
+  <header class="masthead">
+    <a class="brand" href="../../../index.html"><span class="brand-icon">f.</span>家族のまなび帳</a>
+    <nav aria-label="家族サイト"><a href="../index.html">プログラミング</a><a href="../../../questions/index.html">日々の疑問</a></nav>
+  </header>
+
+  <main class="walker-wrap walker-help-wrap" id="main">
+    <div class="crumbs"><a href="../../../index.html">ホーム</a> / <a href="../index.html">プログラミング</a> / <a href="index.html">ころころウォーカー</a> / 報酬の設計</div>
+    <header class="walker-heading help-heading reward-heading">
+      <div>
+        <p class="eyebrow">REWARD DESIGN / ONE QUESTION AT A TIME</p>
+        <h1>何をほめると、どんなAIに育つ？</h1>
+        <p><span class="reward-interactive-intro">同じ棒人間、同じ地面、同じ5,000回。変えるのは、結果につける「採点表」だけです。</span><span class="reward-static-intro">下の6コマを順に追うと、採点表を直す実験を一覧できます。</span></p>
+      </div>
+      <a class="help-close-button" href="index.html#rewardTitle" data-close-reward>ゲームで採点を作る</a>
+    </header>
+
+    <aside class="help-model-note reward-model-note" id="rewardGuideStart" tabindex="-1" aria-label="この実験の前提">
+      <strong>このページで変えるものは、一つだけ</strong>
+      <p><b>体・地面・学習回数・練習用の乱数は同じ。</b> 報酬は感情的な「ほめ言葉」ではなく、結果へ返す数値です。これは固定した一組の乱数による教材例で、乱数や回数が変われば結果も変わります。</p>
+    </aside>
+
+    <div class="reward-sibling-link"><span>「報酬」の前に全体像を見たいときは</span><a href="learn.html#reward">AIの学び方6コマへ →</a></div>
+
+    <section class="help-lab reward-lab" id="rewardLab" data-reward-step="0" aria-labelledby="rewardLabTitle">
+      <header class="help-lab-header">
+        <div><p class="panel-step">採点の抜けを見つける6コマ</p><h2 id="rewardLabTitle">「安全」を数字にしたら、歩く？</h2></div>
+        <p>答えを先に読まず、予想してから一手ずつ採点し、最後に3つの学習結果を比べます。</p>
+      </header>
+
+      <div class="help-progress reward-progress">
+        <strong id="rewardStepCount">1 / 6</strong>
+        <div class="help-step-dots" id="rewardStepDots" role="group" aria-label="報酬設計のコマ"></div>
+      </div>
+
+      <div class="reward-fixed-strip" aria-label="比較中ずっと同じ条件">
+        <strong>ずっと同じ</strong>
+        <span>同じ体</span><span>同じ地面</span><span>同じ順番のゆらぎ（乱数）</span><span>各5,000回</span>
+        <b>採点表だけ変える</b>
+      </div>
+
+      <div class="help-stage-grid reward-stage-grid">
+        <figure class="help-scene-card reward-scene-card" tabindex="0">
+          <svg id="rewardScene" viewBox="0 0 760 330" role="img" aria-labelledby="rewardSceneTitle rewardSceneDesc">
+            <title id="rewardSceneTitle">採点表を見上げる棒人間</title>
+            <desc id="rewardSceneDesc">棒人間は同じ開始姿勢で立っています。まだ、どんな歩き方になるかは表示していません。</desc>
+            <defs>
+              <linearGradient id="rewardSky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#e6f2f0"/><stop offset="1" stop-color="#fff7e6"/></linearGradient>
+              <marker id="rewardArrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M0 0 L10 5 L0 10 Z" fill="#26718a"/></marker>
+            </defs>
+            <rect width="760" height="330" rx="18" fill="url(#rewardSky)"/>
+            <path d="M0 268 Q180 263 380 271 T760 265 V330 H0 Z" fill="#c7d6a2"/>
+            <path d="M0 268 Q180 263 380 271 T760 265" fill="none" stroke="#304b3c" stroke-width="5"/>
+            <line x1="202" y1="54" x2="202" y2="271" stroke="#7d9c94" stroke-width="2" stroke-dasharray="7 7"/>
+            <text x="146" y="43" class="reward-svg-small">同じSTART</text>
+            <g id="rewardGhost" class="reward-ghost" hidden>
+              <circle cx="202" cy="132" r="32"/><line x1="202" y1="164" x2="202" y2="216"/><polyline points="202,216 184,242 174,269"/><polyline points="202,216 220,242 232,269"/>
+            </g>
+            <g id="rewardFigure" transform="translate(202 269)">
+              <circle cx="0" cy="-137" r="34"/><circle class="reward-eye" cx="11" cy="-143" r="3.5"/>
+              <line x1="0" y1="-103" x2="0" y2="-52"/>
+              <polyline id="rewardLeftLeg" class="reward-limb reward-active-limb" points="0,-52 -17,-27 -29,0"/>
+              <polyline id="rewardRightLeg" class="reward-limb" points="0,-52 18,-26 31,0"/>
+              <polyline id="rewardLeftArm" class="reward-arm" points="0,-91 -24,-70 -37,-48"/>
+              <polyline id="rewardRightArm" class="reward-arm" points="0,-91 24,-70 37,-48"/>
+            </g>
+            <g id="rewardMotionArrow" hidden><line x1="250" y1="177" x2="408" y2="177" stroke="#26718a" stroke-width="8" stroke-linecap="round" marker-end="url(#rewardArrow)"/><text x="268" y="155" class="reward-svg-label">小さな一歩</text></g>
+            <g id="rewardFallMark" hidden><path d="M386 104 L438 156 M438 104 L386 156" fill="none" stroke="#b74f3d" stroke-width="12" stroke-linecap="round"/><text x="384" y="185" class="reward-svg-fail">転倒</text></g>
+            <g id="rewardBoard">
+              <rect x="468" y="50" width="238" height="171" rx="15" class="reward-board"/>
+              <text x="490" y="79" class="reward-svg-small" id="rewardBoardLabel">人の願い</text>
+              <text x="490" y="106" class="reward-svg-title" id="rewardBoardTitle">転ばず前へ歩いて</text>
+              <text x="490" y="137" class="reward-svg-value" id="rewardBoardForward">前進　？</text>
+              <text x="490" y="160" class="reward-svg-value" id="rewardBoardBalance">直立　？</text>
+              <text x="490" y="183" class="reward-svg-value" id="rewardBoardEnergy">力　？</text>
+              <text x="490" y="206" class="reward-svg-value" id="rewardBoardFall">転倒　？</text>
+            </g>
+            <g id="rewardScoreTag" hidden><rect x="286" y="212" width="157" height="43" rx="12" class="reward-score-tag"/><text x="306" y="240" id="rewardScoreText">報酬 +0.000</text></g>
+          </svg>
+          <figcaption id="rewardSceneCaption">人の願いは「転ばず前へ」。でも、AIへ渡るのは数字の採点表だけです。</figcaption>
+
+          <div class="reward-demo-panels">
+            <section class="reward-demo-panel reward-predict-panel" data-reward-panel="0" aria-labelledby="rewardPredictTitle">
+              <h3 id="rewardPredictTitle">「安全」を強くほめたら、どうすると思う？</h3>
+              <div class="reward-predictions" id="rewardPredictions" role="group" aria-label="AIの行動を予想する">
+                <button type="button" data-prediction="careful" aria-pressed="false"><b>ゆっくり歩く</b><small>慎重に少しずつ前へ</small></button>
+                <button type="button" data-prediction="still" aria-pressed="false"><b>その場で待つ</b><small>動かなければ転びにくい</small></button>
+                <button type="button" data-prediction="rush" aria-pressed="false"><b>大股で進む</b><small>早く終わらせようとする</small></button>
+              </div>
+              <p id="rewardPredictionFeedback">まず一つ予想してください。まだ結果は見せません。</p>
+            </section>
+
+            <section class="reward-demo-panel reward-sheet-panel" data-reward-panel="1" aria-labelledby="rewardSheetTitle" hidden>
+              <h3 id="rewardSheetTitle">人の願いを、AIへ渡す数字にしたつもり</h3>
+              <div class="reward-intent-bridge"><div><span>人の願い</span><b>転ばず、前へ歩いて</b></div><i aria-hidden="true">→</i><div><span>AIへ渡した採点</span><b>4項目の数字だけ</b></div></div>
+              <button class="reward-zero-discovery" id="rewardZeroButton" type="button" aria-describedby="rewardZeroHint"><span>前へ進む</span><strong>0 点 / m</strong><small>ここを押して、抜けを見つける</small></button>
+              <div class="reward-weight-list" aria-label="最初の採点表">
+                <div><span>直立を保つ</span><b>最大 +0.08 / 一手</b></div>
+                <div><span>力を使う</span><b>−0.12 × 操作コスト</b></div>
+                <div><span>転ぶ</span><b>転んだ瞬間 −35</b></div>
+              </div>
+              <p id="rewardZeroHint">「安全に」の数字はあります。では「歩いて」は、どこに入っているでしょう？</p>
+              <div class="reward-discovery" id="rewardZeroDiscovery" hidden><span>見つけた！</span><b>「転ばずに」は入れた。でも「前へ歩く」は0点のまま。</b></div>
+            </section>
+
+            <section class="reward-demo-panel reward-step-panel" data-reward-panel="2" aria-labelledby="rewardStepTitle" hidden>
+              <h3 id="rewardStepTitle">同じ開始場面で、二つの動きを採点する</h3>
+              <p>どちらも実際のゲームエンジンによる一手です。先に動きを選び、あとから点を開きます。</p>
+              <div class="reward-action-tests" role="group" aria-label="二つの動きを採点する">
+                <button type="button" data-score-action="step"><b>小さな一歩を採点</b><small>0.043 m 前進・転倒なし</small><span data-action-score="step">まだ採点していない</span></button>
+                <button type="button" data-score-action="wait"><b>踏ん張る（1手待つ）を採点</b><small>0 m・転倒なし</small><span data-action-score="wait">まだ採点していない</span></button>
+              </div>
+              <div class="reward-action-verdict" id="rewardActionVerdict" hidden><span>この採点表では</span><b>前へ出るより、その場で待つ方が高得点。</b><p>しかも待つたび直立点が入り、その先の合計でも差が広がります。AIが反抗したのではありません。</p></div>
+              <details class="reward-details"><summary>なぜこの点？ 4項目の内訳を見る</summary><div id="rewardTrialDetails"></div></details>
+              <div class="reward-q-bridge" id="rewardQBridge" hidden><span>一手の点は、どこへ行く？</span><p><b id="rewardQValues">Qメモを計算中</b> → 次は、高いQの動きを選びやすくなる</p><small>Q値＝「この場面でこの動きを選ぶと、この先どれくらい得しそうか」の予想点。</small></div>
+              <p class="reward-motion-links"><a href="help.html#push" target="_blank" rel="noopener">なぜ足を出すと進む？</a><a href="help.html#brace" target="_blank" rel="noopener">踏ん張る動きの意味は？</a></p>
+            </section>
+
+            <section class="reward-demo-panel reward-training-panel" data-reward-panel="3" aria-labelledby="rewardTrainingTitle" hidden>
+              <h3 id="rewardTrainingTitle">5,000回なら、願いを察して歩き出す？</h3>
+              <p>1回は、スタートから転倒・完走・時間切れまで。空の「経験メモ（Qテーブル）」から5,000回学び、最後に別の20回でテストします。</p>
+              <details class="reward-details"><summary>公平な比べ方を詳しく見る</summary><p>学習中のグラフはQ更新に使わない固定5条件。最後は別の20条件です。テストでは冒険せず、一番よさそうな動きだけを選び、Qも更新しません。</p></details>
+              <button class="reward-do-button" id="rewardTrainSafe" type="button">この採点で5,000回学習する</button>
+              <div class="reward-training-progress" id="rewardSafeProgress" hidden><div><span>学習中</span><b data-progress-label>0 / 5,000回</b></div><progress max="5000" value="0" aria-label="前進を採点しない条件の学習進捗"></progress></div>
+              <div class="reward-training-result" id="rewardSafeResult" hidden>
+                <div><span>距離の真ん中（中央値）</span><strong data-result="distance">0.00 m</strong></div>
+                <div><span>転倒</span><strong data-result="falls">0 / 20</strong></div>
+                <div><span>時間切れ</span><strong data-result="timeouts">20 / 20</strong></div>
+                <div><span>踏ん張る（待つ）割合</span><strong data-result="brace">100%</strong></div>
+                <p><b>この学習例の行動ルール：その場で待つ。</b> サボりではなく、この採点で点を守った結果です。</p>
+                <p id="rewardSafePredictionRecall">最初の予想と、実際の結果をここで比べます。</p>
+              </div>
+            </section>
+
+            <section class="reward-demo-panel reward-fix-panel" data-reward-panel="4" aria-labelledby="rewardFixTitle" hidden>
+              <h3 id="rewardFixTitle">採点表へ、一つだけ足すなら？</h3>
+              <div class="reward-one-change"><span>前進の点</span><b>0 / m</b><i aria-hidden="true">→</i><button type="button" id="rewardAddForward">+5 / mへ変える</button><small>ほかの3項目は同じ。完走ボーナスも、この前進係数の0.7倍（+3.5）になります。</small></div>
+              <p id="rewardResetReason">報酬を変えたら別の実験です。前のQテーブルを使い回さず、0へ戻します。+5は違いを見やすくする教材例で、唯一の正解ではありません。</p>
+              <button class="reward-do-button" id="rewardTrainBoth" type="button" disabled>Qを0へ戻して5,000回学習する</button>
+              <div class="reward-training-progress" id="rewardBothProgress" hidden><div><span>新しい採点で学習中</span><b data-progress-label>0 / 5,000回</b></div><progress max="5000" value="0" aria-label="前進と安全を採点する条件の学習進捗"></progress></div>
+              <div class="reward-training-result" id="rewardBothResult" hidden>
+                <div><span>距離の真ん中（中央値）</span><strong data-result="distance">—</strong></div>
+                <div><span>完走</span><strong data-result="finishes">—</strong></div>
+                <div><span>転倒</span><strong data-result="falls">—</strong></div>
+                <p><b>変えたのはAIの賢さではなく、採点表。</b> 「前へ」も数字に入れると、歩く工夫が学習対象になりました。</p>
+              </div>
+            </section>
+
+            <section class="reward-demo-panel reward-compare-panel" data-reward-panel="5" aria-labelledby="rewardCompareTitle" hidden>
+              <h3 id="rewardCompareTitle">安全・省エネを外し、前進だけをほめたら？</h3>
+              <p>最後に「前進だけ20点/m（完走+14）、ほかは0」も同じ条件で育て、3つを冒険なしで比べます。</p>
+              <button class="reward-do-button" id="rewardCompareButton" type="button">3つ目も5,000回学習して比べる</button>
+              <div class="reward-training-progress" id="rewardRushProgress" hidden><div><span>前進だけ採点で学習中</span><b data-progress-label>0 / 5,000回</b></div><progress max="5000" value="0" aria-label="前進だけを採点する条件の学習進捗"></progress></div>
+              <div class="reward-comparison" id="rewardComparison" hidden>
+                <div class="reward-replay-heading"><span>数字は20条件のまとめ／動きは同じ固定1条件の一例</span><button type="button" id="rewardReplayButton">3体をもう一度見る</button></div>
+                <p class="reward-prediction-recall" id="rewardPredictionRecall">最初の予想と、「前進を採点しない」で育った結果を比べます。</p>
+                <div class="reward-lanes" id="rewardLanes" aria-label="3つの採点で育った棒人間の比較"></div>
+                <div class="reward-metric-question"><p>どの違いも手掛かり。まず一つ選んで比べよう。</p><div id="rewardMetricChoices" role="group" aria-label="注目する比較指標"><button type="button" data-metric="distance" aria-pressed="false">進んだ距離</button><button type="button" data-metric="fall" aria-pressed="false">転倒・完走</button><button type="button" data-metric="effort" aria-pressed="false">使った力の合計</button></div></div>
+                <div class="reward-final-insight" id="rewardFinalInsight" hidden><span>選んだ指標で見つけた差</span><strong id="rewardMetricFinding">3つの結果を同じ物差しで比べます。</strong><p><b>ここでアハ！</b> AIは「安全に歩いて」という願いを読んだのではない。先の点ほど少し小さく数えた、点の合計を増やす方法を覚えた。</p><p class="reward-learning-loop">一手の結果 → 報酬 → Qの予想を少し直す → 次は高いQを選びやすくなる ↺</p><p>この実験のように、学習回数を増やすほど抜けのある採点にも上手に従うことがあります。だから「学習 → テスト → 想定外の攻略法 → 採点を直す」までが報酬設計です。</p></div>
+              </div>
+            </section>
+
+            <div class="reward-curve-wrap" id="rewardCurveWrap" hidden>
+              <div class="reward-curve-heading"><span>学習中、テスト距離はどう変わった？</span><small>Q更新しない固定5条件の中央値・500回ごと（狭い画面は横へ）</small></div>
+              <svg id="rewardCurve" viewBox="0 0 680 245" role="img" aria-labelledby="rewardCurveTitle rewardCurveDesc"><title id="rewardCurveTitle">学習回数とテスト距離</title><desc id="rewardCurveDesc">学習した採点条件ごとの、500回ごとのテスト距離を線で比べます。</desc></svg>
+              <div class="reward-curve-legend" id="rewardCurveLegend"></div>
+              <p class="reward-curve-note">途中で伸びたり崩れたりするのも学習の一部。線は途中確認の5条件、結果カードは最後にだけ使う20条件なので、終点の数字は少し違います。</p>
+            </div>
+          </div>
+        </figure>
+
+        <article class="help-explanation reward-explanation" aria-live="off">
+          <p class="help-question-label">このコマの問い</p>
+          <h3 id="rewardQuestion">「転ばない」を強くほめたら、AIはどうする？</h3>
+          <div class="help-frame-title"><span id="rewardFrameNumber">FRAME 1</span><strong id="rewardFrameTitle">答えを見る前に予想する</strong></div>
+          <p id="rewardFrameText">人は「転ばずに歩いて」と一文で言えます。でもAIが受け取るのは、結果につけた数字だけです。</p>
+          <dl class="help-observation">
+            <div><dt>見るところ</dt><dd id="rewardLookFor">自分の予想を、最後の実際の動きと比べる</dd></div>
+            <div><dt>今回変えるもの</dt><dd id="rewardChanged">まだ何も変えない。まず予想だけ</dd></div>
+          </dl>
+          <p class="help-takeaway"><span>このコマで分かること</span><b id="rewardTakeaway">人の願いと、AIへ渡した採点表は同じとは限らない。</b></p>
+          <p class="help-caution" id="rewardCaution">予想に正解・不正解をつけるのが目的ではありません。結果とのずれが、採点を考える入口です。</p>
+        </article>
+      </div>
+
+      <div class="help-controls reward-controls" role="group" aria-label="報酬設計の操作">
+        <button type="button" id="rewardPrev" aria-controls="rewardLab">← ひとつ前</button>
+        <button type="button" id="rewardNext" class="primary-help-control" aria-controls="rewardLab">予想を選ぶと次へ</button>
+        <button type="button" id="rewardReset" aria-controls="rewardLab">最初から</button>
+      </div>
+      <p class="help-keyboard-note">図や説明にフォーカスがあるときは、キーボードの ← → でも一コマずつ移動できます。学習・再生は自動で次のコマへ進みません。</p>
+      <p class="visually-hidden" id="rewardLive" role="status" aria-live="polite" aria-atomic="true">1コマ目。結果を見る前に予想します。</p>
+    </section>
+
+    <section class="help-print-guide reward-print-guide" aria-labelledby="rewardPrintTitle">
+      <header><p class="panel-step">紙・JavaScriptなしでもたどれる</p><h2 id="rewardPrintTitle">採点の抜けを直す6コマ</h2><p>同じ棒人間を、同じ乱数列で各5,000回学習させた固定条件の教材例です。乱数や回数で結果は変わります。</p></header>
+      <article class="help-print-topic"><h3>1．まず予想する</h3><ol><li data-reward-static-frame><b>問い：</b>「安全」を強くほめると、慎重に歩く・動かない・大股で進むのどれになるでしょう。</li></ol></article>
+      <article class="help-print-topic"><h3>2．採点表の抜けを見る</h3><ol><li data-reward-static-frame><b>最初の採点：</b>前進0/m（完走+0）、直立+0.08、力−0.12、転倒−35。「安全に」は数にしましたが、「前へ歩く」は0点です。</li></ol></article>
+      <article class="help-print-topic"><h3>3．同じ一手を採点する</h3><ol><li data-reward-static-frame><b>実エンジンの一手：</b>小さな一歩は約−0.04、踏ん張る（1手待つ）は約+0.07。最初0だったQメモも約−0.011と+0.020へ少し変わり、待つ方を選びやすくなります。</li></ol></article>
+      <article class="help-print-topic"><h3>4．抜けた採点で5,000回学ぶ</h3><ol><li data-reward-static-frame><b>この学習例の結果：</b>20条件すべてで0 m・転倒なし・時間切れ。AIは怠けたのではなく、「動かず点を守る」を学びました。</li></ol></article>
+      <article class="help-print-topic"><h3>5．前進点だけを0から5へ</h3><ol><li data-reward-static-frame><b>一つだけ修正：</b>前進+5/m（完走+3.5）へ変え、Qを0に戻して再学習すると、距離中央値約20.03 m、17/20完走。AIの賢さではなく採点を変えました。</li></ol></article>
+      <article class="help-print-topic"><h3>6．前進だけ20点とも比べる</h3><ol><li data-reward-static-frame><b>安全条件を外す：</b>前進+20/m（完走+14）、ほか0。この例では20/20転倒、距離中央値約4.68 m。前進だけでは安全な歩きと危険な突進を区別できません。</li></ol></article>
+      <p class="reward-print-aha"><b>ここでアハ：</b>AIは人の願いを察したのではなく、先の点ほど少し小さく数えた合計を増やす方法を覚えました。</p>
+    </section>
+
+    <section class="reward-next" aria-labelledby="rewardNextTitle">
+      <div><p class="panel-step">次は本物の実験へ</p><h2 id="rewardNextTitle">今度は、自分の採点表を作る</h2><p>前進・直立・使った力・転倒を一つずつ変え、学習を0へ戻して比べます。一度に全部変えないのが、原因を見つけるコツです。</p></div>
+      <a href="index.html#rewardTitle" data-close-reward><span>ころころウォーカーへ戻る</span><b>報酬デザイン研究所で試す →</b></a>
+    </section>
+
+    <details class="reward-adult-note">
+      <summary>大人向け：これは「reward hacking（報酬の抜け道）」？</summary>
+      <p>はい。AIは反抗したり、ずるを理解したりしたのではありません。渡された数字を増やそうと学習した結果、人の意図とずれた攻略法が生まれることがあります。各5,000回でも、転倒・完走・時間切れまでの長さが違うため、操作の総数は条件ごとに異なります。実際のAI開発でも、報酬・評価指標・複数のテスト条件を往復して設計します。</p>
+    </details>
+
+    <noscript><p class="help-noscript-note">JavaScriptが無効なので、上の静的6コマを表示しています。実際に動かす場合はJavaScriptを有効にするか、<a href="index.html#rewardTitle">ゲーム本編の報酬研究所</a>を使ってください。</p></noscript>
+  </main>
+
+  <footer class="footer"><span>家族のまなび帳<br>読んで、動かして、考える。</span><span><a href="index.html">ころころウォーカー</a> · <a href="learn.html">AIの学び方</a> · <a href="help.html#push">歩き方HELP</a></span></footer>
+  <script src="../../../assets/reinforcement-walker/engine.js?v=20261004-1"></script>
+  <script src="../../../assets/reinforcement-walker/reward.js?v=20261004-1"></script>
+</body>
+</html>
