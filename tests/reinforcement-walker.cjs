@@ -229,6 +229,8 @@ async function checkPageAndUi(){
   assert(staticDoc.getElementById('motionCause'),'foot-ground causality has a focused dynamic explanation');
   assert.strictEqual(staticDoc.querySelectorAll('.learning-entrances a').length,3,'help, hands-on discovery, and quick AI routes are visible together');
   assert(staticDoc.querySelector('.learning-entrances a[href^="help.html"]'),'the dedicated frame-by-frame help is a top-level route');
+  assert(staticDoc.querySelector('.learning-entrances a[href^="learn.html"]'),'the six-frame AI learning guide is a top-level route');
+  assert(staticDoc.querySelector('.idea-guide-link[href^="learn.html"]'),'the state-action-reward-Q summary links to the focused guide');
   assert(staticDoc.querySelector('[data-start-manual]'),'the discovery entry can restore manual mode after AI activity');
   assert(html.indexOf('id="manualControls"')<html.indexOf('id="movementTheory"'),'the first manual controls appear before the detailed body explanation');
   assert(staticDoc.getElementById('replayToolbar').hidden,'replay controls stay out of the way before AI learning');

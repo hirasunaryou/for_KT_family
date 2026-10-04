@@ -139,7 +139,7 @@ const server=http.createServer((request,response)=>{
     await game.screenshot({path:'test-results/walker-game-help-entry-390.png'});
     await game.evaluate(()=>{window.__walkerSessionMarker='keep-me';});
     const popupPromise=context.waitForEvent('page');
-    await game.locator('.recommended-entrance').click();
+    await game.locator('.learning-entrances a[href^="help.html"]').click();
     const help=await popupPromise;
     await help.waitForLoadState('domcontentloaded');
     await expect(help).toHaveURL(/help\.html#push$/);

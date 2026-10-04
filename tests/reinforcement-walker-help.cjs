@@ -43,7 +43,9 @@ function checkStaticPage(){
   assert(/target="_blank" rel="opener"/.test(gameHtml),'help opens separately so an in-memory learning session is preserved');
   assert(gameHtml.includes('id="motionHelpLink"'),'the live result has a contextual help entrance');
   assert(programming.includes('reinforcement-walker/help.html#push'),'the programming index offers the guide as a separate entrance');
-  assert(helpHtml.includes('engine.js?v=20261004-1')&&helpHtml.includes('help.js?v=20261004-3'),'help loads versioned local assets in dependency order');
+  assert(programming.includes('reinforcement-walker/learn.html'),'the programming index offers the AI learning guide as a separate entrance');
+  assert(helpHtml.includes('learn.html'),'the walking guide leads into the AI learning guide without returning to the crowded game page');
+  assert(helpHtml.includes('engine.js?v=20261004-1')&&helpHtml.includes('help.js?v=20261004-3'),'help loads versioned local scripts in dependency order');
   dom.window.close();
 }
 
