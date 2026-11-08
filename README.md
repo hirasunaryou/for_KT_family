@@ -4,6 +4,8 @@
 
 **[家族の入口](https://hirasunaryou.github.io/for_KT_family/)**
 
+- [AIで開発するためのメモ帳](https://hirasunaryou.github.io/for_KT_family/ai-development/)：AGENTS.md、アプリ改善、マニュアル作成の雛形を閲覧・コピー・ダウンロードできます。
+
 - [Python新テーマ：迷路メーカー＆脱出ロボット](https://hirasunaryou.github.io/for_KT_family/study/programming/python-maze-robot/)
 - [Python続編：サイコロ金庫破り](https://hirasunaryou.github.io/for_KT_family/study/programming/python-dice-vault/)
 - [Python：JupyterLabでサイコロ探偵を作る](https://hirasunaryou.github.io/for_KT_family/study/programming/python-dice-jupyter/)
@@ -26,6 +28,7 @@
 | 場所 | 役割 |
 | --- | --- |
 | `index.html` | 家族全体の入口・おすすめ教材 |
+| `ai-development/index.html` | AI開発のプロンプト・AGENTS.mdを探してコピーするメモ帳 |
 | `study/index.html` | 勉強の入口・教科一覧 |
 | `study/math/index.html` | 数学の単元一覧 |
 | `study/math/square-roots/index.html` | 平方根の教材 |
@@ -120,6 +123,10 @@ JupyterLabの左側で `python_games/dice_detective/` を作り、以下を同�
 進み具合の保存キーは `family-python-dice-jupyter-v1`（説明サイトのチェック）と `family-python-dice-v1`（ブラウザ実行版）。Notebook本体はJupyterLab側で保存し、サイトのチェックとは別です。以前のSites版のブラウザ記録は異なるオリジンなので自動移行しません。
 
 ブラウザ単体HTMLは `python3 scripts/build-python-dice-portable.py` で再生成。JupyterLab説明サイトは手書きの静的HTML/JS/CSSで、ビルドは不要です。配置の詳細は [materials/python-dice/README.md](materials/python-dice/README.md) に記載しています。
+
+## AI開発メモ帳の更新
+
+`ai-development/index.html` の `templates` に、雛形の内容とファイル名を格納しています。新しい雛形を追加する際はカード・ページ内リンク・コピーボタンの番号とデータを対応させてください。公開ページのため、認証情報や業務上の非公開情報を収録しないでください。この初版は添付いただいた3点セットをWebで使いやすい長さに整理した版です。元の詳細版は別資料として保管してください。
 
 ## 開発
 
