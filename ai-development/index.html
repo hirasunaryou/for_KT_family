@@ -1,0 +1,132 @@
+<!doctype html>
+<html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="description" content="AIで開発するためのプロンプトやAGENTS.mdを、すぐ探してコピーできるメモ帳。"><title>AIで開発するためのメモ帳 | 家族のまなび帳</title><link rel="icon" href="../assets/icon.svg"><link rel="stylesheet" href="../assets/family/style.css"><link rel="stylesheet" href="../assets/family/navigation.css">
+<style>
+.memo-intro{padding:36px 0 18px;max-width:760px}.memo-intro h1{font-size:clamp(28px,4vw,44px)}.memo-intro p{color:var(--muted);font-size:15px}
+.memo-jumps{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin:18px 0 32px}.memo-jumps a{display:block;border:1px solid var(--line);border-radius:10px;background:var(--white);padding:16px;text-decoration:none;font-weight:700}.memo-jumps a small{display:block;font-size:12px;font-weight:400;line-height:1.6;margin-top:4px}
+.memo-card{border:1px solid var(--line);background:var(--white);border-radius:14px;padding:27px;margin:18px 0 27px;scroll-margin-top:95px}.memo-top{display:flex;justify-content:space-between;gap:20px}.memo-top h2{font-size:24px;margin:7px 0}.memo-top p{font-size:14px;color:var(--muted)}.memo-number{font-family:Georgia,serif;font-size:33px;color:#9bada1}.memo-actions{display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;padding:14px 0;margin:10px 0;border-top:1px solid var(--line);border-bottom:1px solid var(--line)}.memo-actions>div{display:flex;gap:8px;flex-wrap:wrap}.memo-actions code{font-size:13px;overflow-wrap:anywhere}.memo-actions button{background:var(--green);border:1px solid var(--green);color:white;border-radius:7px;padding:11px 14px;min-height:44px;font-size:13px}.memo-actions button.secondary{background:white;color:var(--green)}.memo-card summary{padding:12px 0;font-weight:600;font-size:14px}.memo-card pre{white-space:pre-wrap;overflow-wrap:anywhere;max-height:540px;overflow:auto;background:#f4f6f0;border:1px solid var(--line);padding:18px;border-radius:8px;font:13px/1.85 ui-monospace,Menlo,Consolas,monospace}.memo-help{border-left:3px solid var(--green);padding:10px 18px;background:#e9efe4;border-radius:5px;font-size:14px}.memo-status{min-height:28px;font-size:13px;color:var(--green)}@media(max-width:680px){.memo-jumps{grid-template-columns:1fr}.memo-card{padding:19px}.memo-top h2{font-size:21px}.memo-card pre{font-size:12px}}@media print{.memo-jumps,.memo-actions button,.site-return-nav{display:none!important}.memo-card pre{max-height:none;overflow:visible}.memo-card details{display:block}.memo-card details:not([open])>pre{display:block!important}}
+</style></head><body class="has-site-navigation"><a class="skip" href="#main">本文へスキップ</a><nav class="site-return-nav" aria-label="サイト内の移動"><a class="site-home-link" href="../index.html">サイトのトップ</a></nav><header class="masthead"><a class="brand" href="../index.html"><span class="brand-icon">f.</span>家族のまなび帳</a><nav aria-label="家族サイト"><a href="../study/index.html">勉強</a><a href="../questions/index.html">日々の疑問</a></nav></header><main class="wrap" id="main"><div class="crumbs"><a href="../index.html">ホーム</a> / AIで開発するためのメモ帳</div><header class="memo-intro"><p class="eyebrow">AI DEVELOPMENT NOTEBOOK</p><h1>AIで開発するための<br>メモ帳</h1><p>良いプロンプトと開発ルールを、使いたいときにすぐ見つける。コピーして、対象のリポジトリや作業内容を書き換えるだけで使える雛形集です。</p></header>
+<nav class="memo-jumps" aria-label="雛形へ移動"><a href="#template-1">01 AGENTS.md<small>開発方針を継続して伝える</small></a><a href="#template-2">02 アプリ改善<small>調査から修正・検証まで</small></a><a href="#template-3">03 マニュアル<small>初めて使う人にも伝わる</small></a></nav>
+<p class="memo-help"><strong>使い方：</strong>「全文をコピー」を押してAIとの会話へ貼り付け、［記入］を埋めます。AGENTS.mdは既存ファイルを上書きせず、必要な項目を統合してください。公開サイトなので秘密情報は貼り付けないでください。</p><p class="memo-status" id="status" role="status" aria-live="polite"></p><section class="memo-card" id="template-1" aria-labelledby="title-1"><div class="memo-top"><div><span class="eyebrow">TEMPLATE 01 · 設計・UX・品質</span><h2 id="title-1">継続して守る開発方針</h2><p>各リポジトリの既存方針と統合して使う、利用者目線の開発ルール。</p></div><span class="memo-number">01</span></div><div class="memo-actions"><code>AGENTS.md</code><div><button type="button" data-copy="0">全文をコピー</button><button type="button" class="secondary" data-download="0">ファイル保存</button></div></div><details><summary>本文を読む・編集前に確認する</summary><pre id="source-0"># アプリ開発・改善の共通方針
+
+このファイルは継続的な開発方針です。既存のAGENTS.mdやプロジェクト固有のルールを読み、上書きせず適切に統合してください。
+
+## 1. 利用者と目的から設計
+- 初見・ときどき使う利用者も、何をしたいかから始められること。
+- 画面には現在の対象・状態・次の操作・保存先を必要な場所に示す。
+- 機能は削りすぎない。頻用操作を隠さず、高度な設定は段階的に示す。
+- 新規作成→入力→作業→確認→保存→再開までを一つの体験にする。
+
+## 2. 最初の一歩と日常の操作
+- 空画面に開始方法と実際に使える入力例を示す。
+- 初回だけの設定と毎回の作業を分け、登録済みの設定を再利用可能にする。
+- 安全な初期値を用意し、変更したときの意味を説明する。
+- ファイル移動・不足・失敗・再起動から復帰できるようにする。
+
+## 3. 状態と用語を一致させる
+- 入力途中・プレビュー・採用・保存済み・完了を区別する。
+- 一時保存と正式結果の保存、コピーと参照と同期を混同しない。
+- 操作名は本当に実行することを示す。「自動」「完了」を誤用しない。
+- 取り消せる範囲と失敗時の次の手順を示す。
+
+## 4. データと再現性
+- 元データ・設定・正式な結果・キャッシュを区別する。
+- 保存先を事前に伝え、重複・移動・対応するファイルのルールを統一する。
+- 結果と入力版・処理条件の関係を追跡できるようにする。
+- 既存データの互換性を壊す変更は影響と移行方法を確認する。
+
+## 5. 軽さと進捗
+- 重い処理が画面を固めないようにする。無駄な全件再処理を避ける。
+- 長時間処理には現在の工程・処理件数・経過時間・結果を示す。
+- 根拠のない進捗率や残り時間を表示しない。
+- キャンセルと再開、古い非同期結果の誤上書きに注意する。
+
+## 6. 画面とアクセシビリティ
+- 画像・図・表を必要な大きさで閲覧できるようにする。
+- 小さい画面・文字拡大・長いファイル名でも重要な操作へ届くこと。
+- 色だけで状態を伝えず、キーボード・タッチ操作にも配慮する。
+
+## 7. 検証と保守性
+- 必須検証と任意点検を区別し、不必要な確認ダイアログを増やさない。
+- UI・状態管理・計算・保存・外部連携の責務を分ける。
+- コードの可読性、変更容易性、テスト用データの独立性を重視する。
+- ログに機密情報を含めず、失敗の原因と再開方法を示す。
+
+## 8. マニュアルと完了
+- 機能名だけでなく「この目的ならこの手順」で説明する。
+- 現行のUI・実際の保存結果に合わせ、変更時にマニュアルも更新する。
+- 代表的な操作の開始から保存・再開まで確認する。
+- 実施した検証・未確認環境・残課題を区別して報告する。
+- コミット・公開・マージは依頼された権限と範囲に従う。</pre></details></section>
+<section class="memo-card" id="template-2" aria-labelledby="title-2"><div class="memo-top"><div><span class="eyebrow">TEMPLATE 02 · UX改善・リファクタリング</span><h2 id="title-2">使いやすさの改善を依頼</h2><p>アプリを調査し、課題を特定して修正・テストまで進めてもらう指示文。</p></div><span class="memo-number">02</span></div><div class="memo-actions"><code>01_App_Improvement_Prompt.txt</code><div><button type="button" data-copy="1">全文をコピー</button><button type="button" class="secondary" data-download="1">ファイル保存</button></div></div><details><summary>本文を読む・編集前に確認する</summary><pre id="source-1">このアプリの使いやすさと保守性を、実装まで含めて改善してください。機能を豊富に保ちながら、初見の利用者でも目的から入り、迷わず保存・再開できる体験を目指します。
+
+【対象：分かる範囲で記入】
+- アプリ／リポジトリ：［記入］
+- 主な利用者・利用頻度：［記入］
+- 完成させたい作業・成果物：［記入］
+- 困っていること・スクリーンショット：［任意］
+- 守るべき既存機能・データ形式・対応環境：［記入］
+- 変更・公開・マージの許可範囲：［記入］
+
+未記入箇所は既存コードやREADMEから調べ、仮定を明示して進めてください。既存のAGENTS.mdがある場合は最初に確認してください。
+
+【進め方】
+1. 起動方法、現在の画面、主な処理、保存形式と既存テストを把握する。
+2. 代表的な利用目的を2〜4つ選び、初回起動→入力→作業→保存→再開までを確認する。
+3. 問題ごとに「目的／現在の挙動／困る理由／根拠／改善案／影響範囲」を整理する。推測と実測を区別する。
+4. データ喪失・進行不能、頻発する迷い・重さ、表示表現の順に優先し、実装する。
+5. 変更範囲をテストし、説明書・必要な開発方針を更新する。提案だけで終わらない。
+
+【重点確認】
+- 初見でも目的から始められるか。初回設定と日常操作は分離されているか。
+- 頻用操作が埋もれず、保存・決定・取消が見つかるか。
+- 入力途中、候補、採用、保存済み、完了の区別は正しいか。
+- 元データと正式結果、コピー・参照・同期の意味を取り違えないか。
+- ファイルの移動・不足、エラー・キャンセルから安全に復帰できるか。
+- 読み込みや再描画に不要な全件処理がないか。長い処理の工程が見えるか。
+- 小画面・文字拡大・大きい画像や図に対応しているか。
+- UI、処理、保存、外部連携が適切に分離されているか。
+- ログに機密情報を含めず、ユーザーが問題を説明できるか。
+
+【変更と検証】
+必要な機能を削る・全面改修する・確認ダイアログを増やすだけで解決しないでください。既存の保存データとの互換性を確認してください。通常操作、保存と再開、失敗、画面サイズ、非同期競合を必要に応じて検証し、未検証の実機・精度を検証済みと書かないでください。
+
+【成果物】
+- 修正したコードと必要なテスト
+- 使いやすくなった点と理由、確認結果、残課題
+- 必要なREADME・ヘルプ・AGENTS.mdの変更
+- 更新と操作確認の具体的な手順
+
+最初に短く現状と計画を説明し、そのまま調査・実装・検証を進めてください。</pre></details></section>
+<section class="memo-card" id="template-3" aria-labelledby="title-3"><div class="memo-top"><div><span class="eyebrow">TEMPLATE 03 · ヘルプ・手順書</span><h2 id="title-3">図入りマニュアルを依頼</h2><p>初めて使う人が実画面と具体例で操作を再現できるHTMLマニュアル。</p></div><span class="memo-number">03</span></div><div class="memo-actions"><code>02_Illustrated_Manual_Prompt.txt</code><div><button type="button" data-copy="2">全文をコピー</button><button type="button" class="secondary" data-download="2">ファイル保存</button></div></div><details><summary>本文を読む・編集前に確認する</summary><pre id="source-2">このアプリについて、初めて使う人が自分で操作できる図入りHTMLマニュアルを作成してください。準備するもの、押す場所、入力例、起こる変化、保存結果、再開まで示してください。
+
+【対象：分かる範囲で記入】
+- アプリ／リポジトリ：［記入］
+- 主な読者と利用環境：［記入］
+- マニュアルで達成したい作業：［記入］
+- 特に詳しく説明したい場面：［任意］
+- 保存先・公開／配布の許可範囲：［記入］
+
+【調査】
+対象コミット、起動方法、実装済み機能、実際のUI名、入力形式、保存先、再開方法、失敗時の状態をコード・実行環境から確認してください。未実装機能や架空の画面を実在すると書かないでください。
+
+【構成】
+最初に何ができるかと、最短の成功体験を示してください。次に目的別に、初回準備、新規作業、既存データの取込、日常作業、AIや自動処理、成果の保存・共有、失敗からの復帰を説明してください。存在しない機能の章は作らなくて構いません。
+
+【各手順に含めること】
+- 目的・開始画面・準備物
+- 実際の項目名と入力例による操作
+- 画面の変化と作成されるファイル・保存場所
+- 成功したことの確認方法
+- 次の作業、途中終了後の再開、よくある間違い
+
+【画像・サンプル】
+可能ならアプリを起動して現在の画面を撮り、操作対象を拡大・注釈で示してください。例示用データは別に用意し、元のデータや設定を変更しないこと。個人情報・認証情報・機密情報を画像に写さないこと。実画面を撮れなかった箇所は模式図と明記し、未確認を検証済みとしないでください。
+
+【HTML要件】
+日本語、目次と章間リンク、読みやすい文字サイズ、PCとスマートフォンへの対応、画像の拡大、印刷可読性。オフライン利用を想定し外部CDNに依存しない単体HTMLを基本としてください。長い表やコードが画面全体を横へはみ出さないようにしてください。
+
+【検証と成果物】
+代表的な手順の入力から保存まで、実装と説明を照合してください。ボタン名、保存先、章リンク、画像の欠落を点検し、確認できないOSや端末は明記してください。HTMLマニュアルと更新用素材、検証結果、説明のしにくさから見つかったUI改善候補を残してください。
+
+マニュアル作成を中心に進め、大きな機能変更は別の改善候補として扱ってください。</pre></details></section><p><a href="../index.html">← サイトのトップへ戻る</a></p></main><footer class="footer"><span>家族のまなび帳<br>読んで、動かして、考える。</span><span><a href="../index.html">ホーム</a> · <a href="../study/index.html">勉強</a> · <a href="../questions/index.html">日々の疑問</a></span></footer>
+<script>const templates=[{"file":"AGENTS.md","content":"# アプリ開発・改善の共通方針\n\nこのファイルは継続的な開発方針です。既存のAGENTS.mdやプロジェクト固有のルールを読み、上書きせず適切に統合してください。\n\n## 1. 利用者と目的から設計\n- 初見・ときどき使う利用者も、何をしたいかから始められること。\n- 画面には現在の対象・状態・次の操作・保存先を必要な場所に示す。\n- 機能は削りすぎない。頻用操作を隠さず、高度な設定は段階的に示す。\n- 新規作成→入力→作業→確認→保存→再開までを一つの体験にする。\n\n## 2. 最初の一歩と日常の操作\n- 空画面に開始方法と実際に使える入力例を示す。\n- 初回だけの設定と毎回の作業を分け、登録済みの設定を再利用可能にする。\n- 安全な初期値を用意し、変更したときの意味を説明する。\n- ファイル移動・不足・失敗・再起動から復帰できるようにする。\n\n## 3. 状態と用語を一致させる\n- 入力途中・プレビュー・採用・保存済み・完了を区別する。\n- 一時保存と正式結果の保存、コピーと参照と同期を混同しない。\n- 操作名は本当に実行することを示す。「自動」「完了」を誤用しない。\n- 取り消せる範囲と失敗時の次の手順を示す。\n\n## 4. データと再現性\n- 元データ・設定・正式な結果・キャッシュを区別する。\n- 保存先を事前に伝え、重複・移動・対応するファイルのルールを統一する。\n- 結果と入力版・処理条件の関係を追跡できるようにする。\n- 既存データの互換性を壊す変更は影響と移行方法を確認する。\n\n## 5. 軽さと進捗\n- 重い処理が画面を固めないようにする。無駄な全件再処理を避ける。\n- 長時間処理には現在の工程・処理件数・経過時間・結果を示す。\n- 根拠のない進捗率や残り時間を表示しない。\n- キャンセルと再開、古い非同期結果の誤上書きに注意する。\n\n## 6. 画面とアクセシビリティ\n- 画像・図・表を必要な大きさで閲覧できるようにする。\n- 小さい画面・文字拡大・長いファイル名でも重要な操作へ届くこと。\n- 色だけで状態を伝えず、キーボード・タッチ操作にも配慮する。\n\n## 7. 検証と保守性\n- 必須検証と任意点検を区別し、不必要な確認ダイアログを増やさない。\n- UI・状態管理・計算・保存・外部連携の責務を分ける。\n- コードの可読性、変更容易性、テスト用データの独立性を重視する。\n- ログに機密情報を含めず、失敗の原因と再開方法を示す。\n\n## 8. マニュアルと完了\n- 機能名だけでなく「この目的ならこの手順」で説明する。\n- 現行のUI・実際の保存結果に合わせ、変更時にマニュアルも更新する。\n- 代表的な操作の開始から保存・再開まで確認する。\n- 実施した検証・未確認環境・残課題を区別して報告する。\n- コミット・公開・マージは依頼された権限と範囲に従う。"},{"file":"01_App_Improvement_Prompt.txt","content":"このアプリの使いやすさと保守性を、実装まで含めて改善してください。機能を豊富に保ちながら、初見の利用者でも目的から入り、迷わず保存・再開できる体験を目指します。\n\n【対象：分かる範囲で記入】\n- アプリ／リポジトリ：［記入］\n- 主な利用者・利用頻度：［記入］\n- 完成させたい作業・成果物：［記入］\n- 困っていること・スクリーンショット：［任意］\n- 守るべき既存機能・データ形式・対応環境：［記入］\n- 変更・公開・マージの許可範囲：［記入］\n\n未記入箇所は既存コードやREADMEから調べ、仮定を明示して進めてください。既存のAGENTS.mdがある場合は最初に確認してください。\n\n【進め方】\n1. 起動方法、現在の画面、主な処理、保存形式と既存テストを把握する。\n2. 代表的な利用目的を2〜4つ選び、初回起動→入力→作業→保存→再開までを確認する。\n3. 問題ごとに「目的／現在の挙動／困る理由／根拠／改善案／影響範囲」を整理する。推測と実測を区別する。\n4. データ喪失・進行不能、頻発する迷い・重さ、表示表現の順に優先し、実装する。\n5. 変更範囲をテストし、説明書・必要な開発方針を更新する。提案だけで終わらない。\n\n【重点確認】\n- 初見でも目的から始められるか。初回設定と日常操作は分離されているか。\n- 頻用操作が埋もれず、保存・決定・取消が見つかるか。\n- 入力途中、候補、採用、保存済み、完了の区別は正しいか。\n- 元データと正式結果、コピー・参照・同期の意味を取り違えないか。\n- ファイルの移動・不足、エラー・キャンセルから安全に復帰できるか。\n- 読み込みや再描画に不要な全件処理がないか。長い処理の工程が見えるか。\n- 小画面・文字拡大・大きい画像や図に対応しているか。\n- UI、処理、保存、外部連携が適切に分離されているか。\n- ログに機密情報を含めず、ユーザーが問題を説明できるか。\n\n【変更と検証】\n必要な機能を削る・全面改修する・確認ダイアログを増やすだけで解決しないでください。既存の保存データとの互換性を確認してください。通常操作、保存と再開、失敗、画面サイズ、非同期競合を必要に応じて検証し、未検証の実機・精度を検証済みと書かないでください。\n\n【成果物】\n- 修正したコードと必要なテスト\n- 使いやすくなった点と理由、確認結果、残課題\n- 必要なREADME・ヘルプ・AGENTS.mdの変更\n- 更新と操作確認の具体的な手順\n\n最初に短く現状と計画を説明し、そのまま調査・実装・検証を進めてください。"},{"file":"02_Illustrated_Manual_Prompt.txt","content":"このアプリについて、初めて使う人が自分で操作できる図入りHTMLマニュアルを作成してください。準備するもの、押す場所、入力例、起こる変化、保存結果、再開まで示してください。\n\n【対象：分かる範囲で記入】\n- アプリ／リポジトリ：［記入］\n- 主な読者と利用環境：［記入］\n- マニュアルで達成したい作業：［記入］\n- 特に詳しく説明したい場面：［任意］\n- 保存先・公開／配布の許可範囲：［記入］\n\n【調査】\n対象コミット、起動方法、実装済み機能、実際のUI名、入力形式、保存先、再開方法、失敗時の状態をコード・実行環境から確認してください。未実装機能や架空の画面を実在すると書かないでください。\n\n【構成】\n最初に何ができるかと、最短の成功体験を示してください。次に目的別に、初回準備、新規作業、既存データの取込、日常作業、AIや自動処理、成果の保存・共有、失敗からの復帰を説明してください。存在しない機能の章は作らなくて構いません。\n\n【各手順に含めること】\n- 目的・開始画面・準備物\n- 実際の項目名と入力例による操作\n- 画面の変化と作成されるファイル・保存場所\n- 成功したことの確認方法\n- 次の作業、途中終了後の再開、よくある間違い\n\n【画像・サンプル】\n可能ならアプリを起動して現在の画面を撮り、操作対象を拡大・注釈で示してください。例示用データは別に用意し、元のデータや設定を変更しないこと。個人情報・認証情報・機密情報を画像に写さないこと。実画面を撮れなかった箇所は模式図と明記し、未確認を検証済みとしないでください。\n\n【HTML要件】\n日本語、目次と章間リンク、読みやすい文字サイズ、PCとスマートフォンへの対応、画像の拡大、印刷可読性。オフライン利用を想定し外部CDNに依存しない単体HTMLを基本としてください。長い表やコードが画面全体を横へはみ出さないようにしてください。\n\n【検証と成果物】\n代表的な手順の入力から保存まで、実装と説明を照合してください。ボタン名、保存先、章リンク、画像の欠落を点検し、確認できないOSや端末は明記してください。HTMLマニュアルと更新用素材、検証結果、説明のしにくさから見つかったUI改善候補を残してください。\n\nマニュアル作成を中心に進め、大きな機能変更は別の改善候補として扱ってください。"}];const status=document.getElementById('status');function note(s){status.textContent=s}async function copy(i){const s=templates[i].content;try{await navigator.clipboard.writeText(s);note('全文をコピーしました。［記入］を埋めて使ってください。')}catch(e){const pre=document.getElementById('source-'+i);pre.closest('details').open=true;const range=document.createRange();range.selectNodeContents(pre);const sel=getSelection();sel.removeAllRanges();sel.addRange(range);note('本文を選択しました。コピー操作を使ってください。')}}function download(i){const t=templates[i],url=URL.createObjectURL(new Blob([t.content],{type:'text/plain;charset=utf-8'})),a=document.createElement('a');a.href=url;a.download=t.file;a.click();URL.revokeObjectURL(url);note(t.file+' を保存しました。')}document.querySelectorAll('[data-copy]').forEach(b=>b.addEventListener('click',()=>copy(Number(b.dataset.copy))));document.querySelectorAll('[data-download]').forEach(b=>b.addEventListener('click',()=>download(Number(b.dataset.download))));</script></body></html>
